@@ -343,11 +343,19 @@
 </head>
 <body>
 
+
+
+    
    <div class="back-home-container">
-       <a href="index.html" class="btn-home" id="homeBtn">
+       <a href="../index.html" class="btn-home" id="homeBtn">
            <span>←</span> Volver al inicio
        </a>
    </div>
+
+
+
+
+    
 
     <div class="bg-animation"></div>
     <canvas id="canvas3d"></canvas>
@@ -683,7 +691,7 @@
                 fecha: new Date().toLocaleString()
             });
 
-            window.location.href = `panel_administrador.html?${params.toString()}`;
+            window.location.href = `html/panel_administrador.html?${params.toString()}`;
         }
 
         const scene = new THREE.Scene();

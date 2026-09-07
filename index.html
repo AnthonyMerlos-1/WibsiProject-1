@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WibsiProject</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="style.css">
     <link rel="icon" href="img/logwiti.png" type="image/png">
     <style>
         /* --- CORRECCIÓN DE PESTAÑA BLANCA AL RECARGAR --- */
@@ -273,204 +273,6 @@
                 max-width: 60%;
             }
         }
-
-        /* =====================================================
-           INICIO — AJUSTES SOLO PARA MÓVIL (no afecta a PC)
-           Todo lo de aquí abajo va dentro de @media (max-width: 900px)
-           así que en pantallas grandes se ignora por completo.
-        ===================================================== */
-        @media (max-width: 900px) {
-
-            /* --- Botón hamburguesa (solo visible en móvil) --- */
-            .btn-menu-movil {
-                display: flex !important;
-                align-items: center;
-                justify-content: center;
-                width: 40px;
-                height: 40px;
-                background: rgba(255,255,255,0.08);
-                border: 1px solid rgba(255,255,255,0.1);
-                border-radius: 8px;
-                color: #fff;
-                font-size: 18px;
-                cursor: pointer;
-                flex-shrink: 0;
-            }
-
-            /* --- Topbar: todo en una fila que se acomoda, sin desbordar --- */
-            .topbar {
-                display: flex !important;
-                flex-wrap: nowrap !important;
-                align-items: center !important;
-                gap: 8px !important;
-                padding: 10px 12px !important;
-                overflow: hidden;
-            }
-            .topbar .brand-sub { display: none !important; }
-            .topbar .brand-name { font-size: 15px !important; }
-
-            .topbar .search-box {
-                order: 3;
-                width: 100% !important;
-                flex: 1 1 100% !important;
-                margin-top: 8px;
-            }
-
-            .topbar .top-actions {
-                order: 4;
-                width: 100%;
-                flex: 1 1 100%;
-                display: flex !important;
-                flex-wrap: nowrap !important;
-                overflow-x: auto !important;
-                -webkit-overflow-scrolling: touch;
-                gap: 8px !important;
-                margin-top: 8px;
-                padding-bottom: 4px;
-            }
-            .topbar .top-actions::-webkit-scrollbar { height: 3px; }
-            .topbar .top-actions .top-button {
-                flex: 0 0 auto !important;
-                white-space: nowrap;
-                padding: 8px 10px !important;
-                font-size: 12px !important;
-            }
-            /* En pantallas muy chicas, ocultamos el texto y dejamos solo el icono */
-            @media (max-width: 420px) {
-                .topbar .top-actions .top-button span { display: none; }
-            }
-
-            /* --- Layout general: la barra lateral se convierte en menú deslizable --- */
-            .app {
-                display: block !important;
-                grid-template-columns: none !important;
-                transform: none !important;
-                filter: none !important;
-            }
-            /* Salvaguarda: si el body/html tuviera transform o filter, el menú
-               (position: fixed) quedaría "atrapado" dentro y no se vería bien. */
-            html, body {
-                transform: none !important;
-                filter: none !important;
-            }
-
-            /* CORRECCIÓN: forzamos que el menú SIEMPRE sea visible como bloque
-               (por si el CSS original lo pone en display:none en móvil),
-               y lo anclamos a la DERECHA para que se despliegue de derecha a izquierda. */
-            .sidebar {
-                display: flex !important;
-                flex-direction: column !important;
-                visibility: visible !important;
-                position: fixed !important;
-                top: 0 !important;
-                right: 0 !important;
-                left: auto !important;
-                height: 100vh !important;
-                width: 78vw !important;
-                max-width: 300px;
-                z-index: 4000 !important;
-                overflow-y: auto;
-                background: var(--sidebar-bg, #1a1a1a);
-                transform: translateX(100%);
-                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                box-shadow: -6px 0 24px rgba(0,0,0,0.5);
-            }
-            .sidebar.sidebar-abierto {
-                transform: translateX(0) !important;
-            }
-
-            /* Fondo oscuro detrás del menú cuando está abierto */
-            .overlay-menu-movil {
-                display: none;
-                position: fixed;
-                inset: 0;
-                background: rgba(0,0,0,0.55);
-                z-index: 3500;
-                opacity: 0;
-                transition: opacity 0.3s ease;
-            }
-            .overlay-menu-movil.activo {
-                display: block;
-                opacity: 1;
-            }
-
-            .main {
-                width: 100% !important;
-                padding: 12px !important;
-            }
-
-            /* --- Hero: apilado en vertical --- */
-            .hero {
-                flex-direction: column !important;
-                text-align: center;
-                padding: 20px 14px !important;
-                gap: 14px;
-            }
-            .hero-decoration {
-                width: 90px !important;
-                height: 90px !important;
-                margin: 0 auto;
-            }
-            .hero-buttons {
-                justify-content: center !important;
-                flex-wrap: wrap;
-            }
-
-            /* --- Categorías: scroll horizontal, sin amontonarse --- */
-            .categories {
-                display: flex !important;
-                flex-wrap: nowrap !important;
-                overflow-x: auto !important;
-                -webkit-overflow-scrolling: touch;
-                gap: 8px !important;
-                padding-bottom: 6px;
-            }
-            .categories .category {
-                flex: 0 0 auto !important;
-                white-space: nowrap;
-                font-size: 12px !important;
-                padding: 8px 12px !important;
-            }
-
-            /* --- Grid de videos: 2 columnas ordenadas en vez de amontonado --- */
-            .video-grid,
-            #panelVideosContainer {
-                grid-template-columns: repeat(2, 1fr) !important;
-                gap: 10px !important;
-            }
-            .video-card .video-title {
-                font-size: 13px !important;
-            }
-
-            /* --- Modal del reproductor: pantalla completa en móvil --- */
-            .modal .player-window {
-                width: 100vw !important;
-                height: 100vh !important;
-                max-width: 100vw !important;
-                max-height: 100vh !important;
-                border-radius: 0 !important;
-                margin: 0 !important;
-            }
-
-            /* --- Barra flotante de reproducción: más compacta --- */
-            .ymusic-floating-bar {
-                height: 58px !important;
-                padding: 0 8px !important;
-            }
-            .ymusic-center-info {
-                max-width: 45% !important;
-            }
-        }
-
-        @media (max-width: 420px) {
-            .video-grid,
-            #panelVideosContainer {
-                grid-template-columns: 1fr !important;
-            }
-        }
-        /* =====================================================
-           FIN — AJUSTES SOLO PARA MÓVIL
-        ===================================================== */
     </style>
 </head>
 
@@ -480,9 +282,6 @@
     <div class="ambient ambient-two"></div>
 
     <header class="topbar">
-        <!-- INICIO: BOTÓN MENÚ MÓVIL (solo aparece en pantallas pequeñas) -->
-        <button class="btn-menu-movil" id="btnMenuMovil" style="display:none;" title="Abrir menú" onclick="abrirMenuMovil()">☰</button>
-        <!-- FIN: BOTÓN MENÚ MÓVIL -->
         <div class="brand">
             <div class="brand-symbol">W</div>
             <div>
@@ -510,7 +309,7 @@
 
 
 
-<button class="top-button" onclick="window.location.href='html/Wchat.html'">
+<button class="top-button" onclick="window.location.href='Wchat.html'">
 
 
 
@@ -518,7 +317,7 @@
                 </button>
 
 
-<button class="top-button" onclick="window.location.href='html/WitiIA.html'">
+<button class="top-button" onclick="window.location.href='WitiIA.html'">
                 🤖 <span>WitiIA</span>
                 </button>
             
@@ -536,35 +335,31 @@
                 <span>Privados</span>
             </button>
 
-            <button class="icon-button" onclick="window.location.href='html/favoritos.html'">
+            <button class="icon-button" onclick="window.location.href='favoritos.html'">
                 💝
             </button>
 
-            <button class="profile-button" onclick="window.location.href='html/cuenta.html'">
+            <button class="profile-button" onclick="window.location.href='cuenta.html'">
                 <span>AM</span>
             </button>
         </div>
     </header>
 
-    <!-- INICIO: FONDO OSCURO PARA CERRAR EL MENÚ MÓVIL AL TOCAR AFUERA -->
-    <div class="overlay-menu-movil" id="overlayMenuMovil" onclick="cerrarMenuMovil()"></div>
-    <!-- FIN: FONDO OSCURO MENÚ MÓVIL -->
-
     <div class="app">
-        <aside class="sidebar" id="sidebarPrincipal">
+        <aside class="sidebar">
             <div class="sidebar-section">
                 <div class="section-label">EXPLORAR</div>
-                <button class="side-link active" onclick="window.location.href='html/index.html'">
+                <button class="side-link active" onclick="window.location.href='index.html'">
                     <span>🏠</span> Inicio
                 </button>
-                <button class="side-link" onclick="window.location.href='html/tendencias.html'">
+                <button class="side-link" onclick="window.location.href='tendencias.html'">
                     <span>🎁</span> Tendencias
                 </button>
-                <button class="side-link" onclick="window.location.href='html/destacados.html'">
+                <button class="side-link" onclick="window.location.href='destacados.html'">
                     <span>🖨️</span> Destacados
                 </button>
                 
-                <button class="side-link" onclick="window.location.href='html/Wshorts.html'">
+                <button class="side-link" onclick="window.location.href='Wshorts.html'">
                     <span>🎬</span> Wshorts
                 </button>
 
@@ -573,18 +368,18 @@
 
             <div class="sidebar-section">
                 <div class="section-label">TU ESPACIO</div>
-                <button class="side-link" onclick="window.location.href='html/favoritos.html'">
+                <button class="side-link" onclick="window.location.href='favoritos.html'">
                     <span>💝</span> Favoritos
                 </button>
 
 
-                <button class="side-link" onclick="window.location.href='html/historial.html'">
+                <button class="side-link" onclick="window.location.href='historial.html'">
                     <span>💻️</span> Historial
                 </button>
                 
 
 
-                <button class="side-link" onclick="window.location.href='html/guardados.html'">
+                <button class="side-link" onclick="window.location.href='guardados.html'">
                     <span>💾</span> Guardados
                 </button>
 
@@ -599,16 +394,16 @@
             <div class="sidebar-section">
                 <div class="section-label">MÁS</div>
                 <div class="hero-buttons">
-                    <button class="side-link" onclick="window.location.href='html/creadores.html'">
+                    <button class="side-link" onclick="window.location.href='creadores.html'">
                         <span>🤝</span> creadores
                     </button>
                 </div>
                 <div class="hero-buttons">
-                    <button class="side-link" onclick="window.location.href='html/colecciones.html'">
+                    <button class="side-link" onclick="window.location.href='colecciones.html'">
                         <span>🎥</span> colecciones
                     </button>
                 </div>
-                <button class="side-link" onclick="window.location.href='html/Ajustes.html'">
+                <button class="side-link" onclick="window.location.href='Ajustes.html'">
                     <span>⚙️</span> Ajustes
                 </button>
             </div>
@@ -637,7 +432,7 @@
                         creadores y contenido que vale la pena mirar.
                     </p>
                     <div class="hero-buttons">
-                       <button class="side-link" onclick="window.location.href='html/explorar_mas.html'">
+                       <button class="side-link" onclick="window.location.href='explorar_mas.html'">
                         <span>✦</span> Explorar Más
                         </button>
                         <button class="secondary-button" id="heroRandom">
@@ -679,7 +474,7 @@
                 <div class="video-grid" id="secureVideoGrid">
                     <article class="video-card" data-category="Privado">
                         <div class="thumbnail">
-                            <img src="../assets/img/portada1.jpg" alt="Video Privado">
+                            <img src="img/portada1.jpg" alt="Video Privado">
                             <div class="thumbnail-gradient"></div>
                             <div class="quality">VIP</div>
                             <div class="duration">10:00</div>
@@ -715,7 +510,7 @@
                         <span>🎬</span> Videos
                     </button>
                    
-                    <button class="category" class="side-link" onclick="window.location.href='html/directos.html'">
+                    <button class="category" class="side-link" onclick="window.location.href='directos.html'">
                         <span>⌁</span> Directos
                     </button>
                   
@@ -729,7 +524,7 @@
                         <span class="tiny-label">AHORA MISMO</span>
                         <h2>En tendencia</h2>
                     </div>
-                    <button class="view-all" onclick="window.location.href='html/tendencias.html'">
+                    <button class="view-all" onclick="window.location.href='tendencias.html'">
                         Ver todo →
                     </button>
                 </div>
@@ -739,12 +534,12 @@
                         class="video-card"
                         data-category="Videos"
                         data-title="Dentro del futuro digital"
-                        data-video="../assets/videos/phonk3.mp4"
-                        data-image="../assets/img/paisaje.jpg"
-                        onclick="openVideo('Dentro del futuro digital', '../assets/videos/phonk3.mp4', '../assets/img/paisaje.jpg')"
+                        data-video="videos/phonk3.mp4"
+                        data-image="img/paisaje.jpg"
+                        onclick="openVideo('Dentro del futuro digital', 'videos/phonk3.mp4', 'img/paisaje.jpg')"
                     >
                         <div class="thumbnail">
-                            <img src="../assets/img/paisaje.jpg" alt="Video">
+                            <img src="img/paisaje.jpg" alt="Video">
                             <div class="thumbnail-gradient"></div>
                             <div class="quality">4K</div>
                             <div class="duration">12:48</div>
@@ -769,12 +564,12 @@
                         class="video-card"
                         data-category="Phonk"
                         data-title="Drift"
-                        data-video="../assets/videos/carro.mp4"
-                        data-image="../assets/img/tortuga.jpg"
-                        onclick="openVideo('DRIFT PHONK MIX', '../assets/videos/carro.mp4', '../assets/img/tortuga.jpg')"
+                        data-video="videos/carro.mp4"
+                        data-image="img/tortuga.jpg"
+                        onclick="openVideo('DRIFT PHONK MIX', 'videos/carro.mp4', 'img/tortuga.jpg')"
                     >
                         <div class="thumbnail">
-                            <img src="../assets/img/tortuga.jpg" alt="Phonk">
+                            <img src="img/tortuga.jpg" alt="Phonk">
                             <div class="thumbnail-gradient"></div>
                             <div class="quality">HD</div>
                             <div class="duration">04:15</div>
@@ -800,11 +595,11 @@
                         data-category="Phonk"
                         data-title="Después de medianoche Phonk"
                         data-video="https://youtu.be/c95WGXY42jo"
-                        data-image="../assets/img/phonk1.jpg"
-                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/c95WGXY42jo', '../assets/img/phonk1.jpg')"
+                        data-image="img/phonk1.jpg"
+                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/c95WGXY42jo', 'img/phonk1.jpg')"
                     >
                         <div class="thumbnail">
-                            <img src="../assets/img/phonk1.jpg" alt="Phonk">
+                            <img src="img/phonk1.jpg" alt="Phonk">
                             <div class="thumbnail-gradient"></div>
                             <div class="quality">4K</div>
                             <div class="duration">08:35</div>
@@ -835,8 +630,8 @@
                         data-category="Phonk"
                         data-title="Después de medianoche Phonk"
                         data-video="https://youtu.be/GG6xJMaVBms"
-                        data-image="../assets/img/phonk1.jpg"
-                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/GG6xJMaVBms', '../assets/img/phonk1.jpg')"
+                        data-image="img/phonk1.jpg"
+                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/GG6xJMaVBms', 'img/phonk1.jpg')"
                     >
                         <div class="thumbnail">
                             <img src="https://i.ytimg.com/vi/GG6xJMaVBms/hqdefault.jpg?sqp=-oaymwEnCNACELwBSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLDqQYdbYL_o6VdnJx073fGlhmmxxQ" alt="Phonk">
@@ -871,8 +666,8 @@
                         data-category="Phonk"
                         data-title="Después de medianoche Phonk"
                         data-video="https://youtu.be/CiGVMIErCDw"
-                        data-image="../assets/img/phonk1.jpg"
-                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/CiGVMIErCDw', '../assets/img/phonk1.jpg')"
+                        data-image="img/phonk1.jpg"
+                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/CiGVMIErCDw', 'img/phonk1.jpg')"
                     >
                         <div class="thumbnail">
                             <img src="https://i.ytimg.com/vi/XDxyaEWWxkE/hqdefault.jpg?sqp=-oaymwFBCNACELwBSFryq4qpAzMIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB8AEB-AH-CYAC0AWKAgwIABABGH8gEygbMA8=&rs=AOn4CLDBp7CYLY-Aflvu33fG10ZL0q9bmg" alt="Phonk">
@@ -905,8 +700,8 @@
                         data-category="Phonk"
                         data-title="Después de medianoche Phonk"
                         data-video="https://youtu.be/9vE1WlkRaj8?list=RD9vE1WlkRaj8"
-                        data-image="../assets/img/phonk1.jpg"
-                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/9vE1WlkRaj8?list=RD9vE1WlkRaj8', '../assets/img/phonk1.jpg')"
+                        data-image="img/phonk1.jpg"
+                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/9vE1WlkRaj8?list=RD9vE1WlkRaj8', 'img/phonk1.jpg')"
                     >
                         <div class="thumbnail">
                             <img src="https://i.ytimg.com/vi/9vE1WlkRaj8/hqdefault.jpg?sqp=-oaymwFBCNACELwBSFryq4qpAzMIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB8AEB-AHUBoAC4AOKAgwIABABGFMgPihyMA8=&rs=AOn4CLA9WpI1-eKEdFxc1ys1MsptOBor4Q" alt="Phonk">
@@ -939,8 +734,8 @@
                         data-category="Phonk"
                         data-title="Después de medianoche Phonk"
                         data-video="https://youtu.be/8dOMXfWmghg?list=RD8dOMXfWmghg"
-                        data-image="../assets/img/phonk1.jpg"
-                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/8dOMXfWmghg?list=RD8dOMXfWmghg', '../assets/img/phonk1.jpg')"
+                        data-image="img/phonk1.jpg"
+                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/8dOMXfWmghg?list=RD8dOMXfWmghg', 'img/phonk1.jpg')"
                     >
                         <div class="thumbnail">
                             <img src="https://i.ytimg.com/vi/8dOMXfWmghg/hqdefault.jpg?sqp=-oaymwFBCNACELwBSFryq4qpAzMIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB8AEB-AH-CYAC0AWKAgwIABABGGUgZShlMA8=&rs=AOn4CLCBktgsDm6QNDWAmjYPCiL36fKbVw" alt="Phonk">
@@ -973,8 +768,8 @@
                         data-category="Phonk"
                         data-title="Después de medianoche Phonk"
                         data-video="https://youtu.be/yEbhDfZ6WD0?list=RDEMNcWnYEuMgWpcYQ4O1iFISA"
-                        data-image="../assets/img/phonk1.jpg"
-                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/yEbhDfZ6WD0?list=RDEMNcWnYEuMgWpcYQ4O1iFISA', '../assets/img/phonk1.jpg')"
+                        data-image="img/phonk1.jpg"
+                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/yEbhDfZ6WD0?list=RDEMNcWnYEuMgWpcYQ4O1iFISA', 'img/phonk1.jpg')"
                     >
                         <div class="thumbnail">
                             <img src="https://i.ytimg.com/vi/yEbhDfZ6WD0/hqdefault.jpg?sqp=-oaymwExCNACELwBSFryq4qpAyMIARUAAIhCGAHwAQH4Af4JgALQBYoCDAgAEAEYYyATKH8wDw==&rs=AOn4CLDHdWms6f8yc5B3nzQGZEPNWsBjtA" alt="Phonk">
@@ -1008,8 +803,8 @@
                         data-category="Phonk"
                         data-title="Después de medianoche Phonk"
                         data-video="https://youtu.be/rK9gOo22vyg?list=RDEMNcWnYEuMgWpcYQ4O1iFISA"
-                        data-image="../assets/img/phonk1.jpg"
-                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/rK9gOo22vyg?list=RDEMNcWnYEuMgWpcYQ4O1iFISA', '../assets/img/phonk1.jpg')"
+                        data-image="img/phonk1.jpg"
+                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/rK9gOo22vyg?list=RDEMNcWnYEuMgWpcYQ4O1iFISA', 'img/phonk1.jpg')"
                     >
                         <div class="thumbnail">
                             <img src="https://i.ytimg.com/vi/rK9gOo22vyg/hqdefault.jpg?sqp=-oaymwEmCKgBEF5IWvKriqkDGQgBFQAAiEIYAdgBAeIBCggYEAIYBjgBQAE=&rs=AOn4CLD0jisE4rndBaXjdzkNRl1OPQozRg" alt="Phonk">
@@ -1044,8 +839,8 @@
                         data-category="Phonk"
                         data-title="Después de medianoche Phonk"
                         data-video="https://youtu.be/tm9GpM3lV3s?list=RDEMNcWnYEuMgWpcYQ4O1iFISA"
-                        data-image="../assets/img/phonk1.jpg"
-                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/tm9GpM3lV3s?list=RDEMNcWnYEuMgWpcYQ4O1iFISA', '../assets/img/phonk1.jpg')"
+                        data-image="img/phonk1.jpg"
+                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/tm9GpM3lV3s?list=RDEMNcWnYEuMgWpcYQ4O1iFISA', 'img/phonk1.jpg')"
                     >
                         <div class="thumbnail">
                             <img src="https://i.ytimg.com/vi/tm9GpM3lV3s/hqdefault.jpg?sqp=-oaymwFACKgBEF5IWvKriqkDMwgBFQAAiEIYAdgBAeIBCggYEAIYBjgBQAHwAQH4Af4JgALQBYoCDAgAEAEYUiAUKH8wDw==&rs=AOn4CLB-_FO18sFtGJdSmX5wn_aS3EbmGA" alt="Phonk">
@@ -1078,8 +873,8 @@
                         data-category="Phonk"
                         data-title="Después de medianoche Phonk"
                         data-video="https://youtu.be/XFdnTeTJp3E?list=RDEMNcWnYEuMgWpcYQ4O1iFISA"
-                        data-image="../assets/img/phonk1.jpg"
-                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/XFdnTeTJp3E?list=RDEMNcWnYEuMgWpcYQ4O1iFISA', '../assets/img/phonk1.jpg')"
+                        data-image="img/phonk1.jpg"
+                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/XFdnTeTJp3E?list=RDEMNcWnYEuMgWpcYQ4O1iFISA', 'img/phonk1.jpg')"
                     >
                         <div class="thumbnail">
                             <img src="https://i.ytimg.com/vi/XFdnTeTJp3E/hqdefault.jpg?sqp=-oaymwFACKgBEF5IWvKriqkDMwgBFQAAiEIYAdgBAeIBCggYEAIYBjgBQAHwAQH4Af4JgALQBYoCDAgAEAEYZSBlKGUwDw==&rs=AOn4CLDVR5fWEDNG5PAhO8YAlLM6xU5XSg" alt="Phonk">
@@ -1113,8 +908,8 @@
                         data-category="Phonk"
                         data-title="Después de medianoche Phonk"
                         data-video="https://youtu.be/KO5APXYjLtE?list=RDEMNcWnYEuMgWpcYQ4O1iFISA"
-                        data-image="../assets/img/phonk1.jpg"
-                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/KO5APXYjLtE?list=RDEMNcWnYEuMgWpcYQ4O1iFISA', '../assets/img/phonk1.jpg')"
+                        data-image="img/phonk1.jpg"
+                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/KO5APXYjLtE?list=RDEMNcWnYEuMgWpcYQ4O1iFISA', 'img/phonk1.jpg')"
                     >
                         <div class="thumbnail">
                             <img src="https://i.ytimg.com/vi/KO5APXYjLtE/hqdefault.jpg?sqp=-oaymwEmCKgBEF5IWvKriqkDGQgBFQAAiEIYAdgBAeIBCggYEAIYBjgBQAE=&rs=AOn4CLCR6KFYOS_6FKjZmH-CQq7wuR6G3A" alt="Phonk">
@@ -1147,8 +942,8 @@
                         data-category="Phonk"
                         data-title="Después de medianoche Phonk"
                         data-video="https://youtu.be/0yXX2Iya490?list=RDEMNcWnYEuMgWpcYQ4O1iFISA"
-                        data-image="../assets/img/phonk1.jpg"
-                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/0yXX2Iya490?list=RDEMNcWnYEuMgWpcYQ4O1iFISA', '../assets/img/phonk1.jpg')"
+                        data-image="img/phonk1.jpg"
+                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/0yXX2Iya490?list=RDEMNcWnYEuMgWpcYQ4O1iFISA', 'img/phonk1.jpg')"
                     >
                         <div class="thumbnail">
                             <img src="https://i.ytimg.com/vi/0yXX2Iya490/hqdefault.jpg?sqp=-oaymwEmCKgBEF5IWvKriqkDGQgBFQAAiEIYAdgBAeIBCggYEAIYBjgBQAE=&rs=AOn4CLAlVX6Wq8-zUFNezlYK0QygGMPDdg" alt="Phonk">
@@ -1181,8 +976,8 @@
                         data-category="Phonk"
                         data-title="Después de medianoche Phonk"
                         data-video="https://youtu.be/BVO-qMos5jY?list=RDEMNcWnYEuMgWpcYQ4O1iFISA"
-                        data-image="../assets/img/phonk1.jpg"
-                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/BVO-qMos5jY?list=RDEMNcWnYEuMgWpcYQ4O1iFISA', '../assets/img/phonk1.jpg')"
+                        data-image="img/phonk1.jpg"
+                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/BVO-qMos5jY?list=RDEMNcWnYEuMgWpcYQ4O1iFISA', 'img/phonk1.jpg')"
                     >
                         <div class="thumbnail">
                             <img src="https://i.ytimg.com/vi/BVO-qMos5jY/hqdefault.jpg?sqp=-oaymwEmCKgBEF5IWvKriqkDGQgBFQAAiEIYAdgBAeIBCggYEAIYBjgBQAE=&rs=AOn4CLBmBGpFDgpMOgW9PMcDkw2tZT-0iw" alt="Phonk">
@@ -1318,7 +1113,7 @@
                         </div>
                         <div>
                             <label style="display: block; font-size: 13px; color: #aaa; margin-bottom: 5px;">Enlace de miniatura</label>
-                            <input type="text" id="inputPortadaVideo" placeholder="../assets/img/portada1.jpg o URL de imagen" style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 14px;" autocomplete="off">
+                            <input type="text" id="inputPortadaVideo" placeholder="img/portada1.jpg o URL de imagen" style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 14px;" autocomplete="off">
                         </div>
                     </div>
                     <button id="btnSubirVideoForm" style="background: #6366f1; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 10px;">
@@ -1365,7 +1160,7 @@
         </div>
 
         <div class="ymusic-center-info" onclick="abrirModalDesdeBarra()">
-            <img id="barThumb" src="../assets/img/portada1.jpg" alt="Miniatura">
+            <img id="barThumb" src="img/portada1.jpg" alt="Miniatura">
             <div class="ymusic-text-group">
                 <div id="barTitle" class="ymusic-bar-title">Selecciona un video</div>
                 <div class="ymusic-bar-channel">WibsiProject Network</div>
@@ -1418,48 +1213,6 @@
             video: "",
             image: ""
         };
-
-        /* ============================================================
-           INICIO: MENÚ MÓVIL (abrir / cerrar barra lateral deslizable)
-           Esto solo tiene efecto visual en pantallas de celular/tablet,
-           en PC el botón permanece oculto y no cambia nada.
-        ============================================================ */
-        function mostrarUOcultarBotonMenu() {
-            const btnMenu = document.getElementById('btnMenuMovil');
-            if (!btnMenu) return;
-            if (window.innerWidth <= 900) {
-                btnMenu.style.display = 'flex';
-            } else {
-                btnMenu.style.display = 'none';
-                cerrarMenuMovil();
-            }
-        }
-
-        function abrirMenuMovil() {
-            const sidebar = document.getElementById('sidebarPrincipal');
-            const overlay = document.getElementById('overlayMenuMovil');
-            if (sidebar) sidebar.classList.add('sidebar-abierto');
-            if (overlay) overlay.classList.add('activo');
-        }
-
-        function cerrarMenuMovil() {
-            const sidebar = document.getElementById('sidebarPrincipal');
-            const overlay = document.getElementById('overlayMenuMovil');
-            if (sidebar) sidebar.classList.remove('sidebar-abierto');
-            if (overlay) overlay.classList.remove('activo');
-        }
-
-        window.addEventListener('resize', mostrarUOcultarBotonMenu);
-
-        // Al tocar cualquier botón del menú lateral en móvil, se cierra el menú automáticamente
-        document.addEventListener('DOMContentLoaded', function() {
-            mostrarUOcultarBotonMenu();
-            const sidebarBtns = document.querySelectorAll('#sidebarPrincipal .side-link');
-            sidebarBtns.forEach(btn => btn.addEventListener('click', cerrarMenuMovil));
-        });
-        /* ============================================================
-           FIN: MENÚ MÓVIL
-        ============================================================ */
 
         document.addEventListener("DOMContentLoaded", function() {
             // Lógica para abrir el modal de compartir desde el reproductor
@@ -1552,7 +1305,7 @@
 
                 const tituloEl = card.querySelector('.video-title');
                 const videoUrl = card.getAttribute('data-video') || 'https://www.youtube.com/watch?v=pBUlV7rZp_c';
-                const imagenUrl = card.querySelector('img') ? card.querySelector('img').src : '../assets/img/portada1.jpg';
+                const imagenUrl = card.querySelector('img') ? card.querySelector('img').src : 'img/portada1.jpg';
                 const tituloVal = tituloEl ? tituloEl.textContent : `Video ${index}`;
                 const uniqueFavId = 'video_' + index + '_' + tituloVal.replace(/\s+/g, '_');
                 card.setAttribute('data-id', uniqueFavId);
@@ -1574,14 +1327,6 @@
 
             actualizarPanelVideos();
 
-            // INICIO: recuperar en la cuadrícula principal los videos que el usuario subió antes (persistencia)
-            cargarVideosSubidosGuardados();
-            // FIN: recuperar videos subidos
-
-            // INICIO: si había un video reproduciéndose antes de recargar, mostrarlo de nuevo en la barra
-            restaurarUltimoVideoAlRecargar();
-            // FIN: restaurar último video
-
             const btnAbrirSubida = document.getElementById('btnAbrirSubida');
             const modalSubida = document.getElementById('modalSubida');
             const closeSubida = document.getElementById('closeSubida');
@@ -1589,13 +1334,6 @@
 
             if (btnAbrirSubida && modalSubida) {
                 btnAbrirSubida.addEventListener('click', () => {
-                    // INICIO: exigir inicio de sesión antes de subir video (PC y móvil)
-                    if (!haySesionIniciada()) {
-                        mostrarToast("Necesitas iniciar sesión para subir un video 🔐");
-                        window.location.href = 'cuenta.html';
-                        return;
-                    }
-                    // FIN: exigir inicio de sesión
                     modalSubida.style.display = 'flex';
                 });
             }
@@ -1630,7 +1368,7 @@
                 btnSubirVideoForm.addEventListener('click', function() {
                     const titulo = document.getElementById('inputTituloVideo').value.trim();
                     const urlVideo = document.getElementById('inputUrlVideo').value.trim();
-                    const portada = document.getElementById('inputPortadaVideo').value.trim() || '../assets/img/portada1.jpg';
+                    const portada = document.getElementById('inputPortadaVideo').value.trim() || 'img/portada1.jpg';
 
                     if (!titulo || !urlVideo) {
                         alert("Por favor completa el título y el enlace del video.");
@@ -1750,7 +1488,7 @@
             if (cardEl && !catalogoDinamico.some(item => item.id === id)) {
                 const titulo = cardEl.querySelector('.video-title') ? cardEl.querySelector('.video-title').textContent : 'Video WIBSIPROJECT';
                 const videoUrl = cardEl.getAttribute('data-video') || '';
-                const imagenUrl = cardEl.querySelector('img') ? cardEl.querySelector('img').src : '../assets/img/portada1.jpg';
+                const imagenUrl = cardEl.querySelector('img') ? cardEl.querySelector('img').src : 'img/portada1.jpg';
                 catalogoDinamico.push({
                     id: id,
                     titulo: '🎬 ' + titulo,
@@ -1802,131 +1540,6 @@
                 panelContainer.appendChild(itemCard);
             });
         }
-
-        /* ============================================================
-           INICIO: GUARDAR Y MOSTRAR DE NUEVO LOS VIDEOS SUBIDOS
-           Antes, al recargar la página, los videos subidos por el
-           usuario desaparecían de la cuadrícula principal (solo
-           quedaban en el panel de abajo). Esta función los vuelve a
-           dibujar en #videoGrid usando los datos guardados en
-           localStorage, para que no se pierdan al recargar.
-        ============================================================ */
-        function cargarVideosSubidosGuardados() {
-            const videoGrid = document.getElementById('videoGrid');
-            if (!videoGrid) return;
-
-            let misVideosPanel = JSON.parse(localStorage.getItem('wibsitihub_panel_videos')) || [];
-            if (misVideosPanel.length === 0) return;
-
-            // Insertamos del más antiguo al más nuevo para que el más reciente quede arriba
-            for (let i = misVideosPanel.length - 1; i >= 0; i--) {
-                const v = misVideosPanel[i];
-
-                // Evitar duplicar si por algún motivo ya existe una tarjeta con ese id
-                if (videoGrid.querySelector(`[data-id="${v.id}"]`)) continue;
-
-                const tituloSeguro = (v.title || 'Video').replace(/'/g, "\\'");
-                const nuevaCard = document.createElement('article');
-                nuevaCard.className = 'video-card';
-                nuevaCard.setAttribute('data-category', v.categoria || 'Videos');
-                nuevaCard.setAttribute('data-title', v.title || 'Video');
-                nuevaCard.setAttribute('data-video', v.video || '');
-                nuevaCard.setAttribute('data-image', v.image || '../assets/img/portada1.jpg');
-                nuevaCard.setAttribute('data-id', v.id);
-                nuevaCard.setAttribute('onclick', `openVideo('${tituloSeguro}', '${v.video}', '${v.image}')`);
-
-                let favoritosActuales = JSON.parse(localStorage.getItem('wibsi_favoritos')) || [];
-                const esFav = favoritosActuales.includes(v.id);
-
-                nuevaCard.innerHTML = `
-                    <div class="thumbnail" style="position: relative;">
-                        <img src="${v.image || '../assets/img/portada1.jpg'}" alt="Miniatura">
-                        <div class="thumbnail-gradient"></div>
-                        <div class="quality">HD</div>
-                        <div class="duration">03:30</div>
-                        <button class="play-button">▶</button>
-                        <div class="card-quick-actions" style="opacity: 1;">
-                            <button class="action-chip fav-btn ${esFav ? 'favorito-activo' : ''}" onclick="toggleFavoritoIndex(event, '${v.id}', this)" title="Marcar como favorito">❤</button>
-                            <button class="action-chip privado-btn" onclick="enviarAVideoPrivado(event, '${tituloSeguro}', '${v.video}', '${v.image}')" title="Guardar como privado">🔒</button>
-                        </div>
-                    </div>
-                    <div class="video-info">
-                        <div class="video-title">${v.title}</div>
-                        <div class="creator">
-                            <div class="creator-avatar">AM</div>
-                            <span>Anthony Merlos</span>
-                            <i>✓</i>
-                        </div>
-                        <div class="video-meta">
-                            <span>Subido por ti</span>
-                            <b>•</b>
-                            <span>guardado</span>
-                        </div>
-                    </div>
-                `;
-
-                videoGrid.insertBefore(nuevaCard, videoGrid.firstChild);
-            }
-        }
-        /* ============================================================
-           FIN: GUARDAR Y MOSTRAR DE NUEVO LOS VIDEOS SUBIDOS
-        ============================================================ */
-
-        /* ============================================================
-           INICIO: RECORDAR EL ÚLTIMO VIDEO VISTO AL RECARGAR LA PÁGINA
-           Guarda qué video estaba activo y, al volver a cargar la
-           página, muestra de nuevo la barra flotante con ese video
-           listo para reproducirse (no se autorreproduce por las
-           restricciones de los navegadores, pero queda visible).
-        ============================================================ */
-        function restaurarUltimoVideoAlRecargar() {
-            const datosGuardados = localStorage.getItem('wibsi_ultimo_video');
-            if (!datosGuardados) return;
-
-            try {
-                const v = JSON.parse(datosGuardados);
-                if (!v || !v.video) return;
-
-                videoActualReproduciendo = v;
-
-                const videoPlayer = document.getElementById('videoPlayer');
-                if (videoPlayer) videoPlayer.src = v.video;
-
-                mostrarBarraFlotante(v.title, v.image);
-            } catch (e) {
-                console.log('No se pudo restaurar el último video:', e);
-            }
-        }
-        /* ============================================================
-           FIN: RECORDAR EL ÚLTIMO VIDEO VISTO
-        ============================================================ */
-
-        /* ============================================================
-           INICIO: VERIFICAR SI HAY SESIÓN INICIADA (para exigir login
-           antes de subir video, tanto en PC como en móvil)
-           Revisa las claves más comunes que suele usar cuenta.html.
-           Si tu cuenta.html usa otra clave/nombre para guardar la
-           sesión, avísame y ajusto esta función para que coincida.
-        ============================================================ */
-        function haySesionIniciada() {
-            const posiblesClaves = [
-                'wibsi_sesion_iniciada',
-                'wibsi_usuario',
-                'wibsitihub_usuario',
-                'usuarioActivo',
-                'sesionIniciada'
-            ];
-            for (const clave of posiblesClaves) {
-                const valor = localStorage.getItem(clave) || sessionStorage.getItem(clave);
-                if (valor && valor !== 'false' && valor !== 'null') {
-                    return true;
-                }
-            }
-            return false;
-        }
-        /* ============================================================
-           FIN: VERIFICAR SI HAY SESIÓN INICIADA
-        ============================================================ */
 
         function checkPassword() {
             const passwordCorrecta = "2436anthony123privado123"; 
@@ -2167,10 +1780,6 @@
                 image: imageSrc
             };
 
-            // INICIO: recordar este video para poder mostrarlo de nuevo si se recarga la página
-            localStorage.setItem('wibsi_ultimo_video', JSON.stringify(videoActualReproduciendo));
-            // FIN: recordar video
-
             let historialVideos = JSON.parse(localStorage.getItem('wibsitihub_historial_videos')) || [];
             
             const nuevoRegistro = {
@@ -2224,6 +1833,6 @@
         }
 
      </script>
-    <script src="../js/script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

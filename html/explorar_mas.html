@@ -379,9 +379,16 @@
             <button class="add-video-btn" onclick="abrirModalAddVideo()">
                 <span>+</span> <span>Agregar Video</span>
             </button>
-            <button class="top-button" onclick="window.location.href='../index.html'">
-                ⌂ <span>Volver al Inicio</span>
-            </button>
+
+
+            
+           <button class="top-button" onclick="window.location.href='../index.html'">
+    ⌂ <span>Volver al Inicio</span>
+</button>
+
+
+
+            
             <div class="account-menu-wrapper">
                 <button class="profile-button" id="profileBtn" onclick="toggleAccountMenu(event)"><span>AM</span></button>
                 <div id="accountDropdown" class="account-dropdown hidden">
@@ -427,7 +434,7 @@
                 <div class="widget-box">
                     <div class="widget-title">▶️ Continuar Viendo</div>
                     <div id="continuarViendoContainer">
-                        <div class="progress-card-item" onclick="openVideo('Dentro del futuro digital', 'videos\\phonk3.mp4', '../assets/img/paisaje.jpg')">
+                        <div class="progress-card-item" onclick="openVideo('Dentro del futuro digital', '../assets/videos\\phonk3.mp4', '../assets/img/paisaje.jpg')">
                             <img src="../assets/img/paisaje.jpg" class="progress-thumb" alt="Thumb">
                             <div style="flex:1; overflow:hidden;">
                                 <div style="font-size:13px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Dentro del futuro digital</div>
@@ -455,7 +462,7 @@
                 </div>
 
                 <div class="video-grid" id="gridExplorarMas">
-                    <article class="video-card" data-category="Tecnologia" data-title="Desarrollo Web Full Stack Avanzado" data-src="videos\phonk3.mp4" data-thumb="../assets/img/paisaje.jpg" onclick="openVideo('Desarrollo Web Full Stack Avanzado', 'videos\\phonk3.mp4', '../assets/img/paisaje.jpg')">
+                    <article class="video-card" data-category="Tecnologia" data-title="Desarrollo Web Full Stack Avanzado" data-src="../assets/videos\phonk3.mp4" data-thumb="../assets/img/paisaje.jpg" onclick="openVideo('Desarrollo Web Full Stack Avanzado', 'videos\\phonk3.mp4', '../assets/img/paisaje.jpg')">
                         <div class="thumbnail">
                             <img src="../assets/img/paisaje.jpg" alt="Tech">
                             <div class="thumbnail-gradient"></div>

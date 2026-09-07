@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WibsiProject</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="icon" href="../assets/img/logwiti.png" type="image/png">
+   <link rel="icon" href="assets/img/logwiti.png" type="image/png">
     <style>
         /* --- CORRECCIÓN DE PESTAÑA BLANCA AL RECARGAR --- */
         html, body {
@@ -1202,6 +1202,105 @@
     </style>
 
     <script>
+
+
+
+// =====================================================
+// BOTÓN "SORPRÉNDEME"
+// ELIGE UN VIDEO ALEATORIO
+// =====================================================
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const randomButton = document.getElementById("randomButton");
+
+    if (!randomButton) {
+        console.error("❌ No se encontró el botón randomButton");
+        return;
+    }
+
+    randomButton.addEventListener("click", function (event) {
+
+        event.preventDefault();
+
+        const videos = Array.from(
+            document.querySelectorAll(".video-grid .video-card")
+        );
+
+        const videosDisponibles = videos.filter(video => {
+            return video.getAttribute("data-video");
+        });
+
+        if (videosDisponibles.length === 0) {
+            alert("No hay videos disponibles.");
+            return;
+        }
+
+        const indiceAleatorio = Math.floor(
+            Math.random() * videosDisponibles.length
+        );
+
+        const videoElegido = videosDisponibles[indiceAleatorio];
+
+        const titulo =
+            videoElegido.getAttribute("data-title") ||
+            "Video aleatorio";
+
+        const video =
+            videoElegido.getAttribute("data-video");
+
+        let imagen =
+            videoElegido.getAttribute("data-image");
+
+        if (!imagen) {
+            const img = videoElegido.querySelector("img");
+
+            if (img) {
+                imagen = img.getAttribute("src");
+            }
+        }
+
+        if (!imagen) {
+            imagen = "";
+        }
+
+        console.log("🎲 Sorpréndeme seleccionó:");
+        console.log("Título:", titulo);
+        console.log("Video:", video);
+        console.log("Imagen:", imagen);
+
+        if (typeof openVideo === "function") {
+
+            openVideo(
+                titulo,
+                video,
+                imagen
+            );
+
+        } else {
+
+            console.error("❌ No existe la función openVideo().");
+
+        }
+
+    });
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme) {
             document.body.classList.add(savedTheme);

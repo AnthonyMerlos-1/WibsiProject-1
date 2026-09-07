@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../assets/img/favoritos.png" type="image/png">
+    <title>Favoritos - WIBSIPROJECT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #050508;
+            color: #f0f0f0;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
+            background: linear-gradient(135deg, #050508, #11111d, #1a0b2e);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        #canvas3d {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .back-home-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .btn-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.7rem 1.4rem;
+            background: linear-gradient(135deg, #00d2ff, #9b51e0, #ff007f);
+            background-size: 200% 200%;
+            color: #ffffff;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 50px;
+            box-shadow: 0 5px 20px rgba(0, 210, 255, 0.4);
+            animation: colorShift 5s ease infinite, pulseGlow 2s infinite alternate;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+        }
+
+        @keyframes colorShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes pulseGlow {
+            from { box-shadow: 0 0 10px rgba(0, 210, 255, 0.3); }
+            to { box-shadow: 0 0 25px rgba(255, 0, 127, 0.7); }
+        }
+
+        .btn-home:hover {
+            transform: scale(1.08) translateY(-2px);
+            box-shadow: 0 8px 30px rgba(155, 81, 224, 0.8);
+        }
+
+        header {
+            text-align: center;
+            padding: 4rem 1rem 2rem 1rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        header h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(45deg, #00d2ff, #9b51e0, #ff007f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            color: #a0a0c0;
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .favorites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .fav-card {
+            background: rgba(18, 18, 30, 0.75);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            position: relative;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.4s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .fav-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(255, 0, 127, 0.5);
+        }
+
+        .fav-card h3 {
+            font-size: 1.5rem;
+            color: #ffffff;
+            margin-bottom: 0.8rem;
+        }
+
+        .fav-card p {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #d0d0e0;
+            margin-bottom: 1.5rem;
+        }
+
+        .heart-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ff007f;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.3rem;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            align-self: flex-end;
+        }
+
+        .heart-btn:hover {
+            transform: scale(1.15);
+            background: rgba(255, 0, 127, 0.2);
+            border-color: #ff007f;
+        }
+
+        .heart-btn.active {
+            background: #ff007f;
+            color: white;
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.8);
+        }
+
+        .empty-state {
+            text-align: center;
+            grid-column: 1 / -1;
+            padding: 4rem 2rem;
+            background: rgba(18, 18, 30, 0.5);
+            border-radius: 20px;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            color: #a0a0c0;
+            font-size: 1.2rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #707090;
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="back-home-container">
+        <a href="index.html" class="btn-home">
+            <span>←</span> Volver al inicio
+        </a>
+    </div>
+
+    <div class="bg-animation"></div>
+    <canvas id="canvas3d"></canvas>
+
+    <header>
+        <h1>Mis Favoritos - WIBSIPROJECT</h1>
+        <p>Tus elementos, módulos y herramientas preferidas guardadas y sincronizadas con almacenamiento persistente.</p>
+    </header>
+
+    <main class="container">
+        <section class="favorites-grid" id="favoritesGrid">
+            <!-- Los elementos favoritos se renderizarán dinámicamente aquí -->
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 WIBSIPROJECT - Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Catálogo base de elementos disponibles para marcar como favoritos
+        const catalogoElementos = [
+            {
+                id: 'mod_animaciones',
+                titulo: '🎨 Animaciones y Gráficos 3D',
+                descripcion: 'Módulo de renderizado tridimensional en tiempo real utilizando Three.js y adaptación fluida al cursor.'
+            },
+            {
+                id: 'mod_funciones',
+                titulo: '⚙️ Funciones e Interactividad',
+                descripcion: 'Controles de estado inteligentes, flujos multimedia avanzados y gestión de visibilidad de pestañas.'
+            },
+            {
+                id: 'mod_estructura',
+                titulo: '🛡️ Estructura y Rendimiento',
+                descripcion: 'Arquitectura modular limpia basada en Glassmorphism avanzado y alta optimización gráfica por hardware.'
+            },
+            {
+                id: 'chat_wchat',
+                titulo: '💬 Sistema de Comunicación Wchat',
+                descripcion: 'Plataforma integrada de chat en tiempo real con sincronización de perfiles y buzón de solicitudes.'
+            }
+        ];
+
+        // Obtener favoritos guardados en localStorage (o lista vacía)
+        function obtenerFavoritos() {
+            return JSON.parse(localStorage.getItem('wibsi_favoritos')) || [];
+        }
+
+        // Guardar favoritos en localStorage
+        function guardarFavoritos(favoritos) {
+            localStorage.setItem('wibsi_favoritos', JSON.stringify(favoritos));
+        }
+
+        // Renderizar la vista de favoritos
+        function renderizarFavoritos() {
+            const grid = document.getElementById('favoritesGrid');
+            const idsFavoritos = obtenerFavoritos();
+            
+            // Filtrar los elementos del catálogo que están en favoritos
+            const elementosFavoritos = catalogoElementos.filter(item => idsFavoritos.includes(item.id));
+
+            grid.innerHTML = '';
+
+            if (elementosFavoritos.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <p>💔 No tienes ningún elemento marcado como favorito todavía.</p>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem; color: #707090;">Explora los módulos de la plataforma y haz clic en el icono de corazón para guardarlos aquí.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            elementosFavoritos.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'fav-card';
+                card.innerHTML = `
+                    <div>
+                        <h3>${item.titulo}</h3>
+                        <p>${item.descripcion}</p>
+                    </div>
+                    <button class="heart-btn active" onclick="toggleFavorito('${item.id}')" title="Quitar de favoritos">
+                        ❤️
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Alternar el estado de favorito al hacer clic en el corazón
+        function toggleFavorito(id) {
+            let favoritos = obtenerFavoritos();
+            const index = favoritos.indexOf(id);
+
+            if (index > -1) {
+                favoritos.splice(index, 1); // Remover si ya estaba
+            } else {
+                favoritos.push(id); // Agregar si no estaba
+            }
+
+            guardarFavoritos(favoritos);
+            renderizarFavoritos();
+        }
+
+        // Inicializar al cargar la página
+        window.onload = function() {
+            renderizarFavoritos();
+        };
+
+        // Configuración del fondo 3D con Three.js (misma estética fluida del proyecto)
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#canvas3d'), alpha: true, antialias: true });
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        const geometry = new THREE.IcosahedronGeometry(2, 0);
+        const material = new THREE.MeshStandardMaterial({
+            color: 0xff007f,
+            wireframe: true,
+            roughness: 0.4,
+            metalness: 0.8
+        });
+
+        const icosahedron = new THREE.Mesh(geometry, material);
+        scene.add(icosahedron);
+
+        const pointLight = new THREE.PointLight(0x00d2ff, 3, 50);
+        pointLight.position.set(5, 5, 5);
+        scene.add(pointLight);
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        camera.position.z = 6;
+
+        let mouseX = 0;
+        let mouseY = 0;
+
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX / window.innerWidth) - 0.5;
+            mouseY = (event.clientY / window.innerHeight) - 0.5;
+        });
+
+        const clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+            const elapsedTime = clock.getElapsedTime();
+            icosahedron.rotation.x = elapsedTime * 0.3 + mouseY * 0.6;
+            icosahedron.rotation.y = elapsedTime * 0.4 + mouseX * 0.6;
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>

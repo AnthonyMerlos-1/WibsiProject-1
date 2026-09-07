@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../assets/img/destacados.png" type="image/png">
+    <title>Destacados y Centro de Juegos | Tech Matrix Pro v4</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            900: '#05070f',
+                            800: '#0e1424',
+                            700: '#1a233a',
+                            600: '#283554'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-modal { animation: fadeInScale 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); }
+            50% { box-shadow: 0 0 35px rgba(59, 130, 246, 0.5); }
+        }
+        .glow-effect:hover { animation: pulseGlow 2s infinite; }
+
+        .glass-panel {
+            background: rgba(14, 20, 36, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-panel:hover {
+            border-color: rgba(59, 130, 246, 0.4);
+            transform: translateY(-3px);
+        }
+
+        .zoomable-img {
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: zoom-in;
+        }
+        .zoomable-img:hover {
+            transform: scale(1.08);
+        }
+
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Estilos Modo Claro */
+        html:not(.dark) body { background-color: #f1f5f9 !important; color: #0f172a !important; }
+        html:not(.dark) .glass-panel { background: rgba(255, 255, 255, 0.9) !important; border-color: rgba(0, 0, 0, 0.08) !important; color: #0f172a !important; }
+        html:not(.dark) header, html:not(.dark) footer, html:not(.dark) nav { background-color: rgba(255, 255, 255, 0.95) !important; border-color: #cbd5e1 !important; }
+        html:not(.dark) input, html:not(.dark) select, html:not(.dark) textarea { background-color: #f8fafc !important; color: #0f172a !important; border-color: #94a3b8 !important; }
+        html:not(.dark) .text-slate-400 { color: #475569 !important; }
+        html:not(.dark) .text-slate-300 { color: #334155 !important; }
+        html:not(.dark) .text-slate-100, html:not(.dark) .text-white { color: #0f172a !important; }
+    </style>
+</head>
+<body class="bg-dark-900 text-slate-100 min-h-screen flex flex-col selection:bg-blue-500 selection:text-white transition-colors duration-300">
+
+    <!-- VISOR ZOOM DE IMAGEN -->
+    <div id="imageZoomModal" class="fixed inset-0 z-50 bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 hidden animate-modal" onclick="closeZoomModal()">
+        <button class="absolute top-6 right-6 text-slate-400 hover:text-white text-2xl z-50 bg-dark-800/80 p-2 rounded-full border border-slate-700">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="relative max-w-5xl max-h-[90vh] overflow-hidden flex flex-col items-center" onclick="event.stopPropagation()">
+            <img id="zoomedImageElement" src="" alt="Zoom" class="max-w-full max-h-[80vh] object-contain rounded-2xl shadow-2xl border border-slate-700 transition-transform duration-300 hover:scale-105">
+            <div class="mt-4 px-4 py-2 bg-dark-800/90 border border-slate-700 rounded-xl text-xs text-slate-300 font-medium shadow-lg" id="zoomedImageCaption">Vista ampliada</div>
+        </div>
+    </div>
+
+    <!-- MODAL DE NUEVA PUBLICACIÓN (GUARDADO AUTOMÁTICO EN LOCALSTORAGE) -->
+    <div id="newPostModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="glass-panel max-w-lg w-full rounded-2xl p-6 shadow-2xl relative animate-modal">
+            <button onclick="closeNewPostModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <h2 class="text-lg font-bold text-white mb-1"><i class="fa-solid fa-pen-nib text-blue-400 mr-2"></i> Crear Publicación Global</h2>
+            <p class="text-xs text-slate-400 mb-4">Tus publicaciones se guardarán automáticamente en tu navegador (Modo Offline).</p>
+            
+            <form id="userPostForm" onsubmit="handleUserPostSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Tu Nombre o Alias</label>
+                    <input type="text" id="postAuthor" required placeholder="ej. Anthony Merlos" class="w-full px-3 py-2 bg-dark-700 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-blue-500 text-white">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Categoría</label>
+                        <select id="postCategory" class="w-full px-3 py-2 bg-dark-700 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-blue-500 text-white">
+                            <option value="ai">Inteligencia Artificial</option>
+                            <option value="hardware">Hardware & Silicio</option>
+                            <option value="dev">Desarrollo & Cloud</option>
+                            <option value="cyber">Ciberseguridad</option>
+                            <option value="quantum">Computación Cuántica</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">URL de Imagen (Opcional)</label>
+                        <input type="url" id="postImage" placeholder="https://..." class="w-full px-3 py-2 bg-dark-700 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-blue-500 text-white">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Título del Artículo</label>
+                    <input type="text" id="postTitle" required placeholder="ej. Arquitectura de redes neuronales..." class="w-full px-3 py-2 bg-dark-700 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-blue-500 text-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Contenido Detallado</label>
+                    <textarea id="postContent" required rows="3" placeholder="Describe los detalles técnicos..." class="w-full px-3 py-2 bg-dark-700 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-blue-500 text-white"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeNewPostModal()" class="px-4 py-2 bg-dark-700 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition-all">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-blue-600/20 transition-all">Publicar y Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DE DETALLE TÉCNICO -->
+    <div id="detailModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="glass-panel max-w-lg w-full rounded-2xl p-6 shadow-2xl relative animate-modal">
+            <button onclick="closeDetailModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="flex items-center gap-2 text-blue-400 text-xs font-semibold uppercase tracking-wider mb-2">
+                <i class="fa-solid fa-terminal animate-pulse"></i> Reporte de Análisis Técnico Profundo
+            </div>
+            <h2 id="modalTitle" class="text-xl font-bold text-white mb-3 leading-snug">Título</h2>
+            <p id="modalDescription" class="text-slate-300 text-sm leading-relaxed mb-6">Contenido...</p>
+            <div class="flex items-center justify-between pt-4 border-t border-slate-800">
+                <span class="text-xs text-slate-500 font-mono">Hash: <span class="text-slate-400">0x9F8...A12</span></span>
+                <button onclick="closeDetailModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-semibold transition-all shadow-lg shadow-blue-600/20">Cerrar Diagnóstico</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BARRA SUPERIOR -->
+    <header class="border-b border-slate-800 bg-dark-800/80 sticky top-0 z-40 backdrop-blur-md transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="flex items-center gap-2 px-3 py-1.5 bg-dark-700 hover:bg-slate-700 border border-slate-700 rounded-xl text-xs font-semibold text-slate-300 transition-all" title="Volver al index principal">
+                    <i class="fa-solid fa-house"></i>
+                    <span class="hidden sm:inline">Volver Index</span>
+                </a>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                    <i class="fa-solid fa-microchip text-white text-lg"></i>
+                </div>
+                <div>
+                    <span class="text-xs font-semibold uppercase tracking-widest text-blue-400 block">Tech Matrix Pro v4</span>
+                    <h1 class="text-lg font-bold tracking-tight text-white leading-none">DESTACADOS</h1>
+                </div>
+            </div>
+
+            <!-- BUSCADOR GLOBAL -->
+            <div class="flex-1 max-w-xl relative hidden md:block">
+                <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </span>
+                <input type="text" id="globalSearch" placeholder="Buscar hardware, IA, publicaciones guardadas..." 
+                    class="w-full pl-11 pr-10 py-2.5 bg-dark-700/60 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder:text-slate-500">
+                <button onclick="clearSearch()" id="clearBtn" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300 hidden">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </button>
+            </div>
+
+            <!-- CONTROLES -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <a href="juegos.html" class="flex items-center gap-2 px-3 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-xl text-xs font-semibold transition-all shadow-lg shadow-amber-500/10">
+                    <i class="fa-solid fa-gamepad"></i>
+                    <span class="hidden sm:inline">Juegos</span>
+                </a>
+                <button onclick="openNewPostModal()" class="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-semibold transition-all shadow-lg shadow-blue-600/20">
+                    <i class="fa-solid fa-plus"></i>
+                    <span class="hidden sm:inline">Publicar</span>
+                </button>
+                <button onclick="toggleThemeMode()" class="p-2.5 bg-dark-700 hover:bg-slate-700 rounded-xl border border-slate-700 text-slate-300 transition-colors" title="Cambiar Tema">
+                    <i id="themeIcon" class="fa-solid fa-sun"></i>
+                </button>
+                <button onclick="toggleViewMode()" class="p-2.5 bg-dark-700 hover:bg-slate-700 rounded-xl border border-slate-700 text-slate-300 transition-colors hidden sm:block" title="Cambiar Vista">
+                    <i id="viewModeIcon" class="fa-solid fa-table-cells"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- NAVEGACIÓN DE CATEGORÍAS -->
+    <nav class="bg-dark-800/30 border-b border-slate-800 py-3 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 flex items-center gap-2 overflow-x-auto hide-scrollbar" id="categoryFilters">
+            <button onclick="filterCategory('all')" class="category-btn px-4 py-2 rounded-xl text-xs font-semibold bg-blue-600 text-white shadow-lg shadow-blue-600/20 transition-all whitespace-nowrap">Todo el Ecosistema</button>
+            <button onclick="filterCategory('ai')" class="category-btn px-4 py-2 rounded-xl text-xs font-semibold bg-dark-700/85 hover:bg-dark-700 text-slate-300 border border-slate-700 transition-all whitespace-nowrap">Inteligencia Artificial</button>
+            <button onclick="filterCategory('hardware')" class="category-btn px-4 py-2 rounded-xl text-xs font-semibold bg-dark-700/85 hover:bg-dark-700 text-slate-300 border border-slate-700 transition-all whitespace-nowrap">Hardware & Silicio</button>
+            <button onclick="filterCategory('dev')" class="category-btn px-4 py-2 rounded-xl text-xs font-semibold bg-dark-700/85 hover:bg-dark-700 text-slate-300 border border-slate-700 transition-all whitespace-nowrap">Desarrollo & Cloud</button>
+            <button onclick="filterCategory('cyber')" class="category-btn px-4 py-2 rounded-xl text-xs font-semibold bg-dark-700/85 hover:bg-dark-700 text-slate-300 border border-slate-700 transition-all whitespace-nowrap">Ciberseguridad</button>
+            <button onclick="filterCategory('quantum')" class="category-btn px-4 py-2 rounded-xl text-xs font-semibold bg-dark-700/85 hover:bg-dark-700 text-slate-300 border border-slate-700 transition-all whitespace-nowrap">Computación Cuántica</button>
+            <button onclick="filterCategory('community')" class="category-btn px-4 py-2 rounded-xl text-xs font-semibold bg-dark-700/85 hover:bg-dark-700 text-slate-300 border border-slate-700 transition-all whitespace-nowrap"><i class="fa-solid fa-users mr-1"></i> Publicaciones Comunidad</button>
+        </div>
+    </nav>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <main class="max-w-7xl mx-auto px-4 py-8 flex-1 w-full">
+        
+        <!-- ESTADÍSTICAS -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="glass-panel p-4 rounded-2xl">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-xs uppercase font-medium">Modelos de IA Activos</span>
+                    <i class="fa-solid fa-brain text-blue-400"></i>
+                </div>
+                <div class="text-2xl font-bold text-white">1,428</div>
+                <div class="text-xs text-emerald-400 mt-1"><i class="fa-solid fa-arrow-trend-up"></i> +12% esta semana</div>
+            </div>
+            <div class="glass-panel p-4 rounded-2xl">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-xs uppercase font-medium">Latencia Global Nube</span>
+                    <i class="fa-solid fa-cloud text-indigo-400"></i>
+                </div>
+                <div class="text-2xl font-bold text-white">14.2 ms</div>
+                <div class="text-xs text-emerald-400 mt-1"><i class="fa-solid fa-circle-check"></i> Estabilidad 99.99%</div>
+            </div>
+            <div class="glass-panel p-4 rounded-2xl">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-xs uppercase font-medium">Vulnerabilidades Cero-Day</span>
+                    <i class="fa-solid fa-shield-halved text-amber-400"></i>
+                </div>
+                <div class="text-2xl font-bold text-white">3 Bloqueadas</div>
+                <div class="text-xs text-amber-400 mt-1"><i class="fa-solid fa-triangle-exclamation"></i> Monitoreo activo</div>
+            </div>
+            <div class="glass-panel p-4 rounded-2xl">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-xs uppercase font-medium">Posts Guardados (Local)</span>
+                    <i class="fa-solid fa-database text-purple-400"></i>
+                </div>
+                <div class="text-2xl font-bold text-white" id="communityCountDisplay">Guardados</div>
+                <div class="text-xs text-purple-400 mt-1"><i class="fa-solid fa-bolt"></i> Persistencia Automática</div>
+            </div>
+        </div>
+
+        <!-- GRILLA DE ARTÍCULOS -->
+        <div id="techGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            <!-- TARJETA 1 -->
+            <article class="glass-panel rounded-2xl overflow-hidden glow-effect flex flex-col justify-between" data-category="ai" data-keywords="ia inteligencia artificial modelos transformers llm">
+                <div>
+                    <div class="relative h-48 bg-slate-800 overflow-hidden group">
+                        <img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=800&auto=format&fit=crop" alt="IA" class="w-full h-full object-cover opacity-80 zoomable-img" onclick="openZoomModal(this.src, 'Arquitecturas de Gran Escala y Razonamiento Autónomo')">
+                        <span class="absolute top-3 left-3 bg-blue-600/90 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Inteligencia Artificial</span>
+                        <div class="absolute bottom-2 right-2 bg-black/70 backdrop-blur-sm text-slate-200 text-[10px] px-2.5 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i class="fa-solid fa-magnifying-glass-plus mr-1"></i> Zoom
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center justify-between text-xs text-slate-400 mb-3">
+                            <span><i class="fa-regular fa-clock mr-1"></i> Actualizado hace 2h</span>
+                            <span class="text-blue-400 font-medium">Transformers v5</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2 leading-snug">Arquitecturas de Gran Escala y Razonamiento Autónomo</h3>
+                        <p class="text-sm text-slate-400 mb-4 line-clamp-3">Nuevos paradigmas en modelos de lenguaje multimodal con capacidades de auto-corrección lógica y menor consumo de cómputo en inferencia.</p>
+                    </div>
+                </div>
+                <div class="px-6 pb-6 pt-0 flex items-center justify-between border-t border-slate-800/80 pt-4">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-blue-500 animate-ping"></span>
+                        <span class="text-xs text-slate-300 font-medium">Inferencia en Borde</span>
+                    </div>
+                    <button onclick="openDetailModal('Arquitecturas de Gran Escala y Razonamiento Autónomo', 'Los avances recientes en redes neuronales han permitido desplegar modelos multimodales directamente en dispositivos perimetrales con una reducción del 60% en la huella de memoria.')" class="text-xs font-semibold text-blue-400 hover:text-blue-300 transition-colors">
+                        Analizar <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </article>
+
+            <!-- TARJETA 2 -->
+            <article class="glass-panel rounded-2xl overflow-hidden glow-effect flex flex-col justify-between" data-category="hardware" data-keywords="hardware silicio semiconductores procesadores nvidia amd intel apple">
+                <div>
+                    <div class="relative h-48 bg-slate-800 overflow-hidden group">
+                        <img src="https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?q=80&w=800&auto=format&fit=crop" alt="Hardware" class="w-full h-full object-cover opacity-80 zoomable-img" onclick="openZoomModal(this.src, 'Evolución de Transistores Gate-All-Around (GAA)')">
+                        <span class="absolute top-3 left-3 bg-purple-600/90 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Hardware & Silicio</span>
+                        <div class="absolute bottom-2 right-2 bg-black/70 backdrop-blur-sm text-slate-200 text-[10px] px-2.5 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i class="fa-solid fa-magnifying-glass-plus mr-1"></i> Zoom
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center justify-between text-xs text-slate-400 mb-3">
+                            <span><i class="fa-regular fa-clock mr-1"></i> Actualizado hace 5h</span>
+                            <span class="text-purple-400 font-medium">Node 2nm GAA</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2 leading-snug">Evolución de Transistores Gate-All-Around (GAA)</h3>
+                        <p class="text-sm text-slate-400 mb-4 line-clamp-3">La transición definitiva hacia nodos de 2 nanómetros con arquitectura multi-puente para superar barreras térmicas y maximizar rendimiento por vatio.</p>
+                    </div>
+                </div>
+                <div class="px-6 pb-6 pt-0 flex items-center justify-between border-t border-slate-800/80 pt-4">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                        <span class="text-xs text-slate-300 font-medium">Eficiencia Térmica</span>
+                    </div>
+                    <button onclick="openDetailModal('Evolución de Transistores Gate-All-Around (GAA)', 'La arquitectura GAA permite un control electrostático superior sobre el canal de conducción, reduciendo drásticamente las fugas de corriente.')" class="text-xs font-semibold text-purple-400 hover:text-purple-300 transition-colors">
+                        Analizar <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </article>
+
+            <!-- TARJETA 3 -->
+            <article class="glass-panel rounded-2xl overflow-hidden glow-effect flex flex-col justify-between" data-category="dev" data-keywords="desarrollo cloud devops kubernetes docker rust web assembly">
+                <div>
+                    <div class="relative h-48 bg-slate-800 overflow-hidden group">
+                        <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=800&auto=format&fit=crop" alt="Cloud" class="w-full h-full object-cover opacity-80 zoomable-img" onclick="openZoomModal(this.src, 'Microservicios Eficientes con Rust y WebAssembly')">
+                        <span class="absolute top-3 left-3 bg-indigo-600/90 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Desarrollo & Cloud</span>
+                        <div class="absolute bottom-2 right-2 bg-black/70 backdrop-blur-sm text-slate-200 text-[10px] px-2.5 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i class="fa-solid fa-magnifying-glass-plus mr-1"></i> Zoom
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center justify-between text-xs text-slate-400 mb-3">
+                            <span><i class="fa-regular fa-clock mr-1"></i> Actualizado hace 1d</span>
+                            <span class="text-indigo-400 font-medium">Cloud-Native v3</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2 leading-snug">Microservicios Eficientes con Rust y WebAssembly</h3>
+                        <p class="text-sm text-slate-400 mb-4 line-clamp-3">Eliminando la sobrecarga de contenedores tradicionales mediante entornos de ejecución basados en Wasm para despliegues instantáneos.</p>
+                    </div>
+                </div>
+                <div class="px-6 pb-6 pt-0 flex items-center justify-between border-t border-slate-800/80 pt-4">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                        <span class="text-xs text-slate-300 font-medium">Cero Latencia</span>
+                    </div>
+                    <button onclick="openDetailModal('Microservicios Eficientes con Rust y WebAssembly', 'WebAssembly fuera del navegador combinado con Rust está redefiniendo la computación serverless con tiempos de arranque en microsegundos.')" class="text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors">
+                        Analizar <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </article>
+
+        </div>
+
+        <!-- ESTADO VACÍO -->
+        <div id="noResults" class="hidden text-center py-20">
+            <div class="w-16 h-16 bg-dark-700 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400 text-xl border border-slate-700">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-1">No se encontraron registros tecnológicos</h3>
+            <p class="text-sm text-slate-400">Intenta con otros términos de búsqueda o cambia de categoría.</p>
+        </div>
+
+    </main>
+
+    <!-- PIE DE PÁGINA -->
+    <footer class="border-t border-slate-800 bg-dark-800/40 py-6 mt-12 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+            <div>&copy; 2026 Tech Matrix Global Pro v4. Todos los sistemas operativos y seguros.</div>
+            <div class="flex items-center gap-6">
+                <a href="index.html" class="hover:text-blue-400 transition-colors"><i class="fa-solid fa-house mr-1"></i> Volver a Index</a>
+                <a href="juegos.html" class="hover:text-amber-400 transition-colors"><i class="fa-solid fa-gamepad mr-1"></i> Centro de Juegos (juegos.html)</a>
+                <span class="hover:text-slate-300 transition-colors cursor-pointer">Modo Offline Habilitado</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- SCRIPT DE FUNCIONALIDAD -->
+    <script>
+        const searchInput = document.getElementById('globalSearch');
+        const clearBtn = document.getElementById('clearBtn');
+        const techGrid = document.getElementById('techGrid');
+        const noResults = document.getElementById('noResults');
+        let currentCategory = 'all';
+
+        // PERSISTENCIA DE PUBLICACIONES EN LOCALSTORAGE
+        function loadStoredPosts() {
+            const savedPosts = JSON.parse(localStorage.getItem('tech_matrix_posts') || '[]');
+            savedPosts.forEach(post => {
+                appendArticleToDOM(post, false);
+            });
+            updateCommunityCount();
+        }
+
+        function savePostToStorage(post) {
+            const savedPosts = JSON.parse(localStorage.getItem('tech_matrix_posts') || '[]');
+            savedPosts.unshift(post);
+            localStorage.setItem('tech_matrix_posts', JSON.stringify(savedPosts));
+            updateCommunityCount();
+        }
+
+        function updateCommunityCount() {
+            const savedPosts = JSON.parse(localStorage.getItem('tech_matrix_posts') || '[]');
+            document.getElementById('communityCountDisplay').textContent = (1 + savedPosts.length) + " Posts";
+        }
+
+        function appendArticleToDOM(post, prepend = true) {
+            const newArticle = document.createElement('article');
+            newArticle.className = "glass-panel rounded-2xl overflow-hidden glow-effect flex flex-col justify-between";
+            newArticle.setAttribute('data-category', post.category);
+            newArticle.setAttribute('data-keywords', `comunidad usuario post ${post.author.toLowerCase()} ${post.title.toLowerCase()}`);
+
+            newArticle.innerHTML = `
+                <div>
+                    <div class="relative h-48 bg-slate-800 overflow-hidden group">
+                        <img src="${post.imgUrl}" alt="Post" class="w-full h-full object-cover opacity-80 zoomable-img" onclick="openZoomModal(this.src, '${post.title.replace(/'/g, "")}')">
+                        <span class="absolute top-3 left-3 bg-emerald-600/95 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider"><i class="fa-solid fa-users mr-1"></i> Publicación de Usuario</span>
+                        <div class="absolute bottom-2 right-2 bg-black/70 backdrop-blur-sm text-slate-200 text-[10px] px-2.5 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i class="fa-solid fa-magnifying-glass-plus mr-1"></i> Zoom
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center justify-between text-xs text-slate-400 mb-3">
+                            <span><i class="fa-solid fa-user-circle text-emerald-400 mr-1"></i> por ${post.author}</span>
+                            <span class="text-emerald-400 font-medium">Guardado Local</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2 leading-snug">${post.title}</h3>
+                        <p class="text-sm text-slate-400 mb-4 line-clamp-3">${post.content}</p>
+                    </div>
+                </div>
+                <div class="px-6 pb-6 pt-0 flex items-center justify-between border-t border-slate-800/80 pt-4">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <span class="text-xs text-slate-300 font-medium">Comunidad Activa</span>
+                    </div>
+                    <button onclick="openDetailModal('${post.title.replace(/'/g, "")}', '${post.content.replace(/'/g, "")} (Publicado por ${post.author})')" class="text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition-colors">
+                        Analizar <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            `;
+            if (prepend) {
+                techGrid.prepend(newArticle);
+            } else {
+                techGrid.appendChild(newArticle);
+            }
+        }
+
+        // Búsqueda Dinámica
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            clearBtn.classList.toggle('hidden', query.length === 0);
+            filterArticles(query, currentCategory);
+        });
+
+        function clearSearch() {
+            searchInput.value = '';
+            clearBtn.classList.add('hidden');
+            filterArticles('', currentCategory);
+            searchInput.focus();
+        }
+
+        // Filtro por Categoría
+        function filterCategory(category) {
+            currentCategory = category;
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.className = "category-btn px-4 py-2 rounded-xl text-xs font-semibold bg-dark-700/85 hover:bg-dark-700 text-slate-300 border border-slate-700 transition-all whitespace-nowrap";
+            });
+            event.currentTarget.className = "category-btn px-4 py-2 rounded-xl text-xs font-semibold bg-blue-600 text-white shadow-lg shadow-blue-600/20 transition-all whitespace-nowrap";
+            filterArticles(searchInput.value.toLowerCase().trim(), currentCategory);
+        }
+
+        function filterArticles(query, category) {
+            const articles = techGrid.querySelectorAll('article');
+            let visibleCount = 0;
+
+            articles.forEach(article => {
+                const articleCategory = article.getAttribute('data-category');
+                const keywords = article.getAttribute('data-keywords').toLowerCase();
+                const title = article.querySelector('h3').textContent.toLowerCase();
+                const description = article.querySelector('p').textContent.toLowerCase();
+
+                const matchesCategory = (category === 'all' || articleCategory === category);
+                const matchesQuery = (query === '' || title.includes(query) || description.includes(query) || keywords.includes(query));
+
+                if (matchesCategory && matchesQuery) {
+                    article.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    article.style.display = 'none';
+                }
+            });
+
+            noResults.classList.toggle('hidden', visibleCount > 0);
+        }
+
+        // Modales Generales
+        function openDetailModal(title, description) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalDescription').textContent = description;
+            document.getElementById('detailModal').classList.remove('hidden');
+        }
+        function closeDetailModal() { document.getElementById('detailModal').classList.add('hidden'); }
+
+        function openZoomModal(imgSrc, caption) {
+            document.getElementById('zoomedImageElement').src = imgSrc;
+            document.getElementById('zoomedImageCaption').textContent = caption || 'Detalle visual tecnológico';
+            document.getElementById('imageZoomModal').classList.remove('hidden');
+        }
+        function closeZoomModal() { document.getElementById('imageZoomModal').classList.add('hidden'); }
+
+        function openNewPostModal() { document.getElementById('newPostModal').classList.remove('hidden'); }
+        function closeNewPostModal() { document.getElementById('newPostModal').classList.add('hidden'); }
+
+        function handleUserPostSubmit(e) {
+            e.preventDefault();
+            const post = {
+                author: document.getElementById('postAuthor').value,
+                category: document.getElementById('postCategory').value,
+                imgUrl: document.getElementById('postImage').value || "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800&auto=format&fit=crop",
+                title: document.getElementById('postTitle').value,
+                content: document.getElementById('postContent').value
+            };
+
+            savePostToStorage(post);
+            appendArticleToDOM(post, true);
+            closeNewPostModal();
+            document.getElementById('userPostForm').reset();
+            filterArticles(searchInput.value.toLowerCase().trim(), currentCategory);
+        }
+
+        // Modo Claro / Oscuro
+        function toggleThemeMode() {
+            const html = document.documentElement;
+            const icon = document.getElementById('themeIcon');
+            html.classList.toggle('dark');
+            icon.className = html.classList.contains('dark') ? "fa-solid fa-sun" : "fa-solid fa-moon";
+        }
+
+        let isGrid = true;
+        function toggleViewMode() {
+            isGrid = !isGrid;
+            const icon = document.getElementById('viewModeIcon');
+            techGrid.className = isGrid ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : "grid grid-cols-1 gap-4";
+            icon.className = isGrid ? "fa-solid fa-table-cells" : "fa-solid fa-list";
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeZoomModal();
+                closeDetailModal();
+                closeNewPostModal();
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadStoredPosts();
+        });
+    </script>
+</body>
+</html>

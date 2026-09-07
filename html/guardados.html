@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guardados - WibsiProject</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../assets/img/logwiti.png" type="image/png">
+    <style>
+        body.dark-mode {
+            background-color: #0d0d12;
+            color: #e0e0e0;
+        }
+
+        /* --- Diseño Exclusivo y Mejorado para Guardados --- */
+        .saved-wrapper {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .saved-header-banner {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.1));
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 16px;
+            padding: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 35px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.2);
+        }
+
+        .saved-banner-title h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .saved-banner-title p {
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        .btn-volver-home {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-volver-home:hover {
+            background: #6366f1;
+            border-color: #6366f1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Grid estilo bento / tarjetas modernas */
+        .saved-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .saved-item-card {
+            background: rgba(25, 25, 35, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .saved-item-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(99, 102, 241, 0.5);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(99, 102, 241, 0.15);
+            background: rgba(30, 30, 45, 0.9);
+        }
+
+        .saved-thumb-box {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .saved-thumb-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .saved-item-card:hover .saved-thumb-box img {
+            transform: scale(1.08);
+        }
+
+        .saved-play-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .saved-item-card:hover .saved-play-overlay {
+            opacity: 1;
+        }
+
+        .saved-play-icon {
+            width: 48px;
+            height: 48px;
+            background: #6366f1;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.5);
+            transform: scale(0.8);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .saved-item-card:hover .saved-play-icon {
+            transform: scale(1);
+        }
+
+        .saved-content-info {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            justify-content: space-between;
+        }
+
+        .saved-item-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 6px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .saved-item-meta {
+            font-size: 12px;
+            color: #9ca3af;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .btn-quitar-guardado {
+            background: transparent;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .btn-quitar-guardado:hover {
+            background: rgba(239, 68, 68, 0.15);
+        }
+
+        .empty-saved-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 2px dashed rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+        }
+
+        .empty-saved-state span {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        .empty-saved-state h3 {
+            color: #fff;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .empty-saved-state p {
+            color: #888;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body class="dark-mode">
+
+    <div class="saved-wrapper">
+        <!-- Banner de Cabecera Exclusivo -->
+        <div class="saved-header-banner">
+            <div class="saved-banner-title">
+                <h1><span>💾</span> Tus Videos Guardados</h1>
+                <p>Contenido multimedia almacenado en tu búnker personal de WibsiProject.</p>
+            </div>
+            <a href="index.html" class="btn-volver-home">
+                <span>←</span> Volver al Inicio
+            </a>
+        </div>
+
+        <!-- Contenedor Dinámico de Elementos Guardados -->
+        <div class="saved-grid" id="savedGridContainer">
+            <!-- Los elementos se cargan automáticamente desde localStorage -->
+        </div>
+    </div>
+
+    <!-- Modal Reproductor integrado -->
+    <div class="modal" id="videoModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center;">
+        <div class="player-window" style="width: 90%; max-width: 800px; background: #1e1e24; border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7);">
+            <div class="player-header" style="display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; background: #121216;">
+                <div class="player-brand" style="font-weight: bold; color: #fff; letter-spacing: 0.5px;">WIBSIPROJECT<span>. REPRODUCTOR</span></div>
+                <button onclick="cerrarModalVideo()" style="background: transparent; border: none; color: #fff; font-size: 18px; cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">✕</button>
+            </div>
+            <div class="player" style="position: relative; width: 100%; background: #000; aspect-ratio: 16/9;">
+                <video id="videoPlayer" controls playsinline style="width: 100%; height: 100%;"></video>
+            </div>
+            <div class="player-details" style="padding: 16px 20px;">
+                <h2 id="playerTitle" style="font-size: 18px; color: #fff; margin-bottom: 4px;">Video</h2>
+                <p style="font-size: 13px; color: #9ca3af;">Reproduciendo desde tus elementos guardados en WibsiProject.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderizarGuardados();
+        });
+
+        function renderizarGuardados() {
+            const contenedor = document.getElementById('savedGridContainer');
+            // Clave independiente para la sección de guardados (puedes usar 'wibsitihub_elementos_guardados')
+            let guardados = JSON.parse(localStorage.getItem('wibsitihub_elementos_guardados')) || [];
+
+            if (guardados.length === 0) {
+                contenedor.innerHTML = `
+                    <div class="empty-saved-state">
+                        <span>📭</span>
+                        <h3>No tienes videos guardados todavía</h3>
+                        <p>Explora el catálogo y guarda tus videos favoritos para verlos aquí cuando quieras.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            contenedor.innerHTML = '';
+            guardados.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'saved-item-card';
+                card.setAttribute('onclick', `reproducirVideoGuardado('${item.title.replace(/'/g, "\\'")}', '${item.video}')`);
+
+                card.innerHTML = `
+                    <div class="saved-thumb-box">
+                        <img src="${item.image || '../assets/img/portada1.jpg'}" alt="Miniatura">
+                        <div class="saved-play-overlay">
+                            <div class="saved-play-icon">▶</div>
+                        </div>
+                    </div>
+                    <div class="saved-content-info">
+                        <div class="saved-item-title">${item.title}</div>
+                        <div class="saved-item-meta">
+                            <span>Guardado</span>
+                            <button class="btn-quitar-guardado" onclick="event.stopPropagation(); eliminarGuardado(${index})">
+                                🗑️ Quitar
+                            </button>
+                        </div>
+                    </div>
+                `;
+                contenedor.appendChild(card);
+            });
+        }
+
+        function reproducirVideoGuardado(title, videoSrc) {
+            const videoModal = document.getElementById('videoModal');
+            const playerTitle = document.getElementById('playerTitle');
+            const videoPlayer = document.getElementById('videoPlayer');
+
+            if (playerTitle) playerTitle.textContent = title;
+            if (videoPlayer) {
+                videoPlayer.src = videoSrc;
+                videoPlayer.play().catch(() => {});
+            }
+
+            if (videoModal) {
+                videoModal.style.display = 'flex';
+                document.body.style.overflow = "hidden";
+            }
+        }
+
+        function cerrarModalVideo() {
+            const videoModal = document.getElementById('videoModal');
+            const videoPlayer = document.getElementById('videoPlayer');
+            if (videoPlayer) videoPlayer.pause();
+            if (videoModal) {
+                videoModal.style.display = 'none';
+                document.body.style.overflow = "auto";
+            }
+        }
+
+        function eliminarGuardado(index) {
+            let guardados = JSON.parse(localStorage.getItem('wibsitihub_elementos_guardados')) || [];
+            guardados.splice(index, 1);
+            localStorage.setItem('wibsitihub_elementos_guardados', JSON.stringify(guardados));
+            renderizarGuardados();
+        }
+    </script>
+</body>
+</html>

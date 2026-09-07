@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WIBSIPROJECT - Tendencias Globales</title>
+    <link rel="icon" type="image/png" href="../assets/img/tendencias.png">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        :root {
+            --trend-primary: #8b5cf6;
+            --trend-glow: rgba(139, 92, 246, 0.25);
+            --card-bg: rgba(20, 20, 28, 0.7);
+        }
+
+        .video-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .video-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(139, 92, 246, 0.4);
+            box-shadow: 0 12px 28px rgba(139, 92, 246, 0.15);
+        }
+
+        .edit-video-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(15, 15, 20, 0.85);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            color: #d1d5db;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 10;
+            backdrop-filter: blur(4px);
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .edit-video-btn:hover {
+            background: var(--trend-primary);
+            color: #fff;
+            border-color: var(--trend-primary);
+            transform: scale(1.05);
+            box-shadow: 0 0 12px rgba(139, 92, 246, 0.5);
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(1); box-shadow: 0 0 0 rgba(139, 92, 246, 0); border-color: rgba(139, 92, 246, 0.2); }
+            50% { transform: scale(1.02); box-shadow: 0 0 25px rgba(139, 92, 246, 0.6); border-color: #8b5cf6; background: rgba(139, 92, 246, 0.15); }
+            100% { transform: scale(1); box-shadow: 0 0 0 rgba(139, 92, 246, 0); border-color: rgba(139, 92, 246, 0.2); }
+        }
+
+        .video-card.editing-animation {
+            animation: pulseGlow 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .ymusic-floating-bar {
+            position: fixed;
+            bottom: 0; left: 0; width: 100%; height: 64px;
+            background: rgba(18, 18, 24, 0.95);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 16px; z-index: 1000;
+            box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.5);
+            transform: translateY(100%);
+            animation: slideUpBar 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        .ymusic-floating-bar.closing { animation: slideDownBar 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        @keyframes slideUpBar { to { transform: translateY(0); } }
+        @keyframes slideDownBar { from { transform: translateY(0); } to { transform: translateY(100%); } }
+
+        .ymusic-progress-bar {
+            position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+            background: rgba(255, 255, 255, 0.1); cursor: pointer; transition: height 0.2s ease;
+        }
+        .ymusic-progress-bar:hover { height: 6px; }
+        .ymusic-progress-filled { height: 100%; background: var(--trend-primary); width: 0%; transition: width 0.1s linear; }
+
+        .ymusic-left-controls { display: flex; align-items: center; gap: 12px; }
+        .ymusic-time { font-size: 12px; color: #9ca3af; min-width: 75px; user-select: none; }
+        
+        .ymusic-center-info {
+            display: flex; align-items: center; gap: 12px; cursor: pointer;
+            max-width: 40%; overflow: hidden; padding: 4px 8px; border-radius: 8px; transition: background 0.2s;
+        }
+        .ymusic-center-info:hover { background: rgba(255, 255, 255, 0.05); }
+        #barThumb { width: 44px; height: 44px; border-radius: 6px; object-fit: cover; }
+        .ymusic-text-group { display: flex; flex-direction: column; overflow: hidden; }
+        .ymusic-bar-title { font-size: 14px; font-weight: 600; color: #f3f4f6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ymusic-bar-channel { font-size: 12px; color: #9ca3af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .ymusic-right-controls { display: flex; align-items: center; gap: 8px; }
+        .ymusic-icon-btn {
+            background: transparent; border: none; color: #d1d5db; cursor: pointer;
+            width: 36px; height: 36px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; transition: all 0.2s ease; font-size: 14px;
+        }
+        .ymusic-icon-btn:hover { background: rgba(255, 255, 255, 0.1); color: #fff; transform: scale(1.05); }
+        .ymusic-icon-btn.play-main { background: var(--trend-primary); color: #fff; width: 40px; height: 40px; }
+
+        @media (max-width: 768px) {
+            .ymusic-right-controls .hide-mobile { display: none; }
+            .ymusic-time, .ymusic-left-controls button:not(.play-main) { display: none; }
+            .ymusic-center-info { max-width: 60%; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-symbol">W</div>
+            <div>
+                <div class="brand-name">WIBSIPROJECT<span>.</span></div>
+                <div class="brand-sub">VIDEO NETWORK</div>
+            </div>
+        </div>
+
+        <div class="search-box">
+            <span>⌕</span>
+            <input type="text" id="searchInput" placeholder="Buscar tendencias..." autocomplete="off">
+            <kbd>ENTER</kbd>
+        </div>
+
+        <div class="top-actions">
+            <button class="top-button" id="randomButton">✦ <span>Sorpréndeme</span></button>
+            <button class="top-button" id="btnSecureTop" onclick="checkPassword()" title="Sección protegida para videos privados">🔒 <span>Privados</span></button>
+            <button class="icon-button" title="Lista de favoritos guardados">♡</button>
+            <button class="profile-button" id="profileBtnTop" title="Perfil de usuario" onclick="window.location.href='cuenta.html'"><span id="topUserInitials">AM</span></button>
+        </div>
+    </header>
+
+   <div class="app">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="section-label">EXPLORAR</div>
+                <button class="side-link" onclick="window.location.href='index.html'" title="Ir a la página principal de inicio"><span>🏠</span> Inicio</button>
+                <button class="side-link active" onclick="window.location.href='explorar_mas.html'" title="Ver sección detallada de explorar más contenido"><span>🎁</span> Tendencias</button>
+                <button class="side-link" onclick="window.location.href='Wshorts.html'" title="Ver Shorts"><span>⚡</span> Shorts</button>
+                <button class="side-link" title="Explorar los videos más destacados de la plataforma" onclick="window.location.href='destacados.html'"><span>🖨️</span> Destacados</button>
+                <button class="side-link" title="Reproducir un video aleatorio de forma automática"><span>🔄</span> Aleatorio</button>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="section-label">TU ESPACIO</div>
+                <button class="side-link" title="Ver tus videos marcados como favoritos" onclick="window.location.href='favoritos.html'"><span>💝</span> Favoritos</button>
+
+                   <button class="side-link" onclick="window.location.href='historial.html'">
+                    <span>💻️</span> Historial
+                </button>
+
+
+                <button class="side-link" title="Acceder a tus elementos guardados"><span>💾</span> Guardados</button>
+                <button class="side-link" onclick="checkPassword()" title="Acceso seguro mediante contraseña a contenido privado"><span>🔐</span> Guardados con contraseña</button>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="section-label">MÁS</div>
+                <button class="side-link active" onclick="window.location.href='creadores.html'" title="Conocer a los creadores de contenido de la red"><span>🤝</span> Creadores</button>
+                <button class="side-link active" onclick="window.location.href='colecciones.html'" title="Ver listas de reproducción y colecciones multimedia"><span>🎥</span> Colecciones</button>
+                <button class="side-link active" onclick="window.location.href='Ajustes.html'" title="Configurar preferencias generales del sistema"><span>⚙️</span> Ajustes</button>
+            </div>
+
+            <div class="sidebar-bottom">
+                <div class="mini-status"><span class="status-dot"></span> WIBSIPROJECT ONLINE</div>
+                <small>Plataforma de video</small>
+            </div>
+        </aside>
+
+        <main class="main">
+            <section class="categories-section" style="margin-top: 10px; margin-bottom: 25px;">
+                <div class="categories" id="tendenciasFiltros">
+                    <button class="category active" data-tendencia="Todos"><span>🔥</span> Top Global</button>
+                    <button class="category" data-tendencia="Musica"><span>🎵</span> Música & Phonk</button>
+                    <button class="category" data-tendencia="Gaming"><span>⌁</span> Gaming</button>
+                    <button class="category" data-tendencia="Tecnología"><span>⚡</span> Tecnología & 4K</button>
+                </div>
+            </section>
+
+            <section class="video-section">
+                <div class="section-heading">
+                    <div>
+                        <span class="tiny-label">LO MÁS VISTO</span>
+                        <h2>Videos Populares</h2>
+                    </div>
+                    <span class="category-count">Espacios Independientes</span>
+                </div>
+
+                <div class="video-grid" id="videoGrid">
+                    <!-- Tarjeta 1 -->
+                    <article class="video-card" data-id="video-1" data-category="Tecnología" data-title="Dentro del futuro digital" data-video="https://www.youtube.com/watch?v=pBUlV7rZp_c" data-image="../assets/img/portada1.jpg">
+                        <button class="edit-video-btn" onclick="editarVideo(this, event)">✏️ Editar Video</button>
+                        <div class="thumbnail">
+                            <img src="../assets/img/paisaje.jpg" alt="Video">
+                            <div class="thumbnail-gradient"></div>
+                            <div class="quality">4K</div>
+                            <div class="duration">12:48</div>
+                            <button class="play-button">▶</button>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">Dentro del futuro digital</div>
+                            <div class="creator"><div class="creator-avatar">W</div><span>Wibsiproject Lab</span><i>✓</i></div>
+                            <div class="video-meta"><span>250K vistas</span><b>•</b><span>hace 4 h</span></div>
+                        </div>
+                    </article>
+
+                    <!-- Tarjeta 2 -->
+                    <article class="video-card" data-id="video-2" data-category="Musica" data-title="AGRESSIVE DRIFT PHONK MIX" data-video="https://www.youtube.com/watch?v=DgTJXfsgPi8" data-image="../assets/img/portada1.jpg">
+                        <button class="edit-video-btn" onclick="editarVideo(this, event)">✏️ Editar Video</button>
+                        <div class="thumbnail">
+                            <img src="../assets/img/tortuga.jpg" alt="Phonk">
+                            <div class="thumbnail-gradient"></div>
+                            <div class="quality">HD</div>
+                            <div class="duration">04:15</div>
+                            <button class="play-button">▶</button>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">AGRESSIVE DRIFT PHONK MIX</div>
+                            <div class="creator"><div class="creator-avatar purple">P</div><span>Phonk Nation</span><i>✓</i></div>
+                            <div class="video-meta"><span>180K vistas</span><b>•</b><span>hace 1 día</span></div>
+                        </div>
+                    </article>
+
+                    <!-- Tarjeta 3 -->
+                    <article class="video-card" data-id="video-3" data-category="Gaming" data-title="Gameplay Black Ops II Partida Épica Gaming" data-video="https://youtu.be/c95WGXY42jo" data-image="../assets/img/portada2.jpg">
+                        <button class="edit-video-btn" onclick="editarVideo(this, event)">✏️ Editar Video</button>
+                        <div class="thumbnail">
+                            <img src="../assets/img/phonk1.jpg" alt="Video">
+                            <div class="thumbnail-gradient"></div>
+                            <div class="quality">4K</div>
+                            <div class="duration">08:35</div>
+                            <button class="play-button">▶</button>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">Gameplay Black Ops II Partida Épica Gaming</div>
+                            <div class="creator"><div class="creator-avatar cyan">N</div><span>Night Archive</span><i>✓</i></div>
+                            <div class="video-meta"><span>310K vistas</span><b>•</b><span>ayer</span></div>
+                        </div>
+                    </article>
+
+                    <!-- Tarjeta 4 -->
+                    <article class="video-card" data-id="video-4" data-category="Tecnología" data-title="Innovación en Inteligencia Artificial" data-video="https://www.youtube.com/watch?v=pBUlV7rZp_c" data-image="../assets/img/portada1.jpg">
+                        <button class="edit-video-btn" onclick="editarVideo(this, event)">✏️ Editar Video</button>
+                        <div class="thumbnail">
+                            <img src="../assets/img/portada1.jpg" alt="IA">
+                            <div class="thumbnail-gradient"></div>
+                            <div class="quality">4K</div>
+                            <div class="duration">15:20</div>
+                            <button class="play-button">▶</button>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">Innovación en Inteligencia Artificial</div>
+                            <div class="creator"><div class="creator-avatar">W</div><span>Tech Global</span><i>✓</i></div>
+                            <div class="video-meta"><span>420K vistas</span><b>•</b><span>hace 6 h</span></div>
+                        </div>
+                    </article>
+
+
+
+
+
+
+
+   <!-- Tarjeta 4 -->
+                    <article class="video-card" data-id="video-4" data-category="Tecnología" data-title="Innovación en Inteligencia Artificial" data-video="https://youtu.be/CiGVMIErCDw" data-image="../assets/img/portada1.jpg">
+                        <button class="edit-video-btn" onclick="editarVideo(this, event)">✏️ Editar Video</button>
+                        <div class="thumbnail">
+                            <img src="../assets/img/portada1.jpg" alt="IA">
+                            <div class="thumbnail-gradient"></div>
+                            <div class="quality">4K</div>
+                            <div class="duration">15:20</div>
+                            <button class="play-button">▶</button>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">Innovación en Inteligencia Artificial</div>
+                            <div class="creator"><div class="creator-avatar">W</div><span>Tech Global</span><i>✓</i></div>
+                            <div class="video-meta"><span>420K vistas</span><b>•</b><span>hace 6 h</span></div>
+                        </div>
+                    </article>
+
+
+
+
+
+
+
+                  <article class="video-card" data-id="video-4" data-category="Tecnología" data-title="Innovación en Inteligencia Artificial" data-video="https://youtu.be/9vE1WlkRaj8?list=RD9vE1WlkRaj8" data-image="../assets/img/portada1.jpg">
+                        <button class="edit-video-btn" onclick="editarVideo(this, event)">✏️ Editar Video</button>
+                        <div class="thumbnail">
+                            <img src="../assets/img/portada1.jpg" alt="IA">
+                            <div class="thumbnail-gradient"></div>
+                            <div class="quality">4K</div>
+                            <div class="duration">15:20</div>
+                            <button class="play-button">▶</button>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">Innovación en Inteligencia Artificial</div>
+                            <div class="creator"><div class="creator-avatar">W</div><span>Tech Global</span><i>✓</i></div>
+                            <div class="video-meta"><span>420K vistas</span><b>•</b><span>hace 6 h</span></div>
+                        </div>
+                    </article>
+
+
+
+
+
+                  <article class="video-card" data-id="video-4" data-category="Tecnología" data-title="Innovación en Inteligencia Artificial" data-video="https://youtu.be/8dOMXfWmghg?list=RD8dOMXfWmghg" data-image="../assets/img/portada1.jpg">
+                        <button class="edit-video-btn" onclick="editarVideo(this, event)">✏️ Editar Video</button>
+                        <div class="thumbnail">
+                            <img src="../assets/img/portada1.jpg" alt="IA">
+                            <div class="thumbnail-gradient"></div>
+                            <div class="quality">4K</div>
+                            <div class="duration">15:20</div>
+                            <button class="play-button">▶</button>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">Innovación en Inteligencia Artificial</div>
+                            <div class="creator"><div class="creator-avatar">W</div><span>Tech Global</span><i>✓</i></div>
+                            <div class="video-meta"><span>420K vistas</span><b>•</b><span>hace 6 h</span></div>
+                        </div>
+                    </article>
+
+
+
+
+
+                  <article class="video-card" data-id="video-4" data-category="Tecnología" data-title="Innovación en Inteligencia Artificial" data-video="https://youtu.be/yEbhDfZ6WD0?list=RDEMNcWnYEuMgWpcYQ4O1iFISA" data-image="../assets/img/portada1.jpg">
+                        <button class="edit-video-btn" onclick="editarVideo(this, event)">✏️ Editar Video</button>
+                        <div class="thumbnail">
+                            <img src="../assets/img/portada1.jpg" alt="IA">
+                            <div class="thumbnail-gradient"></div>
+                            <div class="quality">4K</div>
+                            <div class="duration">15:20</div>
+                            <button class="play-button">▶</button>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">Innovación en Inteligencia Artificial</div>
+                            <div class="creator"><div class="creator-avatar">W</div><span>Tech Global</span><i>✓</i></div>
+                            <div class="video-meta"><span>420K vistas</span><b>•</b><span>hace 6 h</span></div>
+                        </div>
+                    </article>
+
+
+
+
+
+                  <article class="video-card" data-id="video-4" data-category="Tecnología" data-title="Innovación en Inteligencia Artificial" data-video="https://youtu.be/rK9gOo22vyg?list=RDEMNcWnYEuMgWpcYQ4O1iFISA" data-image="../assets/img/portada1.jpg">
+                        <button class="edit-video-btn" onclick="editarVideo(this, event)">✏️ Editar Video</button>
+                        <div class="thumbnail">
+                            <img src="../assets/img/portada1.jpg" alt="IA">
+                            <div class="thumbnail-gradient"></div>
+                            <div class="quality">4K</div>
+                            <div class="duration">15:20</div>
+                            <button class="play-button">▶</button>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">Innovación en Inteligencia Artificial</div>
+                            <div class="creator"><div class="creator-avatar">W</div><span>Tech Global</span><i>✓</i></div>
+                            <div class="video-meta"><span>420K vistas</span><b>•</b><span>hace 6 h</span></div>
+                        </div>
+                    </article>
+
+
+                </div>
+            </section>
+        </main>
+    </div>
+
+    
+
+    <!-- Modal Reproductor Principal -->
+    <div class="modal" id="videoModal">
+        <div class="player-window">
+            <div class="player-header">
+                <div class="player-brand">WIBSIPROJECT<span>.</span></div>
+                <button onclick="minimizarAReproductorBarra()" title="Minimizar" style="font-size: 16px; font-weight: bold; background: transparent; border: none; color: #fff; cursor: pointer; margin-left: auto; margin-right: 15px;">▼</button>
+                <button id="closePlayer">✕</button>
+            </div>
+            <div class="player">
+                <video id="videoPlayer" controls playsinline></video>
+            </div>
+            <div class="player-details">
+                <div>
+                    <span class="player-tag">WIBSIPROJECT TENDENCIA</span>
+                    <h2 id="playerTitle">Video</h2>
+                    <p>Reproduciendo contenido multimedia en tendencia.</p>
+                </div>
+                <div class="player-actions">
+                    <button id="likeButton">♡ <span>Me gusta</span></button>
+                    <button>◇ <span>Guardar</span></button>
+                    <button>↗ <span>Compartir</span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Barra Flotante YMusic -->
+    <div id="ymusicBar" class="ymusic-floating-bar" style="display: none;">
+        <div class="ymusic-progress-bar">
+            <div class="ymusic-progress-filled" style="width: 0%;"></div>
+        </div>
+
+        <div class="ymusic-left-controls">
+            <button class="ymusic-icon-btn" onclick="controlAnterior(event)" title="Anterior">⏮</button>
+            <button id="barPlayPause" class="ymusic-icon-btn play-main" onclick="togglePlayBar(event)" title="Pausa">❚❚</button>
+            <button class="ymusic-icon-btn" onclick="controlSiguiente(event)" title="Siguiente">⏭</button>
+            <span class="ymusic-time">0:00 / 0:00</span>
+        </div>
+
+        <div class="ymusic-center-info" onclick="abrirModalDesdeBarra()">
+            <img id="barThumb" src="../assets/img/portada1.jpg" alt="Miniatura">
+            <div class="ymusic-text-group">
+                <div id="barTitle" class="ymusic-bar-title">Selecciona un video</div>
+                <div class="ymusic-bar-channel">Wibsiproject Network</div>
+            </div>
+        </div>
+
+        <div class="ymusic-right-controls" onclick="event.stopPropagation()">
+            <button class="ymusic-icon-btn" id="btnLikeBar" onclick="toggleLikeBar(this)" title="Me gusta">👍</button>
+            <button class="ymusic-icon-btn hide-mobile" id="btnMuteBar" onclick="toggleMuteBar(this)" title="Volumen">🔊</button>
+            <button class="ymusic-icon-btn close-btn" onclick="abrirModalDesdeBarra()" title="Maximizar">▲</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">
+        <span>✓</span>
+        <p>Guardado correctamente</p>
+    </div>
+
+    <script>
+        function checkPassword() {
+            const passwordCorrecta = "2436anthony123privado123"; 
+            let passwordIngresada = prompt("Ingresa la contraseña para ver los videos guardados:");
+            if (passwordIngresada === passwordCorrecta) {
+                window.location.href = "privado.html";
+            } else if (passwordIngresada !== null) {
+                alert("Contraseña incorrecta. Acceso denegado.");
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const sesionActiva = JSON.parse(localStorage.getItem('wibsiproject_sesion_activa'));
+            const profileBtn = document.getElementById('profileBtnTop');
+            if (sesionActiva && profileBtn) {
+                if (sesionActiva.avatar) {
+                    profileBtn.style.backgroundImage = `url(${sesionActiva.avatar})`;
+                    profileBtn.style.backgroundSize = 'cover';
+                    profileBtn.style.backgroundRepeat = 'no-repeat';
+                    profileBtn.style.backgroundPosition = 'center';
+                    const spanInit = document.getElementById('topUserInitials');
+                    if (spanInit) spanInit.style.display = 'none';
+                }
+            }
+        });
+
+        function cargarDatosPersistentes() {
+            const grid = document.getElementById("videoGrid");
+            if (!grid) return;
+
+            let videosSubidos = JSON.parse(localStorage.getItem("wibsiproject_videos_subidos")) || [];
+            
+            videosSubidos.forEach(item => {
+                if (!document.querySelector(`[data-id="${item.id}"]`)) {
+                    const nuevaCard = document.createElement("article");
+                    nuevaCard.className = "video-card";
+                    nuevaCard.dataset.id = item.id;
+                    nuevaCard.dataset.category = item.categoria || "Tecnología";
+                    nuevaCard.dataset.title = item.titulo;
+                    nuevaCard.dataset.video = item.videoUrl || "https://www.youtube.com/watch?v=pBUlV7rZp_c";
+                    nuevaCard.dataset.image = item.imagen || "../assets/img/portada1.jpg";
+
+                    nuevaCard.innerHTML = `
+                        <button class="edit-video-btn" onclick="editarVideo(this, event)">✏️ Editar Video</button>
+                        <div class="thumbnail">
+                            <img src="${item.imagen || '../assets/img/portada1.jpg'}" alt="Video">
+                            <div class="thumbnail-gradient"></div>
+                            <div class="quality">HD</div>
+                            <div class="duration">10:00</div>
+                            <button class="play-button">▶</button>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">${item.titulo}</div>
+                            <div class="creator"><div class="creator-avatar">U</div><span>Usuario</span><i>✓</i></div>
+                            <div class="video-meta"><span>1K vistas</span><b>•</b><span>recién subido</span></div>
+                        </div>
+                    `;
+                    grid.prepend(nuevaCard);
+                }
+            });
+
+            let datosEditados = JSON.parse(localStorage.getItem("wibsiproject_tendencias_videos")) || {};
+            const tarjetas = document.querySelectorAll(".video-card");
+
+            tarjetas.forEach((card, index) => {
+                const idCard = card.dataset.id || `video-${index}`;
+                card.dataset.id = idCard;
+
+                const tituloElem = card.querySelector(".video-title");
+                if (!tituloElem) return;
+
+                if (datosEditados[idCard] && datosEditados[idCard].titulo) {
+                    tituloElem.textContent = datosEditados[idCard].titulo;
+                    card.setAttribute("data-title", datosEditados[idCard].titulo);
+                }
+
+                const textoTitulo = tituloElem.textContent.toLowerCase();
+                let categoriaDetectada = "Tecnología";
+
+                if (textoTitulo.includes("phonk") || textoTitulo.includes("mix") || textoTitulo.includes("musica") || textoTitulo.includes("drift")) {
+                    categoriaDetectada = "Musica";
+                } else if (textoTitulo.includes("gameplay") || textoTitulo.includes("gaming") || textoTitulo.includes("juego") || textoTitulo.includes("black ops")) {
+                    categoriaDetectada = "Gaming";
+                } else if (textoTitulo.includes("futuro") || textoTitulo.includes("ia") || textoTitulo.includes("inteligencia") || textoTitulo.includes("tech")) {
+                    categoriaDetectada = "Tecnología";
+                }
+
+                card.setAttribute("data-category", categoriaDetectada);
+            });
+        }
+
+        window.registrarNuevoVideo = function(titulo, categoria, videoUrl, imagen) {
+            let videosSubidos = JSON.parse(localStorage.getItem("wibsiproject_videos_subidos")) || [];
+            const nuevoId = "video-custom-" + Date.now();
+            
+            videosSubidos.push({
+                id: nuevoId,
+                titulo: titulo,
+                categoria: categoria || "Tecnología",
+                videoUrl: videoUrl,
+                imagen: imagen
+            });
+
+            localStorage.setItem("wibsiproject_videos_subidos", JSON.stringify(videosSubidos));
+            cargarDatosPersistentes();
+        }
+
+        function editarVideo(btn, event) {
+            event.stopPropagation(); 
+            const card = btn.closest(".video-card");
+            const tituloElem = card.querySelector(".video-title");
+            const idCard = card.dataset.id;
+            
+            let nuevoTitulo = prompt("Edita el título de este video:", tituloElem.textContent);
+            if (nuevoTitulo !== null && nuevoTitulo.trim() !== "") {
+                card.classList.add("editing-animation");
+
+                tituloElem.textContent = nuevoTitulo;
+                card.setAttribute("data-title", nuevoTitulo);
+
+                let datosEditados = JSON.parse(localStorage.getItem("wibsiproject_tendencias_videos")) || {};
+                datosEditados[idCard] = { titulo: nuevoTitulo };
+                localStorage.setItem("wibsiproject_tendencias_videos", JSON.stringify(datosEditados));
+
+                let videosSubidos = JSON.parse(localStorage.getItem("wibsiproject_videos_subidos")) || [];
+                let idx = videosSubidos.findIndex(v => v.id === idCard);
+                if (idx !== -1) {
+                    videosSubidos[idx].titulo = nuevoTitulo;
+                    localStorage.setItem("wibsiproject_videos_subidos", JSON.stringify(videosSubidos));
+                }
+
+                cargarDatosPersistentes();
+
+                setTimeout(() => {
+                    card.classList.remove("editing-animation");
+                }, 600);
+            }
+        }
+
+        cargarDatosPersistentes();
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const botonesFiltro = document.querySelectorAll("#tendenciasFiltros .category");
+            const grid = document.getElementById("videoGrid");
+
+            botonesFiltro.forEach(boton => {
+                boton.addEventListener("click", () => {
+                    botonesFiltro.forEach(b => b.classList.remove("active"));
+                    boton.classList.add("active");
+
+                    const filtro = boton.dataset.tendencia;
+                    const tarjetasActualizadas = document.querySelectorAll(".video-card");
+
+                    grid.style.opacity = "0";
+                    grid.style.transform = "translateY(8px)";
+                    grid.style.transition = "opacity 0.2s ease, transform 0.2s ease";
+
+                    setTimeout(() => {
+                        tarjetasActualizadas.forEach(card => {
+                            const categoria = card.getAttribute("data-category");
+                            if (filtro === "Todos" || categoria === filtro) {
+                                card.style.display = "flex";
+                            } else {
+                                card.style.display = "none";
+                            }
+                        });
+
+                        grid.style.opacity = "1";
+                        grid.style.transform = "translateY(0)";
+                    }, 200);
+                });
+            });
+        });
+    </script>
+    <script src="../js/script.js"></script>
+
+</body>
+</html>

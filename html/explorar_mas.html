@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WibsiProject - Explorar Más</title>
+    <link rel="icon" href="../assets/img/explorarmas.png" type="image/png">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        body {
+            background-color: #0d0d12;
+            color: #f3f4f6;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .ymusic-floating-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 64px;
+            background: rgba(18, 18, 24, 0.95);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            z-index: 1000;
+            box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.5);
+            transform: translateY(100%);
+            animation: slideUpBar 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .ymusic-floating-bar.closing {
+            animation: slideDownBar 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        @keyframes slideUpBar { to { transform: translateY(0); } }
+        @keyframes slideDownBar { from { transform: translateY(0); } to { transform: translateY(100%); } }
+
+        .ymusic-progress-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: height 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .ymusic-progress-bar:hover { height: 6px; }
+        .ymusic-progress-filled { height: 100%; background: #6366f1; width: 0%; transition: width 0.1s linear; }
+
+        .ymusic-left-controls { display: flex; align-items: center; gap: 12px; }
+        .ymusic-time { font-size: 12px; color: #9ca3af; min-width: 75px; user-select: none; }
+        .ymusic-center-info { display: flex; align-items: center; gap: 12px; cursor: pointer; max-width: 40%; overflow: hidden; padding: 4px 8px; border-radius: 8px; transition: background 0.2s ease; }
+        .ymusic-center-info:hover { background: rgba(255, 255, 255, 0.05); }
+        #barThumb { width: 44px; height: 44px; border-radius: 6px; object-fit: cover; }
+        .ymusic-text-group { display: flex; flex-direction: column; overflow: hidden; }
+        .ymusic-bar-title { font-size: 14px; font-weight: 600; color: #f3f4f6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ymusic-bar-channel { font-size: 12px; color: #9ca3af; }
+        .ymusic-right-controls { display: flex; align-items: center; gap: 12px; position: relative; }
+        .ymusic-icon-btn { background: transparent; border: none; color: #d1d5db; cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); -webkit-tap-highlight-color: transparent; }
+        .ymusic-icon-btn:hover { background: rgba(255, 255, 255, 0.1); color: #fff; transform: scale(1.05); }
+        .ymusic-icon-btn.play-main { background: #6366f1; color: #fff; width: 40px; height: 40px; }
+
+        .volume-container {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+        }
+        .volume-slider {
+            width: 70px;
+            height: 6px;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            outline: none;
+            cursor: pointer;
+            touch-action: pan-x;
+        }
+        .volume-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #6366f1;
+            cursor: pointer;
+        }
+        .volume-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #6366f1;
+            border: none;
+            cursor: pointer;
+        }
+
+        @media(max-width: 768px) {
+            .volume-slider { width: 50px; }
+        }
+
+        .explore-dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        @media(max-width: 1024px) { .explore-dashboard { grid-template-columns: 1fr; } }
+        .widget-box {
+            background: rgba(25, 25, 35, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        .widget-title { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        
+        .timeline-clock { display: flex; flex-direction: column; gap: 10px; max-height: 220px; overflow-y: auto; }
+        .timeline-item {
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(0, 0, 0, 0.2); padding: 8px 12px; border-radius: 8px; font-size: 13px; color: #d1d5db;
+        }
+        .timeline-time { font-family: monospace; color: #6366f1; font-weight: 600; }
+
+        .progress-card-item {
+            display: flex; gap: 12px; align-items: center; background: rgba(0, 0, 0, 0.2);
+            padding: 8px; border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: background 0.2s;
+        }
+        .progress-card-item:hover { background: rgba(99, 102, 241, 0.15); }
+        .progress-thumb { width: 60px; height: 35px; border-radius: 4px; object-fit: cover; }
+        .progress-bar-mini { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 4px; overflow: hidden; }
+        .progress-fill-mini { height: 100%; background: #6366f1; width: 45%; }
+
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .video-card {
+            background: rgba(20, 20, 30, 0.7); border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px; overflow: hidden; cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .video-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
+        .thumbnail { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #000; }
+        .thumbnail img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+        .video-card:hover .thumbnail img { transform: scale(1.05); }
+        .thumbnail-gradient { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.6)); }
+        .quality, .duration { position: absolute; bottom: 8px; padding: 2px 6px; font-size: 10px; font-weight: 700; border-radius: 4px; background: rgba(0,0,0,0.75); color: #fff; }
+        .quality { right: 8px; background: #6366f1; }
+        .duration { left: 8px; }
+        .play-button {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8);
+            width: 48px; height: 48px; background: rgba(99, 102, 241, 0.9); border: none; border-radius: 50%; color: #fff;
+            display: flex; align-items: center; justify-content: center; opacity: 0; transition: all 0.3s ease;
+        }
+        .video-card:hover .play-button { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        .video-info { padding: 14px; }
+        .video-title { font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .creator { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #9ca3af; margin-bottom: 6px; }
+        .creator-avatar { width: 22px; height: 22px; border-radius: 50%; background: #6366f1; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; }
+        .video-meta { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #6b7280; }
+
+        .modal {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+            z-index: 2000; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease;
+        }
+        .modal.show { display: flex; opacity: 1; }
+        .player-window {
+            background: #14141e; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px;
+            width: 90%; max-width: 900px; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.7);
+        }
+        .player-header { display: flex; align-items: center; padding: 14px 20px; background: rgba(18,18,24,0.9); border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .player-brand { font-weight: 800; color: #fff; }
+        .player-brand span { color: #6366f1; }
+        #closePlayer { background: transparent; border: none; color: #fff; cursor: pointer; font-size: 16px; }
+        .player { width: 100%; background: #000; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; }
+        .player video, .player iframe { width: 100%; height: 100%; border: none; display: block; background: #000; }
+        .player-details { padding: 20px; }
+        .player-tag { font-size: 11px; font-weight: 700; color: #6366f1; }
+        #playerTitle { font-size: 18px; margin-top: 4px; color: #fff; }
+
+        .add-video-btn {
+            background: #6366f1;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+        .add-video-btn:hover { background: #4f46e5; }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: #9ca3af;
+            margin-bottom: 6px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+        }
+        .form-group input[type="file"] {
+            padding: 7px;
+            cursor: pointer;
+        }
+        .form-group input:focus, .form-group select:focus {
+            border-color: #6366f1;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .btn-cancel {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-cancel:hover { background: rgba(255, 255, 255, 0.15); }
+
+        /* --- Navegación lateral del reproductor (anterior / siguiente) --- */
+        .player { position: relative; }
+        #playerContainer { width: 100%; height: 100%; }
+        .player-nav-zone {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 18%;
+            min-width: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            color: #fff;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.25s ease, background 0.25s ease;
+            z-index: 5;
+            user-select: none;
+        }
+        .player-nav-zone:hover { opacity: 1; }
+        .player-nav-zone.nav-left { left: 0; background: linear-gradient(90deg, rgba(0,0,0,0.45), transparent); }
+        .player-nav-zone.nav-right { right: 0; background: linear-gradient(270deg, rgba(0,0,0,0.45), transparent); }
+
+        /* --- Favoritos (corazón sobre miniatura) --- */
+        .fav-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(0,0,0,0.55);
+            color: #fff;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 3;
+            transition: all 0.2s ease;
+        }
+        .fav-btn:hover { background: rgba(0,0,0,0.8); transform: scale(1.1); }
+        .fav-btn.active { color: #ec4899; }
+
+        /* --- Orden / opciones extra de la sección --- */
+        .section-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+        .sort-control { display: flex; align-items: center; gap: 8px; }
+        .sort-control label { font-size: 12px; color: #9ca3af; }
+        .sort-control select {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* --- Autoplay / Shuffle en la barra flotante --- */
+        .autoplay-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: #9ca3af;
+            cursor: pointer;
+            user-select: none;
+        }
+        .switch { position: relative; width: 32px; height: 18px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .switch-slider {
+            position: absolute; inset: 0; background: rgba(255,255,255,0.2);
+            border-radius: 20px; transition: 0.2s;
+        }
+        .switch-slider::before {
+            content: ""; position: absolute; width: 14px; height: 14px; left: 2px; top: 2px;
+            background: #fff; border-radius: 50%; transition: 0.2s;
+        }
+        .switch input:checked + .switch-slider { background: #6366f1; }
+        .switch input:checked + .switch-slider::before { transform: translateX(14px); }
+        .ymusic-icon-btn.active-shuffle { color: #6366f1; }
+
+        /* --- Login --- */
+        .session-hint { font-size: 12px; color: #9ca3af; margin-top: -8px; margin-bottom: 15px; }
+
+        /* --- Menú de cuenta (topbar) --- */
+        .account-menu-wrapper { position: relative; }
+        .account-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            width: 220px;
+            background: rgba(20, 20, 30, 0.98);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            padding: 8px;
+            z-index: 1500;
+        }
+        .account-dropdown-info { padding: 10px 10px 8px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 6px; }
+        #accountDropdownName { font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .account-dropdown-email { font-size: 11px; color: #9ca3af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .account-dropdown-item {
+            display: block; width: 100%; text-align: left; background: transparent; border: none;
+            color: #e5e7eb; padding: 9px 10px; border-radius: 8px; font-size: 13px; cursor: pointer;
+        }
+        .account-dropdown-item:hover { background: rgba(255,255,255,0.08); }
+        .account-dropdown-item.danger { color: #f87171; }
+        .account-dropdown-item.danger:hover { background: rgba(239,68,68,0.15); }
+        .hidden { display: none !important; }
+
+        @media(max-width: 768px) {
+            .player-nav-zone { width: 22%; font-size: 20px; }
+            .autoplay-toggle span.autoplay-label { display: none; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-symbol">W</div>
+            <div>
+                <div class="brand-name">WibsiProject<span>.</span></div>
+                <div class="brand-sub">EXPLORACIÓN AVANZADA</div>
+            </div>
+        </div>
+
+        <div class="search-box">
+            <span>⌕</span>
+            <input type="text" id="searchInputExplorar" placeholder="Buscar en todo el contenido..." autocomplete="off">
+            <kbd>ENTER</kbd>
+        </div>
+
+        <div class="top-actions">
+            <button class="add-video-btn" onclick="abrirModalAddVideo()">
+                <span>+</span> <span>Agregar Video</span>
+            </button>
+            <button class="top-button" onclick="window.location.href='index.html'">
+                ⌂ <span>Volver al Inicio</span>
+            </button>
+            <div class="account-menu-wrapper">
+                <button class="profile-button" id="profileBtn" onclick="toggleAccountMenu(event)"><span>AM</span></button>
+                <div id="accountDropdown" class="account-dropdown hidden">
+                    <div class="account-dropdown-info">
+                        <div id="accountDropdownName">Sin sesión iniciada</div>
+                        <div id="accountDropdownEmail" class="account-dropdown-email"></div>
+                    </div>
+                    <button id="accountDropdownPrimary" class="account-dropdown-item" onclick="window.location.href='cuenta.html'">Iniciar sesión</button>
+                    <button id="accountDropdownLogout" class="account-dropdown-item danger hidden" onclick="cerrarSesionExplorar()">Cerrar sesión</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="app">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="section-label">CATEGORÍAS AMPLIADAS</div>
+                <button class="side-link active" onclick="filtrarSeccion('Todo', event)"><span>✦</span> Todo el contenido</button>
+                <button class="side-link" onclick="filtrarSeccion('Tecnologia', event)"><span>💻</span> Tecnología y Código</button>
+                <button class="side-link" onclick="filtrarSeccion('Gaming', event)"><span>🎮</span> Gaming y Retos</button>
+                <button class="side-link" onclick="filtrarSeccion('Tutoriales', event)"><span>📚</span> Tutoriales y Guías</button>
+                <button class="side-link" onclick="filtrarSeccion('Phonk', event)"><span>🎧</span> Phonk y Música</button>
+                <button class="side-link" onclick="filtrarSeccion('Favoritos', event)"><span>❤</span> Mis Favoritos</button>
+            </div>
+            <div class="sidebar-bottom">
+                <div class="mini-status"><span class="status-dot"></span> MODO EXPLORAR</div>
+            </div>
+        </aside>
+
+        <main class="main">
+            <section class="explore-dashboard">
+                <div class="widget-box">
+                    <div class="widget-title">⏱️ Reloj de Actividad Reciente</div>
+                    <div class="timeline-clock" id="relojCronologico">
+                        <div class="timeline-item">
+                            <span>Iniciada sesión en plataforma</span>
+                            <span class="timeline-time">02:00 PM</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="widget-box">
+                    <div class="widget-title">▶️ Continuar Viendo</div>
+                    <div id="continuarViendoContainer">
+                        <div class="progress-card-item" onclick="openVideo('Dentro del futuro digital', 'videos\\phonk3.mp4', '../assets/img/paisaje.jpg')">
+                            <img src="../assets/img/paisaje.jpg" class="progress-thumb" alt="Thumb">
+                            <div style="flex:1; overflow:hidden;">
+                                <div style="font-size:13px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Dentro del futuro digital</div>
+                                <div class="progress-bar-mini"><div class="progress-fill-mini" style="width: 65%;"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="video-section">
+                <div class="section-heading">
+                    <div>
+                        <span class="tiny-label">DIRECTORIO GENERAL</span>
+                        <h2>Todo el Contenido Multimedia</h2>
+                    </div>
+                    <div class="sort-control">
+                        <label for="ordenSelect">Ordenar por</label>
+                        <select id="ordenSelect" onchange="ordenarVideos(this.value)">
+                            <option value="recientes">Más recientes</option>
+                            <option value="az">Título (A-Z)</option>
+                            <option value="za">Título (Z-A)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="video-grid" id="gridExplorarMas">
+                    <article class="video-card" data-category="Tecnologia" data-title="Desarrollo Web Full Stack Avanzado" data-src="videos\phonk3.mp4" data-thumb="../assets/img/paisaje.jpg" onclick="openVideo('Desarrollo Web Full Stack Avanzado', 'videos\\phonk3.mp4', '../assets/img/paisaje.jpg')">
+                        <div class="thumbnail">
+                            <img src="../assets/img/paisaje.jpg" alt="Tech">
+                            <div class="thumbnail-gradient"></div>
+                            <button class="fav-btn" onclick="toggleFavorito(event, 'Desarrollo Web Full Stack Avanzado', this)">♡</button>
+                            <div class="quality">HD</div>
+                            <div class="duration">18:20</div>
+                            <button class="play-button">▶</button>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">Desarrollo Web Full Stack Avanzado</div>
+                            <div class="creator"><div class="creator-avatar">W</div><span>WibsiProject Lab</span><i>✓</i></div>
+                            <div class="video-meta"><span>52K vistas</span><b>•</b><span>hace 3 h</span></div>
+                        </div>
+                    </article>
+
+                    <article class="video-card" data-category="Gaming" data-title="Gameplay y Trucos de Rendimiento" data-src="videos\carro.mp4" data-thumb="../assets/img/tortuga.jpg" onclick="openVideo('Gameplay y Trucos de Rendimiento', 'videos\\carro.mp4', '../assets/img/tortuga.jpg')">
+                        <div class="thumbnail">
+                            <img src="../assets/img/tortuga.jpg" alt="Gaming">
+                            <div class="thumbnail-gradient"></div>
+                            <button class="fav-btn" onclick="toggleFavorito(event, 'Gameplay y Trucos de Rendimiento', this)">♡</button>
+                            <div class="quality">4K</div>
+                            <div class="duration">10:05</div>
+                            <button class="play-button">▶</button>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">Gameplay y Trucos de Rendimiento</div>
+                            <div class="creator"><div class="creator-avatar purple" style="background:#8b5cf6;">G</div><span>GameZone GT</span><i>✓</i></div>
+                            <div class="video-meta"><span>110K vistas</span><b>•</b><span>hace 1 día</span></div>
+                        </div>
+                    </article>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="modal" id="videoModal">
+        <div class="player-window">
+            <div class="player-header">
+                <div class="player-brand">WibsiProject<span>.</span></div>
+                <button onclick="minimizarAReproductorBarra()" style="background:transparent; border:none; color:#fff; cursor:pointer; margin-left:auto; margin-right:15px; font-weight:bold;" title="Minimizar">▼</button>
+                <button id="closePlayer" title="Cerrar">✕</button>
+            </div>
+            <div class="player">
+                <div id="playerContainer">
+                    <video id="videoPlayer" controls playsinline></video>
+                </div>
+                <div class="player-nav-zone nav-left" onclick="controlAnterior(event)" title="Anterior">‹</div>
+                <div class="player-nav-zone nav-right" onclick="controlSiguiente(event)" title="Siguiente">›</div>
+            </div>
+            <div class="player-details">
+                <div>
+                    <span class="player-tag">REPRODUCTOR MULTIMEDIA</span>
+                    <h2 id="playerTitle">Video</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="addVideoModal">
+        <div class="player-window" style="max-width: 500px;">
+            <div class="player-header">
+                <div class="player-brand">AGREGAR <span>VIDEO</span></div>
+                <button onclick="cerrarModalAddVideo()" style="background:transparent; border:none; color:#fff; cursor:pointer; margin-left:auto; font-size:16px;">✕</button>
+            </div>
+            <div class="player-details">
+                <form id="addVideoForm" onsubmit="guardarNuevoVideo(event)">
+                    <div class="form-group">
+                        <label for="nuevoTitulo">Nombre del video o canción</label>
+                        <input type="text" id="nuevoTitulo" required placeholder="Ej: Drifting Phonk Mix">
+                    </div>
+                    <div class="form-group">
+                        <label for="nuevoEnlace">Enlace del video (Ruta .mp4 o Link de YouTube)</label>
+                        <input type="text" id="nuevoEnlace" required placeholder="Ej: videos/cancion.mp4 o https://youtu.be/...">
+                    </div>
+                    <div class="form-group">
+                        <label for="nuevaMiniaturaArchivo">Seleccionar Miniatura (Archivo local)</label>
+                        <input type="file" id="nuevaMiniaturaArchivo" accept="image/*" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="nuevaCategoria">Categoría</label>
+                        <select id="nuevaCategoria">
+                            <option value="Phonk">Phonk y Música</option>
+                            <option value="Tecnologia">Tecnología y Código</option>
+                            <option value="Gaming">Gaming y Retos</option>
+                            <option value="Tutoriales">Tutoriales y Guías</option>
+                        </select>
+                    </div>
+                    <div class="modal-buttons">
+                        <button type="button" class="btn-cancel" onclick="cerrarModalAddVideo()">Cancelar</button>
+                        <button type="submit" class="add-video-btn">Agregar Video</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="ymusicBar" class="ymusic-floating-bar" style="display: none;">
+        <div class="ymusic-progress-bar">
+            <div class="ymusic-progress-filled"></div>
+        </div>
+
+        <div class="ymusic-left-controls">
+            <button class="ymusic-icon-btn" onclick="controlAnterior(event)" title="Anterior">⏮</button>
+            <button id="barPlayPause" class="ymusic-icon-btn play-main" onclick="togglePlayBar(event)">❚❚</button>
+            <button class="ymusic-icon-btn" onclick="controlSiguiente(event)" title="Siguiente">⏭</button>
+            <span class="ymusic-time">0:00 / 0:00</span>
+        </div>
+
+        <div class="ymusic-center-info" onclick="abrirModalDesdeBarra()">
+            <img id="barThumb" src="../assets/img/portada1.jpg" alt="Thumb">
+            <div class="ymusic-text-group">
+                <div id="barTitle" class="ymusic-bar-title">Selecciona un video</div>
+                <div class="ymusic-bar-channel">Wibsitihub Explorer</div>
+            </div>
+        </div>
+
+        <div class="ymusic-right-controls" onclick="event.stopPropagation()">
+            <label class="autoplay-toggle" title="Reproducir el siguiente video automáticamente">
+                <span class="autoplay-label">Auto</span>
+                <span class="switch">
+                    <input type="checkbox" id="autoplayToggle" checked>
+                    <span class="switch-slider"></span>
+                </span>
+            </label>
+            <button id="shuffleButton" class="ymusic-icon-btn" onclick="toggleShuffle(this)" title="Orden aleatorio">🔀</button>
+            <div class="volume-container">
+                <button id="muteButton" class="ymusic-icon-btn" onclick="toggleMuteBar(this)" title="Silenciar">🔊</button>
+                <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.05" value="1">
+            </div>
+            <button class="ymusic-icon-btn" onclick="activarModoFlotante()" title="Ventana Flotante (PiP)">🗗</button>
+            <button class="ymusic-icon-btn" onclick="abrirModalDesdeBarra()" title="Maximizar">▲</button>
+        </div>
+    </div>
+
+    <script>
+        const videoModal = document.getElementById('videoModal');
+        const playerContainer = document.getElementById('playerContainer');
+        const playerTitle = document.getElementById('playerTitle');
+        const ymusicBar = document.getElementById('ymusicBar');
+        const barPlayPause = document.getElementById('barPlayPause');
+        const barTitle = document.getElementById('barTitle');
+        const barThumb = document.getElementById('barThumb');
+        const progressFilled = document.querySelector('.ymusic-progress-filled');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const muteButton = document.getElementById('muteButton');
+        const addVideoModal = document.getElementById('addVideoModal');
+        const gridExplorarMas = document.getElementById('gridExplorarMas');
+        const continuarViendoContainer = document.getElementById('continuarViendoContainer');
+        const autoplayToggle = document.getElementById('autoplayToggle');
+        const shuffleButton = document.getElementById('shuffleButton');
+        const accountDropdown = document.getElementById('accountDropdown');
+
+        let currentActiveVideoElement = null;
+        let currentPlaylistIndex = -1;
+        let shuffleActivo = false;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarVideosGuardados();
+            cargarFavoritosGuardados();
+            actualizarEstadoSesion();
+            restaurarReproduccionGuardada();
+            manejarRegresoDesdeLogin();
+        });
+
+        /* ---------- SESIÓN (compartida con cuenta.html vía localStorage) ---------- */
+        function obtenerSesion() {
+            const sesion = localStorage.getItem('wibsitihub_sesion_activa');
+            return sesion ? JSON.parse(sesion) : null;
+        }
+
+        function estaAutenticado() {
+            return !!obtenerSesion();
+        }
+
+        function actualizarEstadoSesion() {
+            const profileBtn = document.getElementById('profileBtn');
+            const usuario = obtenerSesion();
+            const nombreEl = document.getElementById('accountDropdownName');
+            const emailEl = document.getElementById('accountDropdownEmail');
+            const primaryBtn = document.getElementById('accountDropdownPrimary');
+            const logoutBtn = document.getElementById('accountDropdownLogout');
+
+            if (usuario) {
+                const iniciales = usuario.name.trim().split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                if (profileBtn) {
+                    profileBtn.innerHTML = `<span>${iniciales || 'W'}</span>`;
+                    profileBtn.title = `Sesión iniciada: ${usuario.name}`;
+                }
+                if (nombreEl) nombreEl.textContent = usuario.name;
+                if (emailEl) emailEl.textContent = usuario.email;
+                if (primaryBtn) {
+                    primaryBtn.textContent = 'Mi Cuenta';
+                    primaryBtn.onclick = () => window.location.href = 'cuenta.html';
+                }
+                if (logoutBtn) logoutBtn.classList.remove('hidden');
+            } else {
+                if (profileBtn) {
+                    profileBtn.innerHTML = `<span>AM</span>`;
+                    profileBtn.title = 'Sin sesión iniciada';
+                }
+                if (nombreEl) nombreEl.textContent = 'Sin sesión iniciada';
+                if (emailEl) emailEl.textContent = '';
+                if (primaryBtn) {
+                    primaryBtn.textContent = 'Iniciar sesión';
+                    primaryBtn.onclick = () => window.location.href = 'cuenta.html';
+                }
+                if (logoutBtn) logoutBtn.classList.add('hidden');
+            }
+        }
+
+        function toggleAccountMenu(event) {
+            event.stopPropagation();
+            if (accountDropdown) accountDropdown.classList.toggle('hidden');
+        }
+
+        document.addEventListener('click', (e) => {
+            if (accountDropdown && !accountDropdown.classList.contains('hidden')) {
+                if (!accountDropdown.contains(e.target) && e.target.id !== 'profileBtn') {
+                    accountDropdown.classList.add('hidden');
+                }
+            }
+        });
+
+        function cerrarSesionExplorar() {
+            localStorage.removeItem('wibsitihub_sesion_activa');
+            actualizarEstadoSesion();
+            if (accountDropdown) accountDropdown.classList.add('hidden');
+        }
+
+        // Modificado: Ahora permite abrir el modal directamente sin forzar redirección a cuenta.html
+        function abrirModalAddVideo() {
+            if (addVideoModal) addVideoModal.classList.add('show');
+        }
+
+        // Ya no redirige automáticamente a cuenta.html
+        function manejarRegresoDesdeLogin() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('openUpload') === '1') {
+                abrirModalAddVideo();
+                params.delete('openUpload');
+                const queryLimpia = params.toString();
+                const nuevaUrl = window.location.pathname + (queryLimpia ? '?' + queryLimpia : '');
+                window.history.replaceState({}, '', nuevaUrl);
+            }
+        }
+
+        function cerrarModalAddVideo() {
+            if (addVideoModal) {
+                addVideoModal.classList.remove('show');
+                document.getElementById('addVideoForm').reset();
+            }
+        }
+
+        function guardarNuevoVideo(event) {
+            event.preventDefault();
+            const titulo = document.getElementById('nuevoTitulo').value.trim();
+            const enlace = document.getElementById('nuevoEnlace').value.trim();
+            const archivoInput = document.getElementById('nuevaMiniaturaArchivo');
+            const categoria = document.getElementById('nuevaCategoria').value;
+
+            if (!titulo || !enlace || archivoInput.files.length === 0) return;
+
+            const archivo = archivoInput.files[0];
+            const reader = new FileReader();
+            const sesion = obtenerSesion();
+
+            reader.onload = function(e) {
+                const miniaturaBase64 = e.target.result;
+                const nuevoItem = { titulo, enlace, miniatura: miniaturaBase64, categoria, subidoPor: sesion ? sesion.email : 'Anónimo' };
+
+                let videosPersonalizados = JSON.parse(localStorage.getItem('wibsitihub_videos')) || [];
+                videosPersonalizados.push(nuevoItem);
+                localStorage.setItem('wibsitihub_videos', JSON.stringify(videosPersonalizados));
+
+                agregarCardAlGrid(nuevoItem);
+                agregarCardContinuarViendo(nuevoItem);
+                cerrarModalAddVideo();
+            };
+
+            reader.readAsDataURL(archivo);
+        }
+
+        function agregarCardAlGrid(item) {
+            const article = document.createElement('article');
+            article.className = 'video-card';
+            article.setAttribute('data-category', item.categoria);
+            article.setAttribute('data-title', item.titulo);
+            article.setAttribute('data-src', item.enlace);
+            article.setAttribute('data-thumb', item.miniatura);
+            article.setAttribute('onclick', `openVideo('${item.titulo.replace(/'/g, "\\'")}', '${item.enlace}', '${item.miniatura}')`);
+
+            const esYT = item.enlace.includes('youtube.com') || item.enlace.includes('youtu.be');
+            const esFavorito = obtenerFavoritos().includes(item.titulo);
+
+            article.innerHTML = `
+                <div class="thumbnail">
+                    <img src="${item.miniatura}" alt="${item.categoria}">
+                    <div class="thumbnail-gradient"></div>
+                    <button class="fav-btn${esFavorito ? ' active' : ''}" onclick="toggleFavorito(event, '${item.titulo.replace(/'/g, "\\'")}', this)">${esFavorito ? '♥' : '♡'}</button>
+                    <div class="quality">${esYT ? 'YOUTUBE' : (item.categoria === 'Phonk' ? 'AUDIO' : 'HD')}</div>
+                    <div class="duration">--:--</div>
+                    <button class="play-button">▶</button>
+                </div>
+                <div class="video-info">
+                    <div class="video-title">${item.titulo}</div>
+                    <div class="creator"><div class="creator-avatar" style="background:${item.categoria === 'Phonk' ? '#ec4899' : '#6366f1'}">${item.categoria[0]}</div><span>Wibsitihub Explorer</span><i>✓</i></div>
+                    <div class="video-meta"><span>Nuevo</span><b>•</b><span>Ahora</span></div>
+                </div>
+            `;
+            gridExplorarMas.prepend(article);
+        }
+
+        /* ---------- FAVORITOS ---------- */
+        function obtenerFavoritos() {
+            return JSON.parse(localStorage.getItem('wibsitihub_favoritos')) || [];
+        }
+
+        function toggleFavorito(event, titulo, btn) {
+            event.stopPropagation();
+            let favoritos = obtenerFavoritos();
+            if (favoritos.includes(titulo)) {
+                favoritos = favoritos.filter(t => t !== titulo);
+                btn.textContent = '♡';
+                btn.classList.remove('active');
+            } else {
+                favoritos.push(titulo);
+                btn.textContent = '♥';
+                btn.classList.add('active');
+            }
+            localStorage.setItem('wibsitihub_favoritos', JSON.stringify(favoritos));
+        }
+
+        function cargarFavoritosGuardados() {
+            const favoritos = obtenerFavoritos();
+            document.querySelectorAll('.video-card').forEach(card => {
+                const titulo = card.getAttribute('data-title');
+                const btn = card.querySelector('.fav-btn');
+                if (btn && favoritos.includes(titulo)) {
+                    btn.textContent = '♥';
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        /* ---------- ORDEN ---------- */
+        function ordenarVideos(criterio) {
+            const cards = Array.from(gridExplorarMas.querySelectorAll('.video-card'));
+            if (criterio === 'az') {
+                cards.sort((a, b) => a.getAttribute('data-title').localeCompare(b.getAttribute('data-title')));
+            } else if (criterio === 'za') {
+                cards.sort((a, b) => b.getAttribute('data-title').localeCompare(a.getAttribute('data-title')));
+            } else {
+                return;
+            }
+            cards.forEach(card => gridExplorarMas.appendChild(card));
+        }
+
+        /* ---------- NAVEGACIÓN DE PLAYLIST (anterior / siguiente) ---------- */
+        function obtenerPlaylist() {
+            return Array.from(document.querySelectorAll('.video-card')).map(card => ({
+                title: card.getAttribute('data-title'),
+                src: card.getAttribute('data-src'),
+                thumb: card.getAttribute('data-thumb')
+            }));
+        }
+
+        function reproducirPorIndice(idx) {
+            const playlist = obtenerPlaylist();
+            if (playlist.length === 0) return;
+            if (idx < 0) idx = playlist.length - 1;
+            if (idx >= playlist.length) idx = 0;
+            const item = playlist[idx];
+            if (item && item.src) openVideo(item.title, item.src, item.thumb);
+        }
+
+        function controlAnterior(event) {
+            if (event) event.stopPropagation();
+            reproducirPorIndice(currentPlaylistIndex - 1);
+        }
+
+        function controlSiguiente(event) {
+            if (event) event.stopPropagation();
+            const playlist = obtenerPlaylist();
+            if (playlist.length === 0) return;
+            if (shuffleActivo && playlist.length > 1) {
+                let siguiente;
+                do {
+                    siguiente = Math.floor(Math.random() * playlist.length);
+                } while (siguiente === currentPlaylistIndex);
+                reproducirPorIndice(siguiente);
+            } else {
+                reproducirPorIndice(currentPlaylistIndex + 1);
+            }
+        }
+
+        function toggleShuffle(btn) {
+            shuffleActivo = !shuffleActivo;
+            btn.classList.toggle('active-shuffle', shuffleActivo);
+        }
+
+        function agregarCardContinuarViendo(item) {
+            const div = document.createElement('div');
+            div.className = 'progress-card-item';
+            div.setAttribute('onclick', `openVideo('${item.titulo.replace(/'/g, "\\'")}', '${item.enlace}', '${item.miniatura}')`);
+            
+            div.innerHTML = `
+                <img src="${item.miniatura}" class="progress-thumb" alt="Thumb">
+                <div style="flex:1; overflow:hidden;">
+                    <div style="font-size:13px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.titulo}</div>
+                    <div class="progress-bar-mini"><div class="progress-fill-mini" style="width: 15%;"></div></div>
+                </div>
+            `;
+            continuarViendoContainer.prepend(div);
+        }
+
+        function cargarVideosGuardados() {
+            let videosPersonalizados = JSON.parse(localStorage.getItem('wibsitihub_videos')) || [];
+            videosPersonalizados.forEach(item => {
+                agregarCardAlGrid(item);
+                agregarCardContinuarViendo(item);
+            });
+        }
+
+        function obtenerIdYouTube(url) {
+            let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            let match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        let currentMediaInfo = null;
+        let ultimoGuardadoMs = 0;
+
+        function guardarEstadoReproduccion(tiempoActual) {
+            if (!currentMediaInfo) return;
+            const estado = {
+                title: currentMediaInfo.title,
+                src: currentMediaInfo.src,
+                thumb: currentMediaInfo.thumb,
+                currentTime: tiempoActual || 0
+            };
+            localStorage.setItem('wibsitihub_now_playing', JSON.stringify(estado));
+        }
+
+        function limpiarEstadoReproduccion() {
+            localStorage.removeItem('wibsitihub_now_playing');
+        }
+
+        function adjuntarListenersVideo(videoEl) {
+            videoEl.addEventListener('timeupdate', () => {
+                if (!isNaN(videoEl.duration) && videoEl.duration > 0) {
+                    const porcentaje = (videoEl.currentTime / videoEl.duration) * 100;
+                    if (progressFilled) progressFilled.style.width = `${porcentaje}%`;
+                }
+                const ahora = Date.now();
+                if (ahora - ultimoGuardadoMs > 3000) {
+                    ultimoGuardadoMs = ahora;
+                    guardarEstadoReproduccion(videoEl.currentTime);
+                }
+            });
+
+            videoEl.addEventListener('pause', () => {
+                guardarEstadoReproduccion(videoEl.currentTime);
+                if (barPlayPause) barPlayPause.textContent = "▶";
+            });
+
+            videoEl.addEventListener('play', () => {
+                if (barPlayPause) barPlayPause.textContent = "❚❚";
+            });
+
+            videoEl.addEventListener('ended', () => {
+                limpiarEstadoReproduccion();
+                if (autoplayToggle && autoplayToggle.checked) {
+                    controlSiguiente();
+                } else if (barPlayPause) {
+                    barPlayPause.textContent = "▶";
+                }
+            });
+        }
+
+        function openVideo(title, videoSrc, imageSrc) {
+            if (playerTitle) playerTitle.textContent = title;
+            playerContainer.innerHTML = '';
+            currentMediaInfo = { title, src: videoSrc, thumb: imageSrc };
+
+            const ytId = obtenerIdYouTube(videoSrc);
+
+            if (ytId) {
+                const iframe = document.createElement('iframe');
+                iframe.src = `https://www.youtube.com/embed/${ytId}?autoplay=1`;
+                iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+                iframe.allowFullscreen = true;
+                playerContainer.appendChild(iframe);
+                currentActiveVideoElement = null;
+            } else {
+                const videoEl = document.createElement('video');
+                videoEl.id = 'videoPlayer';
+                videoEl.controls = true;
+                videoEl.playsInline = true;
+                videoEl.src = videoSrc;
+                videoEl.volume = volumeSlider ? volumeSlider.value : 1;
+                videoEl.play().catch(() => {});
+
+                adjuntarListenersVideo(videoEl);
+
+                playerContainer.appendChild(videoEl);
+                currentActiveVideoElement = videoEl;
+            }
+
+            if (barPlayPause) barPlayPause.textContent = "❚❚";
+            if (videoModal) videoModal.classList.add('show');
+            mostrarBarraFlotante(title, imageSrc);
+            registrarRelojActividad(title);
+            guardarEstadoReproduccion(0);
+
+            const playlist = obtenerPlaylist();
+            const idxEncontrado = playlist.findIndex(v => v.src === videoSrc && v.title === title);
+            currentPlaylistIndex = idxEncontrado !== -1 ? idxEncontrado : currentPlaylistIndex;
+        }
+
+        function restaurarReproduccionGuardada() {
+            const guardadoRaw = localStorage.getItem('wibsitihub_now_playing');
+            if (!guardadoRaw) return;
+
+            let guardado;
+            try { guardado = JSON.parse(guardadoRaw); } catch (e) { return; }
+            if (!guardado || !guardado.src) return;
+
+            currentMediaInfo = { title: guardado.title, src: guardado.src, thumb: guardado.thumb };
+            playerContainer.innerHTML = '';
+
+            const ytId = obtenerIdYouTube(guardado.src);
+
+            if (ytId) {
+                const iframe = document.createElement('iframe');
+                const inicioSegundos = Math.floor(guardado.currentTime || 0);
+                iframe.src = `https://www.youtube.com/embed/${ytId}?${inicioSegundos ? 'start=' + inicioSegundos : ''}`;
+                iframe.allow = "accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+                iframe.allowFullscreen = true;
+                playerContainer.appendChild(iframe);
+                currentActiveVideoElement = null;
+            } else {
+                const videoEl = document.createElement('video');
+                videoEl.id = 'videoPlayer';
+                videoEl.controls = true;
+                videoEl.playsInline = true;
+                videoEl.src = guardado.src;
+                videoEl.volume = volumeSlider ? volumeSlider.value : 1;
+
+                videoEl.addEventListener('loadedmetadata', () => {
+                    if (guardado.currentTime) videoEl.currentTime = guardado.currentTime;
+                });
+
+                adjuntarListenersVideo(videoEl);
+                playerContainer.appendChild(videoEl);
+                currentActiveVideoElement = videoEl;
+            }
+
+            if (playerTitle) playerTitle.textContent = guardado.title;
+            if (barPlayPause) barPlayPause.textContent = "▶";
+            mostrarBarraFlotante(guardado.title, guardado.thumb);
+
+            const playlist = obtenerPlaylist();
+            const idxEncontrado = playlist.findIndex(v => v.src === guardado.src && v.title === guardado.title);
+            currentPlaylistIndex = idxEncontrado !== -1 ? idxEncontrado : currentPlaylistIndex;
+        }
+
+        window.addEventListener('pagehide', () => {
+            if (currentActiveVideoElement && !currentActiveVideoElement.paused) {
+                guardarEstadoReproduccion(currentActiveVideoElement.currentTime);
+            }
+        });
+
+        function mostrarBarraFlotante(titulo, imagen) {
+            if (barTitle) barTitle.textContent = titulo;
+            if (barThumb && imagen) barThumb.src = imagen;
+            if (ymusicBar) {
+                ymusicBar.style.display = 'flex';
+                ymusicBar.classList.remove('closing');
+            }
+        }
+
+        function minimizarAReproductorBarra() {
+            if (videoModal) videoModal.classList.remove('show');
+            if (barTitle && playerTitle) barTitle.textContent = playerTitle.textContent;
+            if (ymusicBar) ymusicBar.style.display = 'flex';
+        }
+
+        function abrirModalDesdeBarra() {
+            if (videoModal) videoModal.classList.add('show');
+            if (ymusicBar) ymusicBar.style.display = 'none';
+        }
+
+        function togglePlayBar(event) {
+            event.stopPropagation();
+            if (!currentActiveVideoElement) return;
+            if (currentActiveVideoElement.paused) {
+                currentActiveVideoElement.play();
+                barPlayPause.textContent = "❚❚";
+            } else {
+                currentActiveVideoElement.pause();
+                barPlayPause.textContent = "▶";
+            }
+        }
+
+        if (volumeSlider) {
+            const actualizarVolumen = (val) => {
+                if (currentActiveVideoElement) {
+                    currentActiveVideoElement.volume = val;
+                    currentActiveVideoElement.muted = (val == 0);
+                }
+                if (muteButton) {
+                    muteButton.textContent = val == 0 ? "🔇" : "🔊";
+                }
+            };
+            volumeSlider.addEventListener('input', (e) => actualizarVolumen(e.target.value));
+            volumeSlider.addEventListener('change', (e) => actualizarVolumen(e.target.value));
+        }
+
+        function toggleMuteBar(btn) {
+            if (!currentActiveVideoElement) return;
+            currentActiveVideoElement.muted = !currentActiveVideoElement.muted;
+            if (currentActiveVideoElement.muted) {
+                btn.textContent = "🔇";
+                if (volumeSlider) volumeSlider.value = 0;
+            } else {
+                btn.textContent = "🔊";
+                if (volumeSlider) volumeSlider.value = currentActiveVideoElement.volume > 0 ? currentActiveVideoElement.volume : 1;
+                currentActiveVideoElement.volume = volumeSlider ? volumeSlider.value : 1;
+            }
+        }
+
+        async function activarModoFlotante() {
+            if (!currentActiveVideoElement) return;
+            try {
+                if (document.pictureInPictureElement) {
+                    await document.exitPictureInPicture();
+                } else if (document.pictureInPictureEnabled) {
+                    await currentActiveVideoElement.requestPictureInPicture();
+                }
+            } catch (error) {
+                console.error("Error al activar el modo flotante:", error);
+            }
+        }
+
+        function registrarRelojActividad(titulo) {
+            const reloj = document.getElementById('relojCronologico');
+            if (!reloj) return;
+            const horaActual = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const item = document.createElement('div');
+            item.className = 'timeline-item';
+            item.innerHTML = `<span>Reprodujo: ${titulo}</span><span class="timeline-time">${horaActual}</span>`;
+            reloj.prepend(item);
+        }
+
+        function filtrarSeccion(categoria, event) {
+            const cards = document.querySelectorAll('.video-card');
+            const favoritos = obtenerFavoritos();
+            cards.forEach(card => {
+                const cat = card.getAttribute('data-category');
+                const titulo = card.getAttribute('data-title');
+                let mostrar;
+                if (categoria === 'Todo') {
+                    mostrar = true;
+                } else if (categoria === 'Favoritos') {
+                    mostrar = favoritos.includes(titulo);
+                } else {
+                    mostrar = cat === categoria;
+                }
+                card.style.display = mostrar ? 'block' : 'none';
+            });
+
+            document.querySelectorAll('.side-link').forEach(link => link.classList.remove('active'));
+            if (event && event.currentTarget) event.currentTarget.classList.add('active');
+        }
+
+        const searchInput = document.getElementById('searchInputExplorar');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase().trim();
+                const cards = document.querySelectorAll('.video-card');
+                cards.forEach(card => {
+                    const title = card.getAttribute('data-title').toLowerCase();
+                    const category = card.getAttribute('data-category').toLowerCase();
+                    if (title.includes(term) || category.includes(term)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        const closePlayerBtn = document.getElementById('closePlayer');
+        if (closePlayerBtn) {
+            closePlayerBtn.addEventListener('click', () => {
+                if (videoModal) videoModal.classList.remove('show');
+                if (currentActiveVideoElement) currentActiveVideoElement.pause();
+                playerContainer.innerHTML = '';
+                currentActiveVideoElement = null;
+                currentMediaInfo = null;
+                limpiarEstadoReproduccion();
+                if (ymusicBar) {
+                    ymusicBar.classList.add('closing');
+                    setTimeout(() => {
+                        ymusicBar.style.display = 'none';
+                        ymusicBar.classList.remove('closing');
+                    }, 300);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,2229 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WibsiProject</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../assets/img/logwiti.png" type="image/png">
+    <style>
+        /* --- CORRECCIÓN DE PESTAÑA BLANCA AL RECARGAR --- */
+        html, body {
+            background-color: #121212 !important;
+            color: #e0e0e0 !important;
+        }
+
+        /* --- ESTILOS PARA SOPORTE DE MODO OSCURO / BLANCO --- */
+        :root {
+            --bg-color: #f4f4f9;
+            --text-color: #333333;
+            --card-bg: #ffffff;
+            --sidebar-bg: #2c3e50;
+            --sidebar-text: #ffffff;
+            --accent-color: #6366f1;
+            --border-color: #dddddd;
+            --hover-color: #4f46e5;
+        }
+
+        body.dark-mode {
+            --bg-color: #121212;
+            --text-color: #e0e0e0;
+            --card-bg: #1e1e1e;
+            --sidebar-bg: #1a1a1a;
+            --sidebar-text: #e0e0e0;
+            --accent-color: #6366f1;
+            --border-color: #333333;
+            --hover-color: #4f46e5;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* --- Estilos y Animación Exclusivos para "Mira. Explora. Repite." --- */
+      .hero-content .interactive-heading {
+    display: inline-block;
+    font-size: clamp(1.8rem, 3.8vw, 4rem); 
+    font-weight: 800;
+    white-space: nowrap; 
+    line-height: 1.1;
+    color: var(--text-color, #ffffff);
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 12px;
+    background: transparent;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                background 0.3s ease, 
+                box-shadow 0.3s ease, 
+                color 0.3s ease;
+    position: relative;
+}
+
+        .hero-content .interactive-heading:hover {
+            transform: scale(1.04) translateY(-4px);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.15));
+            box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.4);
+            color: #6366f1;
+        }
+
+        .hero-content .interactive-heading strong {
+            display: inline-block;
+            transition: transform 0.3s ease, text-shadow 0.3s ease;
+        }
+
+        .hero-content .interactive-heading:hover strong {
+            transform: scale(1.02);
+            text-shadow: 0 0 20px rgba(99, 102, 241, 0.6);
+        }
+
+        /* --- Estilos Mejorados para la Barra Flotante YMusic --- */
+        .ymusic-floating-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 64px;
+            background: rgba(18, 18, 24, 0.95);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            z-index: 1000;
+            box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .ymusic-progress-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: height 0.2s ease;
+        }
+
+        .ymusic-progress-bar:hover {
+            height: 6px;
+        }
+
+        .ymusic-progress-filled {
+            height: 100%;
+            background: #6366f1;
+            width: 0%;
+            position: relative;
+            transition: width 0.1s linear;
+        }
+
+        .ymusic-left-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .ymusic-time {
+            font-size: 12px;
+            color: #9ca3af;
+            min-width: 75px;
+            user-select: none;
+        }
+
+        .ymusic-center-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            max-width: 40%;
+            overflow: hidden;
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .ymusic-center-info:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        #barThumb {
+            width: 44px;
+            height: 44px;
+            border-radius: 6px;
+            object-fit: cover;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .ymusic-text-group {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .ymusic-bar-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #f3f4f6;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .ymusic-bar-channel {
+            font-size: 12px;
+            color: #9ca3af;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .ymusic-right-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ymusic-icon-btn {
+            background: transparent;
+            border: none;
+            color: #d1d5db;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .ymusic-icon-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            transform: scale(1.05);
+        }
+
+        .ymusic-icon-btn.play-main {
+            background: #6366f1;
+            color: #ffffff;
+            width: 40px;
+            height: 40px;
+        }
+
+        .ymusic-icon-btn.play-main:hover {
+            background: #4f46e5;
+        }
+
+        .ymusic-icon-btn.active-state {
+            color: #6366f1;
+        }
+
+        .card-quick-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 6px;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .video-card:hover .card-quick-actions {
+            opacity: 1;
+        }
+        .action-chip {
+            background: rgba(18, 18, 24, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+            transition: background 0.2s, transform 0.2s;
+        }
+        .action-chip:hover {
+            background: #6366f1;
+            transform: scale(1.05);
+        }
+        .action-chip.privado-btn:hover {
+            background: #f59e0b;
+            color: #000;
+        }
+        .action-chip.fav-btn.favorito-activo {
+            background: #ff007f !important;
+            color: #fff !important;
+            border-color: #ff007f;
+        }
+
+        @media (max-width: 768px) {
+            .ymusic-right-controls .hide-mobile {
+                display: none;
+            }
+            .ymusic-time, .ymusic-left-controls button:not(.play-main) {
+                display: none;
+            }
+            .ymusic-center-info {
+                max-width: 60%;
+            }
+        }
+
+        /* =====================================================
+           INICIO — AJUSTES SOLO PARA MÓVIL (no afecta a PC)
+           Todo lo de aquí abajo va dentro de @media (max-width: 900px)
+           así que en pantallas grandes se ignora por completo.
+        ===================================================== */
+        @media (max-width: 900px) {
+
+            /* --- Botón hamburguesa (solo visible en móvil) --- */
+            .btn-menu-movil {
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+                width: 40px;
+                height: 40px;
+                background: rgba(255,255,255,0.08);
+                border: 1px solid rgba(255,255,255,0.1);
+                border-radius: 8px;
+                color: #fff;
+                font-size: 18px;
+                cursor: pointer;
+                flex-shrink: 0;
+            }
+
+            /* --- Topbar: todo en una fila que se acomoda, sin desbordar --- */
+            .topbar {
+                display: flex !important;
+                flex-wrap: nowrap !important;
+                align-items: center !important;
+                gap: 8px !important;
+                padding: 10px 12px !important;
+                overflow: hidden;
+            }
+            .topbar .brand-sub { display: none !important; }
+            .topbar .brand-name { font-size: 15px !important; }
+
+            .topbar .search-box {
+                order: 3;
+                width: 100% !important;
+                flex: 1 1 100% !important;
+                margin-top: 8px;
+            }
+
+            .topbar .top-actions {
+                order: 4;
+                width: 100%;
+                flex: 1 1 100%;
+                display: flex !important;
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch;
+                gap: 8px !important;
+                margin-top: 8px;
+                padding-bottom: 4px;
+            }
+            .topbar .top-actions::-webkit-scrollbar { height: 3px; }
+            .topbar .top-actions .top-button {
+                flex: 0 0 auto !important;
+                white-space: nowrap;
+                padding: 8px 10px !important;
+                font-size: 12px !important;
+            }
+            /* En pantallas muy chicas, ocultamos el texto y dejamos solo el icono */
+            @media (max-width: 420px) {
+                .topbar .top-actions .top-button span { display: none; }
+            }
+
+            /* --- Layout general: la barra lateral se convierte en menú deslizable --- */
+            .app {
+                display: block !important;
+                grid-template-columns: none !important;
+                transform: none !important;
+                filter: none !important;
+            }
+            /* Salvaguarda: si el body/html tuviera transform o filter, el menú
+               (position: fixed) quedaría "atrapado" dentro y no se vería bien. */
+            html, body {
+                transform: none !important;
+                filter: none !important;
+            }
+
+            /* CORRECCIÓN: forzamos que el menú SIEMPRE sea visible como bloque
+               (por si el CSS original lo pone en display:none en móvil),
+               y lo anclamos a la DERECHA para que se despliegue de derecha a izquierda. */
+            .sidebar {
+                display: flex !important;
+                flex-direction: column !important;
+                visibility: visible !important;
+                position: fixed !important;
+                top: 0 !important;
+                right: 0 !important;
+                left: auto !important;
+                height: 100vh !important;
+                width: 78vw !important;
+                max-width: 300px;
+                z-index: 4000 !important;
+                overflow-y: auto;
+                background: var(--sidebar-bg, #1a1a1a);
+                transform: translateX(100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: -6px 0 24px rgba(0,0,0,0.5);
+            }
+            .sidebar.sidebar-abierto {
+                transform: translateX(0) !important;
+            }
+
+            /* Fondo oscuro detrás del menú cuando está abierto */
+            .overlay-menu-movil {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.55);
+                z-index: 3500;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+            .overlay-menu-movil.activo {
+                display: block;
+                opacity: 1;
+            }
+
+            .main {
+                width: 100% !important;
+                padding: 12px !important;
+            }
+
+            /* --- Hero: apilado en vertical --- */
+            .hero {
+                flex-direction: column !important;
+                text-align: center;
+                padding: 20px 14px !important;
+                gap: 14px;
+            }
+            .hero-decoration {
+                width: 90px !important;
+                height: 90px !important;
+                margin: 0 auto;
+            }
+            .hero-buttons {
+                justify-content: center !important;
+                flex-wrap: wrap;
+            }
+
+            /* --- Categorías: scroll horizontal, sin amontonarse --- */
+            .categories {
+                display: flex !important;
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch;
+                gap: 8px !important;
+                padding-bottom: 6px;
+            }
+            .categories .category {
+                flex: 0 0 auto !important;
+                white-space: nowrap;
+                font-size: 12px !important;
+                padding: 8px 12px !important;
+            }
+
+            /* --- Grid de videos: 2 columnas ordenadas en vez de amontonado --- */
+            .video-grid,
+            #panelVideosContainer {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 10px !important;
+            }
+            .video-card .video-title {
+                font-size: 13px !important;
+            }
+
+            /* --- Modal del reproductor: pantalla completa en móvil --- */
+            .modal .player-window {
+                width: 100vw !important;
+                height: 100vh !important;
+                max-width: 100vw !important;
+                max-height: 100vh !important;
+                border-radius: 0 !important;
+                margin: 0 !important;
+            }
+
+            /* --- Barra flotante de reproducción: más compacta --- */
+            .ymusic-floating-bar {
+                height: 58px !important;
+                padding: 0 8px !important;
+            }
+            .ymusic-center-info {
+                max-width: 45% !important;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .video-grid,
+            #panelVideosContainer {
+                grid-template-columns: 1fr !important;
+            }
+        }
+        /* =====================================================
+           FIN — AJUSTES SOLO PARA MÓVIL
+        ===================================================== */
+    </style>
+</head>
+
+<body class="dark-mode">
+
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <header class="topbar">
+        <!-- INICIO: BOTÓN MENÚ MÓVIL (solo aparece en pantallas pequeñas) -->
+        <button class="btn-menu-movil" id="btnMenuMovil" style="display:none;" title="Abrir menú" onclick="abrirMenuMovil()">☰</button>
+        <!-- FIN: BOTÓN MENÚ MÓVIL -->
+        <div class="brand">
+            <div class="brand-symbol">W</div>
+            <div>
+                <div class="brand-name">
+                    WIBSIPROJECT<span>.</span>
+                </div>
+                <div class="brand-sub">
+                    VIDEO NETWORK
+                </div>
+            </div>
+        </div>
+
+        <div class="search-box">
+            <span>⌕</span>
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Buscar algo..."
+                autocomplete="off"
+            >
+            <kbd>ENTER</kbd>
+        </div>
+
+        <div class="top-actions">
+
+
+
+<button class="top-button" onclick="window.location.href='Wchat.html'">
+
+
+
+                💬 <span>WChat</span>
+                </button>
+
+
+<button class="top-button" onclick="window.location.href='WitiIA.html'">
+                🤖 <span>WitiIA</span>
+                </button>
+            
+            <button class="top-button" id="btnAbrirSubida">
+                📤 <span>Subir Video</span>
+            </button>
+
+            <button class="top-button" id="randomButton">
+                
+               🙀 <span>Sorpréndeme</span>
+            </button>
+
+            <button class="top-button" id="btnSecureTop" onclick="checkPassword()">
+                🔐
+                <span>Privados</span>
+            </button>
+
+            <button class="icon-button" onclick="window.location.href='favoritos.html'">
+                💝
+            </button>
+
+            <button class="profile-button" onclick="window.location.href='cuenta.html'">
+                <span>AM</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- INICIO: FONDO OSCURO PARA CERRAR EL MENÚ MÓVIL AL TOCAR AFUERA -->
+    <div class="overlay-menu-movil" id="overlayMenuMovil" onclick="cerrarMenuMovil()"></div>
+    <!-- FIN: FONDO OSCURO MENÚ MÓVIL -->
+
+    <div class="app">
+        <aside class="sidebar" id="sidebarPrincipal">
+            <div class="sidebar-section">
+                <div class="section-label">EXPLORAR</div>
+                <button class="side-link active" onclick="window.location.href='index.html'">
+                    <span>🏠</span> Inicio
+                </button>
+                <button class="side-link" onclick="window.location.href='tendencias.html'">
+                    <span>🎁</span> Tendencias
+                </button>
+                <button class="side-link" onclick="window.location.href='destacados.html'">
+                    <span>🖨️</span> Destacados
+                </button>
+                
+                <button class="side-link" onclick="window.location.href='Wshorts.html'">
+                    <span>🎬</span> Wshorts
+                </button>
+
+                
+            </div>
+
+            <div class="sidebar-section">
+                <div class="section-label">TU ESPACIO</div>
+                <button class="side-link" onclick="window.location.href='favoritos.html'">
+                    <span>💝</span> Favoritos
+                </button>
+
+
+                <button class="side-link" onclick="window.location.href='historial.html'">
+                    <span>💻️</span> Historial
+                </button>
+                
+
+
+                <button class="side-link" onclick="window.location.href='guardados.html'">
+                    <span>💾</span> Guardados
+                </button>
+
+
+
+
+                <button class="side-link" onclick="checkPassword()">
+                    <span>🔐</span> Guardados con contraseña
+                </button>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="section-label">MÁS</div>
+                <div class="hero-buttons">
+                    <button class="side-link" onclick="window.location.href='creadores.html'">
+                        <span>🤝</span> creadores
+                    </button>
+                </div>
+                <div class="hero-buttons">
+                    <button class="side-link" onclick="window.location.href='colecciones.html'">
+                        <span>🎥</span> colecciones
+                    </button>
+                </div>
+                <button class="side-link" onclick="window.location.href='Ajustes.html'">
+                    <span>⚙️</span> Ajustes
+                </button>
+            </div>
+
+            <div class="sidebar-bottom">
+                <div class="mini-status">
+                    <span class="status-dot"></span>
+                    WIBSIPROJECT ONLINE
+                </div>
+                <small>Plataforma de video</small>
+            </div>
+        </aside>
+
+        <main class="main">
+            <section class="hero">
+                <div class="hero-content">
+                    <div class="eyebrow">
+                        <span></span>
+                        DESCUBRE ALGO NUEVO
+                    </div>
+                  <h1 class="interactive-heading" title="¡WibsiProject Video Network!">
+                    Mira. Explora. Repite.
+                </h1>
+                    <p>
+                        Un espacio para descubrir videos, phonk,
+                        creadores y contenido que vale la pena mirar.
+                    </p>
+                    <div class="hero-buttons">
+                       <button class="side-link" onclick="window.location.href='explorar_mas.html'">
+                        <span>✦</span> Explorar Más
+                        </button>
+                        <button class="secondary-button" id="heroRandom">
+                            ✦ Algo aleatorio
+                        </button>
+                    </div>
+                </div>
+
+                <div class="hero-decoration">
+                    <div class="orbit orbit-one"></div>
+                    <div class="orbit orbit-two"></div>
+                    <div class="hero-core">W</div>
+                </div>
+            </section>
+
+            <!-- NUEVO: Panel de gestión de videos añadidos -->
+            <section class="video-section" style="background: rgba(255,255,255,0.02); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px;">
+                <div class="section-heading">
+                    <div>
+                        <span class="tiny-label" style="color: #6366f1;">PANEL DE CONTROL</span>
+                        <h2>Panel de Videos Añadidos 📋</h2>
+                    </div>
+                    <span class="category-count" id="panelContadorVideos">0 videos</span>
+                </div>
+                <div id="panelVideosContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; margin-top: 15px;">
+                    <!-- Los videos añadidos aparecerán aquí automáticamente -->
+                    <p style="color: #888; font-size: 13px; grid-column: 1 / -1;">No hay videos añadidos recientemente en el panel.</p>
+                </div>
+            </section>
+
+            <section class="video-section" id="secureSection" style="display: none; border: 2px dashed var(--accent, #6366f1); padding: 20px; border-radius: 12px; margin-bottom: 30px;">
+                <div class="section-heading">
+                    <div>
+                        <span class="tiny-label" style="color: #f59e0b;">ÁREA RESTRINGIDA</span>
+                        <h2>Videos Guardados con Contraseña 🔐</h2>
+                    </div>
+                    <button class="view-all" onclick="lockSection()">Bloquear ✕</button>
+                </div>
+                <div class="video-grid" id="secureVideoGrid">
+                    <article class="video-card" data-category="Privado">
+                        <div class="thumbnail">
+                            <img src="../assets/img/portada1.jpg" alt="Video Privado">
+                            <div class="thumbnail-gradient"></div>
+                            <div class="quality">VIP</div>
+                            <div class="duration">10:00</div>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">Proyecto Secreto / Contenido Privado</div>
+                            <div class="creator"><span>Administrador</span></div>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <section class="categories-section">
+                <div class="section-heading">
+                    <div>
+                        <span class="tiny-label">EXPLORA POR</span>
+                        <h2>Categorías</h2>
+                    </div>
+                    <span class="category-count">06 categorías</span>
+                </div>
+
+                <div class="categories" id="categories">
+                    <button class="category active" data-category="Todos">
+                        <span>✦</span> Musica Para ti
+                    </button>
+
+
+                    <button class="category" data-category="Phonk">
+                        <span>🎧</span> Phonk
+                    </button>
+
+                    <button class="category" data-category="Videos">
+                        <span>🎬</span> Videos
+                    </button>
+                   
+                    <button class="category" class="side-link" onclick="window.location.href='directos.html'">
+                        <span>⌁</span> Directos
+                    </button>
+                  
+                   
+                </div>
+            </section>
+
+            <section class="video-section">
+                <div class="section-heading">
+                    <div>
+                        <span class="tiny-label">AHORA MISMO</span>
+                        <h2>En tendencia</h2>
+                    </div>
+                    <button class="view-all" onclick="window.location.href='tendencias.html'">
+                        Ver todo →
+                    </button>
+                </div>
+
+                <div class="video-grid" id="videoGrid">
+                    <article
+                        class="video-card"
+                        data-category="Videos"
+                        data-title="Dentro del futuro digital"
+                        data-video="../assets/videos/phonk3.mp4"
+                        data-image="../assets/img/paisaje.jpg"
+                        onclick="openVideo('Dentro del futuro digital', '../assets/videos/phonk3.mp4', '../assets/img/paisaje.jpg')"
+                    >
+                        <div class="thumbnail">
+                            <img src="../assets/img/paisaje.jpg" alt="Video">
+                            <div class="thumbnail-gradient"></div>
+                            <div class="quality">4K</div>
+                            <div class="duration">12:48</div>
+                            <button class="play-button">▶</button>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">Dentro del futuro digital</div>
+                            <div class="creator">
+                                <div class="creator-avatar">W</div>
+                                <span>WibsiProject Lab</span>
+                                <i>✓</i>
+                            </div>
+                            <div class="video-meta">
+                                <span>128K vistas</span>
+                                <b>•</b>
+                                <span>hace 2 h</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article
+                        class="video-card"
+                        data-category="Phonk"
+                        data-title="Drift"
+                        data-video="../assets/videos/carro.mp4"
+                        data-image="../assets/img/tortuga.jpg"
+                        onclick="openVideo('DRIFT PHONK MIX', '../assets/videos/carro.mp4', '../assets/img/tortuga.jpg')"
+                    >
+                        <div class="thumbnail">
+                            <img src="../assets/img/tortuga.jpg" alt="Phonk">
+                            <div class="thumbnail-gradient"></div>
+                            <div class="quality">HD</div>
+                            <div class="duration">04:15</div>
+                            <button class="play-button">▶</button>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">DRIFT PHONK MIX</div>
+                            <div class="creator">
+                                <div class="creator-avatar purple">P</div>
+                                <span>Phonk Nation</span>
+                                <i>✓</i>
+                            </div>
+                            <div class="video-meta">
+                                <span>45K vistas</span>
+                                <b>•</b>
+                                <span>hace 1 día</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article
+                        class="video-card"
+                        data-category="Phonk"
+                        data-title="Después de medianoche Phonk"
+                        data-video="https://youtu.be/c95WGXY42jo"
+                        data-image="../assets/img/phonk1.jpg"
+                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/c95WGXY42jo', '../assets/img/phonk1.jpg')"
+                    >
+                        <div class="thumbnail">
+                            <img src="../assets/img/phonk1.jpg" alt="Phonk">
+                            <div class="thumbnail-gradient"></div>
+                            <div class="quality">4K</div>
+                            <div class="duration">08:35</div>
+                            <button class="play-button">▶</button>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">Después de medianoche Phonk</div>
+                            <div class="creator">
+                                <div class="creator-avatar cyan">N</div>
+                                <span>Night Archive</span>
+                                <i>✓</i>
+                            </div>
+                            <div class="video-meta">
+                                <span>89K vistas</span>
+                                <b>•</b>
+                                <span>ayer</span>
+                            </div>
+                        </div>
+                    </article>
+
+
+
+
+
+
+ <article
+                        class="video-card"
+                        data-category="Phonk"
+                        data-title="Después de medianoche Phonk"
+                        data-video="https://youtu.be/GG6xJMaVBms"
+                        data-image="../assets/img/phonk1.jpg"
+                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/GG6xJMaVBms', '../assets/img/phonk1.jpg')"
+                    >
+                        <div class="thumbnail">
+                            <img src="https://i.ytimg.com/vi/GG6xJMaVBms/hqdefault.jpg?sqp=-oaymwEnCNACELwBSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLDqQYdbYL_o6VdnJx073fGlhmmxxQ" alt="Phonk">
+                            <div class="thumbnail-gradient"></div>
+                            <div class="quality">4K</div>
+                            <div class="duration">08:35</div>
+                            <button class="play-button">▶</button>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">Después de medianoche Phonk</div>
+                            <div class="creator">
+                                <div class="creator-avatar cyan">N</div>
+                                <span>Night Archive</span>
+                                <i>✓</i>
+                            </div>
+                            <div class="video-meta">
+                                <span>89K vistas</span>
+                                <b>•</b>
+                                <span>ayer</span>
+                            </div>
+                        </div>
+                    </article>
+
+
+
+
+
+
+
+ <article
+                        class="video-card"
+                        data-category="Phonk"
+                        data-title="Después de medianoche Phonk"
+                        data-video="https://youtu.be/CiGVMIErCDw"
+                        data-image="../assets/img/phonk1.jpg"
+                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/CiGVMIErCDw', '../assets/img/phonk1.jpg')"
+                    >
+                        <div class="thumbnail">
+                            <img src="https://i.ytimg.com/vi/XDxyaEWWxkE/hqdefault.jpg?sqp=-oaymwFBCNACELwBSFryq4qpAzMIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB8AEB-AH-CYAC0AWKAgwIABABGH8gEygbMA8=&rs=AOn4CLDBp7CYLY-Aflvu33fG10ZL0q9bmg" alt="Phonk">
+                            <div class="thumbnail-gradient"></div>
+                            <div class="quality">4K</div>
+                            <div class="duration">08:35</div>
+                            <button class="play-button">▶</button>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">Después de medianoche Phonk</div>
+                            <div class="creator">
+                                <div class="creator-avatar cyan">N</div>
+                                <span>Night Archive</span>
+                                <i>✓</i>
+                            </div>
+                            <div class="video-meta">
+                                <span>89K vistas</span>
+                                <b>•</b>
+                                <span>ayer</span>
+                            </div>
+                        </div>
+                    </article>
+
+
+
+
+
+ <article
+                        class="video-card"
+                        data-category="Phonk"
+                        data-title="Después de medianoche Phonk"
+                        data-video="https://youtu.be/9vE1WlkRaj8?list=RD9vE1WlkRaj8"
+                        data-image="../assets/img/phonk1.jpg"
+                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/9vE1WlkRaj8?list=RD9vE1WlkRaj8', '../assets/img/phonk1.jpg')"
+                    >
+                        <div class="thumbnail">
+                            <img src="https://i.ytimg.com/vi/9vE1WlkRaj8/hqdefault.jpg?sqp=-oaymwFBCNACELwBSFryq4qpAzMIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB8AEB-AHUBoAC4AOKAgwIABABGFMgPihyMA8=&rs=AOn4CLA9WpI1-eKEdFxc1ys1MsptOBor4Q" alt="Phonk">
+                            <div class="thumbnail-gradient"></div>
+                            <div class="quality">4K</div>
+                            <div class="duration">08:35</div>
+                            <button class="play-button">▶</button>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">Después de medianoche Phonk</div>
+                            <div class="creator">
+                                <div class="creator-avatar cyan">N</div>
+                                <span>Night Archive</span>
+                                <i>✓</i>
+                            </div>
+                            <div class="video-meta">
+                                <span>89K vistas</span>
+                                <b>•</b>
+                                <span>ayer</span>
+                            </div>
+                        </div>
+                    </article>
+
+
+
+
+
+ <article
+                        class="video-card"
+                        data-category="Phonk"
+                        data-title="Después de medianoche Phonk"
+                        data-video="https://youtu.be/8dOMXfWmghg?list=RD8dOMXfWmghg"
+                        data-image="../assets/img/phonk1.jpg"
+                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/8dOMXfWmghg?list=RD8dOMXfWmghg', '../assets/img/phonk1.jpg')"
+                    >
+                        <div class="thumbnail">
+                            <img src="https://i.ytimg.com/vi/8dOMXfWmghg/hqdefault.jpg?sqp=-oaymwFBCNACELwBSFryq4qpAzMIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB8AEB-AH-CYAC0AWKAgwIABABGGUgZShlMA8=&rs=AOn4CLCBktgsDm6QNDWAmjYPCiL36fKbVw" alt="Phonk">
+                            <div class="thumbnail-gradient"></div>
+                            <div class="quality">4K</div>
+                            <div class="duration">08:35</div>
+                            <button class="play-button">▶</button>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">Después de medianoche Phonk</div>
+                            <div class="creator">
+                                <div class="creator-avatar cyan">N</div>
+                                <span>Night Archive</span>
+                                <i>✓</i>
+                            </div>
+                            <div class="video-meta">
+                                <span>89K vistas</span>
+                                <b>•</b>
+                                <span>ayer</span>
+                            </div>
+                        </div>
+                    </article>
+
+
+
+
+
+ <article
+                        class="video-card"
+                        data-category="Phonk"
+                        data-title="Después de medianoche Phonk"
+                        data-video="https://youtu.be/yEbhDfZ6WD0?list=RDEMNcWnYEuMgWpcYQ4O1iFISA"
+                        data-image="../assets/img/phonk1.jpg"
+                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/yEbhDfZ6WD0?list=RDEMNcWnYEuMgWpcYQ4O1iFISA', '../assets/img/phonk1.jpg')"
+                    >
+                        <div class="thumbnail">
+                            <img src="https://i.ytimg.com/vi/yEbhDfZ6WD0/hqdefault.jpg?sqp=-oaymwExCNACELwBSFryq4qpAyMIARUAAIhCGAHwAQH4Af4JgALQBYoCDAgAEAEYYyATKH8wDw==&rs=AOn4CLDHdWms6f8yc5B3nzQGZEPNWsBjtA" alt="Phonk">
+                            <div class="thumbnail-gradient"></div>
+                            <div class="quality">4K</div>
+                            <div class="duration">08:35</div>
+                            <button class="play-button">▶</button>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">Después de medianoche Phonk</div>
+                            <div class="creator">
+                                <div class="creator-avatar cyan">N</div>
+                                <span>Night Archive</span>
+                                <i>✓</i>
+                            </div>
+                            <div class="video-meta">
+                                <span>89K vistas</span>
+                                <b>•</b>
+                                <span>ayer</span>
+                            </div>
+                        </div>
+                    </article>
+
+
+
+
+
+
+ <article
+                        class="video-card"
+                        data-category="Phonk"
+                        data-title="Después de medianoche Phonk"
+                        data-video="https://youtu.be/rK9gOo22vyg?list=RDEMNcWnYEuMgWpcYQ4O1iFISA"
+                        data-image="../assets/img/phonk1.jpg"
+                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/rK9gOo22vyg?list=RDEMNcWnYEuMgWpcYQ4O1iFISA', '../assets/img/phonk1.jpg')"
+                    >
+                        <div class="thumbnail">
+                            <img src="https://i.ytimg.com/vi/rK9gOo22vyg/hqdefault.jpg?sqp=-oaymwEmCKgBEF5IWvKriqkDGQgBFQAAiEIYAdgBAeIBCggYEAIYBjgBQAE=&rs=AOn4CLD0jisE4rndBaXjdzkNRl1OPQozRg" alt="Phonk">
+                            <div class="thumbnail-gradient"></div>
+                            <div class="quality">4K</div>
+                            <div class="duration">08:35</div>
+                            <button class="play-button">▶</button>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">Después de medianoche Phonk</div>
+                            <div class="creator">
+                                <div class="creator-avatar cyan">N</div>
+                                <span>Night Archive</span>
+                                <i>✓</i>
+                            </div>
+                            <div class="video-meta">
+                                <span>89K vistas</span>
+                                <b>•</b>
+                                <span>ayer</span>
+                            </div>
+                        </div>
+                    </article>
+
+
+
+
+
+
+
+ <article
+                        class="video-card"
+                        data-category="Phonk"
+                        data-title="Después de medianoche Phonk"
+                        data-video="https://youtu.be/tm9GpM3lV3s?list=RDEMNcWnYEuMgWpcYQ4O1iFISA"
+                        data-image="../assets/img/phonk1.jpg"
+                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/tm9GpM3lV3s?list=RDEMNcWnYEuMgWpcYQ4O1iFISA', '../assets/img/phonk1.jpg')"
+                    >
+                        <div class="thumbnail">
+                            <img src="https://i.ytimg.com/vi/tm9GpM3lV3s/hqdefault.jpg?sqp=-oaymwFACKgBEF5IWvKriqkDMwgBFQAAiEIYAdgBAeIBCggYEAIYBjgBQAHwAQH4Af4JgALQBYoCDAgAEAEYUiAUKH8wDw==&rs=AOn4CLB-_FO18sFtGJdSmX5wn_aS3EbmGA" alt="Phonk">
+                            <div class="thumbnail-gradient"></div>
+                            <div class="quality">4K</div>
+                            <div class="duration">08:35</div>
+                            <button class="play-button">▶</button>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">Después de medianoche Phonk</div>
+                            <div class="creator">
+                                <div class="creator-avatar cyan">N</div>
+                                <span>Night Archive</span>
+                                <i>✓</i>
+                            </div>
+                            <div class="video-meta">
+                                <span>89K vistas</span>
+                                <b>•</b>
+                                <span>ayer</span>
+                            </div>
+                        </div>
+                    </article>
+
+
+
+
+
+ <article
+                        class="video-card"
+                        data-category="Phonk"
+                        data-title="Después de medianoche Phonk"
+                        data-video="https://youtu.be/XFdnTeTJp3E?list=RDEMNcWnYEuMgWpcYQ4O1iFISA"
+                        data-image="../assets/img/phonk1.jpg"
+                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/XFdnTeTJp3E?list=RDEMNcWnYEuMgWpcYQ4O1iFISA', '../assets/img/phonk1.jpg')"
+                    >
+                        <div class="thumbnail">
+                            <img src="https://i.ytimg.com/vi/XFdnTeTJp3E/hqdefault.jpg?sqp=-oaymwFACKgBEF5IWvKriqkDMwgBFQAAiEIYAdgBAeIBCggYEAIYBjgBQAHwAQH4Af4JgALQBYoCDAgAEAEYZSBlKGUwDw==&rs=AOn4CLDVR5fWEDNG5PAhO8YAlLM6xU5XSg" alt="Phonk">
+                            <div class="thumbnail-gradient"></div>
+                            <div class="quality">4K</div>
+                            <div class="duration">08:35</div>
+                            <button class="play-button">▶</button>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">Después de medianoche Phonk</div>
+                            <div class="creator">
+                                <div class="creator-avatar cyan">N</div>
+                                <span>Night Archive</span>
+                                <i>✓</i>
+                            </div>
+                            <div class="video-meta">
+                                <span>89K vistas</span>
+                                <b>•</b>
+                                <span>ayer</span>
+                            </div>
+                        </div>
+                    </article>
+
+
+
+
+
+
+ <article
+                        class="video-card"
+                        data-category="Phonk"
+                        data-title="Después de medianoche Phonk"
+                        data-video="https://youtu.be/KO5APXYjLtE?list=RDEMNcWnYEuMgWpcYQ4O1iFISA"
+                        data-image="../assets/img/phonk1.jpg"
+                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/KO5APXYjLtE?list=RDEMNcWnYEuMgWpcYQ4O1iFISA', '../assets/img/phonk1.jpg')"
+                    >
+                        <div class="thumbnail">
+                            <img src="https://i.ytimg.com/vi/KO5APXYjLtE/hqdefault.jpg?sqp=-oaymwEmCKgBEF5IWvKriqkDGQgBFQAAiEIYAdgBAeIBCggYEAIYBjgBQAE=&rs=AOn4CLCR6KFYOS_6FKjZmH-CQq7wuR6G3A" alt="Phonk">
+                            <div class="thumbnail-gradient"></div>
+                            <div class="quality">4K</div>
+                            <div class="duration">08:35</div>
+                            <button class="play-button">▶</button>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">Después de medianoche Phonk</div>
+                            <div class="creator">
+                                <div class="creator-avatar cyan">N</div>
+                                <span>Night Archive</span>
+                                <i>✓</i>
+                            </div>
+                            <div class="video-meta">
+                                <span>89K vistas</span>
+                                <b>•</b>
+                                <span>ayer</span>
+                            </div>
+                        </div>
+                    </article>
+
+
+
+
+
+ <article
+                        class="video-card"
+                        data-category="Phonk"
+                        data-title="Después de medianoche Phonk"
+                        data-video="https://youtu.be/0yXX2Iya490?list=RDEMNcWnYEuMgWpcYQ4O1iFISA"
+                        data-image="../assets/img/phonk1.jpg"
+                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/0yXX2Iya490?list=RDEMNcWnYEuMgWpcYQ4O1iFISA', '../assets/img/phonk1.jpg')"
+                    >
+                        <div class="thumbnail">
+                            <img src="https://i.ytimg.com/vi/0yXX2Iya490/hqdefault.jpg?sqp=-oaymwEmCKgBEF5IWvKriqkDGQgBFQAAiEIYAdgBAeIBCggYEAIYBjgBQAE=&rs=AOn4CLAlVX6Wq8-zUFNezlYK0QygGMPDdg" alt="Phonk">
+                            <div class="thumbnail-gradient"></div>
+                            <div class="quality">4K</div>
+                            <div class="duration">08:35</div>
+                            <button class="play-button">▶</button>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">Después de medianoche Phonk</div>
+                            <div class="creator">
+                                <div class="creator-avatar cyan">N</div>
+                                <span>Night Archive</span>
+                                <i>✓</i>
+                            </div>
+                            <div class="video-meta">
+                                <span>89K vistas</span>
+                                <b>•</b>
+                                <span>ayer</span>
+                            </div>
+                        </div>
+                    </article>
+
+
+
+
+
+ <article
+                        class="video-card"
+                        data-category="Phonk"
+                        data-title="Después de medianoche Phonk"
+                        data-video="https://youtu.be/BVO-qMos5jY?list=RDEMNcWnYEuMgWpcYQ4O1iFISA"
+                        data-image="../assets/img/phonk1.jpg"
+                        onclick="openVideo('Después de medianoche Phonk', 'https://youtu.be/BVO-qMos5jY?list=RDEMNcWnYEuMgWpcYQ4O1iFISA', '../assets/img/phonk1.jpg')"
+                    >
+                        <div class="thumbnail">
+                            <img src="https://i.ytimg.com/vi/BVO-qMos5jY/hqdefault.jpg?sqp=-oaymwEmCKgBEF5IWvKriqkDGQgBFQAAiEIYAdgBAeIBCggYEAIYBjgBQAE=&rs=AOn4CLBmBGpFDgpMOgW9PMcDkw2tZT-0iw" alt="Phonk">
+                            <div class="thumbnail-gradient"></div>
+                            <div class="quality">4K</div>
+                            <div class="duration">08:35</div>
+                            <button class="play-button">▶</button>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">Después de medianoche Phonk</div>
+                            <div class="creator">
+                                <div class="creator-avatar cyan">N</div>
+                                <span>Night Archive</span>
+                                <i>✓</i>
+                            </div>
+                            <div class="video-meta">
+                                <span>89K vistas</span>
+                                <b>•</b>
+                                <span>ayer</span>
+                            </div>
+                        </div>
+                    </article>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    <article class="discover-card">
+                        <div class="discover-icon">✦</div>
+                        <span>WIBSIPROJECT</span>
+                        <h3>No sabes qué mirar?</h3>
+                        <p>Deja que nosotros elijamos por ti.</p>
+                        <button id="discoverRandom">
+                            Sorpréndeme <span>→</span>
+                        </button>
+                    </article>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="modal" id="videoModal">
+        <div class="player-window">
+            <div class="player-header">
+                <div class="player-brand">
+                    WIBSIPROJECT<span>.</span>
+                </div>
+                <button onclick="minimizarAReproductorBarra()" title="Minimizar reproductor" style="font-size: 16px; font-weight: bold; background: transparent; border: none; color: #fff; cursor: pointer; margin-left: auto; margin-right: 15px;">▼</button>
+                <button id="closePlayer" title="Cerrar por completo">✕</button>
+            </div>
+            <div class="player">
+                <video id="videoPlayer" controls playsinline></video>
+            </div>
+            <div class="player-details">
+                <div>
+                    <span class="player-tag">WIBSIPROJECT ORIGINAL</span>
+                    <h2 id="playerTitle">Video</h2>
+                    <p>Reproduciendo contenido multimedia.</p>
+                </div>
+                <div class="player-actions">
+                    <button id="likeButton">♡ <span>Me gusta</span></button>
+                    <button id="btnGuardarModal">◇ <span>Guardar</span></button>
+                    <button id="btnCompartirModal">↗ <span>Compartir</span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NUEVO: Modal de Compartir Lugares -->
+    <div class="modal" id="modalCompartir" style="display: none; align-items: center; justify-content: center; z-index: 2000;">
+        <div class="player-window" style="max-width: 400px; height: auto; padding: 25px; background: #1e1e24; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+            <div class="player-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div class="player-brand" style="font-weight: bold; color: #fff;">Compartir Video ↗</div>
+                <button id="cerrarModalCompartir" style="background: transparent; border: none; color: #fff; cursor: pointer; font-size: 16px;">✕</button>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <p style="font-size: 13px; color: #aaa; margin: 0 0 10px 0;">Elige dónde deseas compartir este contenido:</p>
+                
+                <button onclick="compartirRedSocial('whatsapp')" style="display: flex; align-items: center; gap: 12px; background: #25D366; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; text-align: left;">
+                    🟢 Compartir en WhatsApp
+                </button>
+                <button onclick="compartirRedSocial('facebook')" style="display: flex; align-items: center; gap: 12px; background: #1877F2; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; text-align: left;">
+                    📘 Compartir en Facebook
+                </button>
+                <button onclick="compartirRedSocial('twitter')" style="display: flex; align-items: center; gap: 12px; background: #000000; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; text-align: left; border: 1px solid rgba(255,255,255,0.2);">
+                    ✖ Compartir en X (Twitter)
+                </button>
+                <button onclick="compartirRedSocial('telegram')" style="display: flex; align-items: center; gap: 12px; background: #229ED9; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; text-align: left;">
+                    ✈ Compartir en Telegram
+                </button>
+                
+                <div style="margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                    <label style="font-size: 11px; color: #888; display: block; margin-bottom: 5px;">Enlace directo:</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="inputEnlaceCompartir" readonly style="width: 100%; padding: 8px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #fff; font-size: 12px;">
+                        <button onclick="copiarEnlaceDirecto()" style="background: #6366f1; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 12px;">Copiar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modalSubida" style="display: none;">
+        <div class="player-window" style="max-width: 600px; height: auto; padding: 20px;">
+            <div class="player-header">
+                <div class="player-brand">
+                    WIBSIPROJECT<span>. CREADOR</span>
+                </div>
+                <button id="closeSubida">✕</button>
+            </div>
+            <div style="padding: 20px 0;">
+                <h2 style="color: #fff; margin-bottom: 15px; font-size: 20px;">Subir Nuevo Video o Phonk 📤</h2>
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <div>
+                        <label style="display: block; font-size: 13px; color: #aaa; margin-bottom: 5px;">Título o Palabras clave (Ej: Phonk, Drift, Videos...)</label>
+                        <input type="text" id="inputTituloVideo" placeholder="Escribe el título..." style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 14px;" autocomplete="off">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <label style="display: block; font-size: 13px; color: #aaa; margin-bottom: 5px;">Enlace del Video (YouTube o MP4)</label>
+                            <input type="text" id="inputUrlVideo" placeholder="https://www.youtube.com/watch?v=..." style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 14px;" autocomplete="off">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 13px; color: #aaa; margin-bottom: 5px;">Enlace de miniatura</label>
+                            <input type="text" id="inputPortadaVideo" placeholder="../assets/img/portada1.jpg o URL de imagen" style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 14px;" autocomplete="off">
+                        </div>
+                    </div>
+                    <button id="btnSubirVideoForm" style="background: #6366f1; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 10px;">
+                        Publicar y Detectar Categoría ✦
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modalEditarVideo" style="display: none;">
+        <div class="player-window" style="max-width: 450px; height: auto; padding: 20px;">
+            <div class="player-header">
+                <div class="player-brand">WIBSIPROJECT<span>. EDITAR</span></div>
+                <button onclick="cerrarModalEditar()" style="background:transparent; border:none; color:#fff; cursor:pointer; font-size:16px;">✕</button>
+            </div>
+            <div style="padding: 15px 0; display: flex; flex-direction: column; gap: 12px;">
+                <input type="hidden" id="editIndexCard">
+                <div>
+                    <label style="display:block; font-size:12px; color:#aaa; margin-bottom:5px;">Nuevo Título del Video</label>
+                    <input type="text" id="inputEditTitle" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 14px;" autocomplete="off">
+                </div>
+                <button onclick="guardarEdicionVideo()" style="background: #6366f1; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%;">
+                    Actualizar Título ✦
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="ymusicBar" class="ymusic-floating-bar" style="display: none;">
+        <div class="ymusic-progress-bar">
+            <div class="ymusic-progress-filled" style="width: 0%;"></div>
+        </div>
+
+        <div class="ymusic-left-controls">
+            <button class="ymusic-icon-btn" onclick="controlAnterior(event)" title="Anterior">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="4" x2="5" y2="20" stroke="currentColor" stroke-width="2.5"></line></svg>
+            </button>
+            <button id="barPlayPause" class="ymusic-icon-btn play-main" onclick="togglePlayBar(event)" title="Reproducir / Pausa">▶</button>
+            <button class="ymusic-icon-btn" onclick="controlSiguiente(event)" title="Siguiente">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="4" x2="19" y2="20" stroke="currentColor" stroke-width="2.5"></line></svg>
+            </button>
+            <span class="ymusic-time">0:00 / 0:00</span>
+        </div>
+
+        <div class="ymusic-center-info" onclick="abrirModalDesdeBarra()">
+            <img id="barThumb" src="../assets/img/portada1.jpg" alt="Miniatura">
+            <div class="ymusic-text-group">
+                <div id="barTitle" class="ymusic-bar-title">Selecciona un video</div>
+                <div class="ymusic-bar-channel">WibsiProject Network</div>
+            </div>
+        </div>
+
+        <div class="ymusic-right-controls" onclick="event.stopPropagation()">
+            <button class="ymusic-icon-btn" id="btnLikeBar" onclick="toggleLikeBar(this)" title="Me gusta">👍</button>
+            <button class="ymusic-icon-btn hide-mobile" id="btnDislikeBar" onclick="toggleDislikeBar(this)" title="No me gusta">👎</button>
+            <button class="ymusic-icon-btn hide-mobile" onclick="mostrarMenuOpciones(event)" title="Menú">⋮</button>
+            <button class="ymusic-icon-btn" id="btnMuteBar" onclick="toggleMuteBar(this)" title="Volumen">🔊</button>
+            <button class="ymusic-icon-btn hide-mobile" id="btnSubtitulos" onclick="toggleActivo(this)" title="Subtítulos">cc</button>
+            <button class="ymusic-icon-btn hide-mobile" id="btnLoopBar" onclick="toggleActivo(this)" title="Repetir">🔁</button>
+            <button class="ymusic-icon-btn hide-mobile" id="btnShuffleBar" onclick="toggleActivo(this)" title="Aleatorio">🔀</button>
+            <button class="ymusic-icon-btn close-btn" onclick="abrirModalDesdeBarra()" title="Maximizar">▲</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">
+        <span>✓</span>
+        <p>Guardado correctamente</p>
+    </div>
+
+    <style>
+        .ymusic-floating-bar {
+            transform: translateY(100%);
+            animation: slideUpBar 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        .ymusic-floating-bar.closing {
+            animation: slideDownBar 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        @keyframes slideUpBar {
+            to { transform: translateY(0); }
+        }
+        @keyframes slideDownBar {
+            from { transform: translateY(0); }
+            to { transform: translateY(100%); }
+        }
+    </style>
+
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            document.body.classList.add(savedTheme);
+        }
+
+        // Variable global para almacenar temporalmente los datos del video que se está reproduciendo
+        let videoActualReproduciendo = {
+            title: "",
+            video: "",
+            image: ""
+        };
+
+        /* ============================================================
+           INICIO: MENÚ MÓVIL (abrir / cerrar barra lateral deslizable)
+           Esto solo tiene efecto visual en pantallas de celular/tablet,
+           en PC el botón permanece oculto y no cambia nada.
+        ============================================================ */
+        function mostrarUOcultarBotonMenu() {
+            const btnMenu = document.getElementById('btnMenuMovil');
+            if (!btnMenu) return;
+            if (window.innerWidth <= 900) {
+                btnMenu.style.display = 'flex';
+            } else {
+                btnMenu.style.display = 'none';
+                cerrarMenuMovil();
+            }
+        }
+
+        function abrirMenuMovil() {
+            const sidebar = document.getElementById('sidebarPrincipal');
+            const overlay = document.getElementById('overlayMenuMovil');
+            if (sidebar) sidebar.classList.add('sidebar-abierto');
+            if (overlay) overlay.classList.add('activo');
+        }
+
+        function cerrarMenuMovil() {
+            const sidebar = document.getElementById('sidebarPrincipal');
+            const overlay = document.getElementById('overlayMenuMovil');
+            if (sidebar) sidebar.classList.remove('sidebar-abierto');
+            if (overlay) overlay.classList.remove('activo');
+        }
+
+        window.addEventListener('resize', mostrarUOcultarBotonMenu);
+
+        // Al tocar cualquier botón del menú lateral en móvil, se cierra el menú automáticamente
+        document.addEventListener('DOMContentLoaded', function() {
+            mostrarUOcultarBotonMenu();
+            const sidebarBtns = document.querySelectorAll('#sidebarPrincipal .side-link');
+            sidebarBtns.forEach(btn => btn.addEventListener('click', cerrarMenuMovil));
+        });
+        /* ============================================================
+           FIN: MENÚ MÓVIL
+        ============================================================ */
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // Lógica para abrir el modal de compartir desde el reproductor
+            const btnCompartirModal = document.getElementById('btnCompartirModal');
+            const modalCompartir = document.getElementById('modalCompartir');
+            const cerrarModalCompartir = document.getElementById('cerrarModalCompartir');
+            const inputEnlaceCompartir = document.getElementById('inputEnlaceCompartir');
+
+            if (btnCompartirModal && modalCompartir) {
+                btnCompartirModal.addEventListener('click', function() {
+                    let linkActual = videoActualReproduciendo.video || window.location.href;
+                    if (inputEnlaceCompartir) {
+                        inputEnlaceCompartir.value = linkActual.startsWith('http') ? linkActual : window.location.origin + '/' + linkActual;
+                    }
+                    modalCompartir.style.display = 'flex';
+                });
+            }
+
+            if (cerrarModalCompartir && modalCompartir) {
+                cerrarModalCompartir.addEventListener('click', function() {
+                    modalCompartir.style.display = 'none';
+                });
+            }
+
+            // Evento para el botón de "Guardar" del modal de reproducción
+            const btnGuardarModal = document.getElementById('btnGuardarModal');
+            if (btnGuardarModal) {
+                btnGuardarModal.addEventListener('click', function() {
+                    if (!videoActualReproduciendo.video) {
+                        mostrarToast("No hay ningún video reproduciéndose actualmente.");
+                        return;
+                    }
+
+                    let guardados = JSON.parse(localStorage.getItem('wibsiGuardados')) || [];
+                    const yaExiste = guardados.some(item => item.video === videoActualReproduciendo.video);
+
+                    if (!yaExiste) {
+                        guardados.push({
+                            id: Date.now(),
+                            title: videoActualReproduciendo.title,
+                            video: videoActualReproduciendo.video,
+                            image: videoActualReproduciendo.image
+                        });
+                        localStorage.setItem('wibsiGuardados', JSON.stringify(guardados));
+                        mostrarToast("¡Video guardado en guardados.html con éxito! 💾");
+                    } else {
+                        mostrarToast("Este video ya se encuentra en tus guardados.");
+                    }
+                });
+            }
+
+            function sincronizarColecciones() {
+                const coleccionesGuardadas = JSON.parse(localStorage.getItem('wibsitihub_colecciones')) || [];
+                if (coleccionesGuardadas.length > 0) {
+                    console.log("Colecciones sincronizadas:", coleccionesGuardadas);
+                }
+            }
+
+            sincronizarColecciones();
+
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'wibsitihub_colecciones') {
+                    sincronizarColecciones();
+                }
+            });
+
+            let historialVisitas = JSON.parse(localStorage.getItem('wibsitihub_visitas')) || {
+                'index.html': 0,
+                'tendencias.html': 0,
+                'privado.html': 0
+            };
+            historialVisitas['index.html']++;
+            localStorage.setItem('wibsitihub_visitas', JSON.stringify(historialVisitas));
+
+            const metasVideos = document.querySelectorAll('.video-meta span:first-child');
+            metasVideos.forEach(meta => {
+                if (!meta.textContent.trim()) {
+                    meta.textContent = "Sin vistas por el momento";
+                    meta.style.fontStyle = "italic";
+                    meta.style.opacity = "0.7";
+                }
+            });
+
+            const cards = document.querySelectorAll('.video-grid .video-card');
+            cards.forEach((card, index) => {
+                if (card.querySelector('.card-quick-actions')) return;
+
+                const thumbnail = card.querySelector('.thumbnail');
+                if (!thumbnail) return;
+
+                const tituloEl = card.querySelector('.video-title');
+                const videoUrl = card.getAttribute('data-video') || 'https://www.youtube.com/watch?v=pBUlV7rZp_c';
+                const imagenUrl = card.querySelector('img') ? card.querySelector('img').src : '../assets/img/portada1.jpg';
+                const tituloVal = tituloEl ? tituloEl.textContent : `Video ${index}`;
+                const uniqueFavId = 'video_' + index + '_' + tituloVal.replace(/\s+/g, '_');
+                card.setAttribute('data-id', uniqueFavId);
+
+                let favoritosActuales = JSON.parse(localStorage.getItem('wibsi_favoritos')) || [];
+                const esFav = favoritosActuales.includes(uniqueFavId);
+
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'card-quick-actions';
+                actionsDiv.innerHTML = `
+                    <button class="action-chip fav-btn ${esFav ? 'favorito-activo' : ''}" onclick="toggleFavoritoIndex(event, '${uniqueFavId}', this)" title="Marcar como favorito">❤</button>
+                    <button class="action-chip" onclick="abrirModalEditar(event, '${index}', '${tituloVal.replace(/'/g, "\\'")}')" title="Editar título">✏️</button>
+                    <button class="action-chip privado-btn" onclick="enviarAVideoPrivado(event, '${tituloVal.replace(/'/g, "\\'")}', '${videoUrl}', '${imagenUrl}')" title="Guardar como privado">🔒</button>
+                `;
+                
+                thumbnail.style.position = 'relative';
+                thumbnail.appendChild(actionsDiv);
+            });
+
+            actualizarPanelVideos();
+
+            // INICIO: recuperar en la cuadrícula principal los videos que el usuario subió antes (persistencia)
+            cargarVideosSubidosGuardados();
+            // FIN: recuperar videos subidos
+
+            // INICIO: si había un video reproduciéndose antes de recargar, mostrarlo de nuevo en la barra
+            restaurarUltimoVideoAlRecargar();
+            // FIN: restaurar último video
+
+            const btnAbrirSubida = document.getElementById('btnAbrirSubida');
+            const modalSubida = document.getElementById('modalSubida');
+            const closeSubida = document.getElementById('closeSubida');
+            const btnSubirVideoForm = document.getElementById('btnSubirVideoForm');
+
+            if (btnAbrirSubida && modalSubida) {
+                btnAbrirSubida.addEventListener('click', () => {
+                    // INICIO: exigir inicio de sesión antes de subir video (PC y móvil)
+                    if (!haySesionIniciada()) {
+                        mostrarToast("Necesitas iniciar sesión para subir un video 🔐");
+                        window.location.href = 'cuenta.html';
+                        return;
+                    }
+                    // FIN: exigir inicio de sesión
+                    modalSubida.style.display = 'flex';
+                });
+            }
+
+            if (closeSubida && modalSubida) {
+                closeSubida.addEventListener('click', () => {
+                    modalSubida.style.display = 'none';
+                });
+            }
+
+            const categoryButtons = document.querySelectorAll('.categories .category');
+            categoryButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    categoryButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const categoriaSeleccionada = this.getAttribute('data-category');
+                    const cardsGrid = document.querySelectorAll('#videoGrid .video-card');
+                    
+                    cardsGrid.forEach(card => {
+                        const catCard = card.getAttribute('data-category');
+                        if (categoriaSeleccionada === 'Todos' || catCard === categoriaSeleccionada) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+
+            if (btnSubirVideoForm) {
+                btnSubirVideoForm.addEventListener('click', function() {
+                    const titulo = document.getElementById('inputTituloVideo').value.trim();
+                    const urlVideo = document.getElementById('inputUrlVideo').value.trim();
+                    const portada = document.getElementById('inputPortadaVideo').value.trim() || '../assets/img/portada1.jpg';
+
+                    if (!titulo || !urlVideo) {
+                        alert("Por favor completa el título y el enlace del video.");
+                        return;
+                    }
+
+                    let categoriaAsignada = "Videos";
+                    const tLower = titulo.toLowerCase();
+                    if (tLower.includes('phonk') || tLower.includes('drift')) categoriaAsignada = "Phonk";
+                    else if (tLower.includes('game') || tLower.includes('gaming')) categoriaAsignada = "Gaming";
+                    else if (tLower.includes('musica') || tLower.includes('music')) categoriaAsignada = "Musica";
+                    else if (tLower.includes('corto') || tLower.includes('short')) categoriaAsignada = "Cortos";
+
+                    const videoGrid = document.getElementById('videoGrid');
+                    if (videoGrid) {
+                        const nuevaCard = document.createElement('article');
+                        nuevaCard.className = 'video-card';
+                        nuevaCard.setAttribute('data-category', categoriaAsignada);
+                        nuevaCard.setAttribute('data-title', titulo);
+                        nuevaCard.setAttribute('data-video', urlVideo);
+                        nuevaCard.setAttribute('data-image', portada);
+                        const uniqueFavId = 'custom_' + Date.now() + '_' + titulo.replace(/\s+/g, '_');
+                        nuevaCard.setAttribute('data-id', uniqueFavId);
+                        nuevaCard.setAttribute('onclick', `openVideo('${titulo.replace(/'/g, "\\'")}', '${urlVideo}', '${portada}')`);
+
+                        const indexCard = videoGrid.querySelectorAll('.video-card').length;
+
+                        nuevaCard.innerHTML = `
+                            <div class="thumbnail" style="position: relative;">
+                                <img src="${portada}" alt="Miniatura">
+                                <div class="thumbnail-gradient"></div>
+                                <div class="quality">HD</div>
+                                <div class="duration">03:30</div>
+                                <button class="play-button">▶</button>
+                                <div class="card-quick-actions" style="opacity: 1;">
+                                    <button class="action-chip fav-btn" onclick="toggleFavoritoIndex(event, '${uniqueFavId}', this)" title="Marcar como favorito">❤</button>
+                                    <button class="action-chip" onclick="abrirModalEditar(event, '${indexCard}', '${titulo.replace(/'/g, "\\'")}')" title="Editar título">✏️</button>
+                                    <button class="action-chip privado-btn" onclick="enviarAVideoPrivado(event, '${titulo.replace(/'/g, "\\'")}', '${urlVideo}', '${portada}')" title="Guardar como privado">🔒</button>
+                                </div>
+                            </div>
+                            <div class="video-info">
+                                <div class="video-title">${titulo}</div>
+                                <div class="creator">
+                                    <div class="creator-avatar">AM</div>
+                                    <span>Anthony Merlos</span>
+                                    <i>✓</i>
+                                </div>
+                                <div class="video-meta">
+                                    <span>Nuevo</span>
+                                    <b>•</b>
+                                    <span>hace un momento</span>
+                                </div>
+                            </div>
+                        `;
+
+                        videoGrid.insertBefore(nuevaCard, videoGrid.firstChild);
+                        
+                        let misVideosPanel = JSON.parse(localStorage.getItem('wibsitihub_panel_videos')) || [];
+                        misVideosPanel.unshift({ id: uniqueFavId, title: titulo, video: urlVideo, image: portada, categoria: categoriaAsignada, descripcion: 'Video subido desde el panel de control de WIBSIPROJECT.' });
+                        localStorage.setItem('wibsitihub_panel_videos', JSON.stringify(misVideosPanel));
+
+                        actualizarPanelVideos();
+
+                        modalSubida.style.display = 'none';
+                        document.getElementById('inputTituloVideo').value = '';
+                        document.getElementById('inputUrlVideo').value = '';
+                        document.getElementById('inputPortadaVideo').value = '';
+
+                        mostrarToast("¡Video publicado y añadido al panel! ✦");
+                    }
+                });
+            }
+        });
+
+        // Funciones auxiliares para compartir
+        function compartirRedSocial(red) {
+            const titulo = encodeURIComponent(videoActualReproduciendo.title || "¡Mira este increíble video en WibsiProject!");
+            const enlace = encodeURIComponent(videoActualReproduciendo.video || window.location.href);
+            let urlCompartir = "";
+
+            if (red === 'whatsapp') {
+                urlCompartir = `https://api.whatsapp.com/send?text=${titulo}%20-%20${enlace}`;
+            } else if (red === 'facebook') {
+                urlCompartir = `https://www.facebook.com/sharer/sharer.php?u=${enlace}`;
+            } else if (red === 'twitter') {
+                urlCompartir = `https://twitter.com/intent/tweet?text=${titulo}&url=${enlace}`;
+            } else if (red === 'telegram') {
+                urlCompartir = `https://t.me/share/url?url=${enlace}&text=${titulo}`;
+            }
+
+            if (urlCompartir) {
+                window.open(urlCompartir, '_blank');
+            }
+        }
+
+        function copiarEnlaceDirecto() {
+            const input = document.getElementById('inputEnlaceCompartir');
+            if (input) {
+                input.select();
+                input.setSelectionRange(0, 99999);
+                navigator.clipboard.writeText(input.value).then(() => {
+                    mostrarToast("¡Enlace copiado al portapapeles! 📋");
+                }).catch(() => {
+                    alert("Enlace copiado: " + input.value);
+                });
+            }
+        }
+
+        function toggleFavoritoIndex(event, id, btnElement) {
+            event.stopPropagation();
+            let favoritos = JSON.parse(localStorage.getItem('wibsi_favoritos')) || [];
+            const index = favoritos.indexOf(id);
+
+            let catalogoDinamico = JSON.parse(localStorage.getItem('wibsi_catalogo_favoritos')) || [];
+            
+            const cardEl = btnElement.closest('.video-card');
+            if (cardEl && !catalogoDinamico.some(item => item.id === id)) {
+                const titulo = cardEl.querySelector('.video-title') ? cardEl.querySelector('.video-title').textContent : 'Video WIBSIPROJECT';
+                const videoUrl = cardEl.getAttribute('data-video') || '';
+                const imagenUrl = cardEl.querySelector('img') ? cardEl.querySelector('img').src : '../assets/img/portada1.jpg';
+                catalogoDinamico.push({
+                    id: id,
+                    titulo: '🎬 ' + titulo,
+                    descripcion: 'Video interactivo guardado directamente desde la página principal de WIBSIPROJECT.',
+                    video: videoUrl,
+                    image: imagenUrl
+                });
+                localStorage.setItem('wibsi_catalogo_favoritos', JSON.stringify(catalogoDinamico));
+            }
+
+            if (index > -1) {
+                favoritos.splice(index, 1);
+                btnElement.classList.remove('favorito-activo');
+                mostrarToast("Eliminado de favoritos 💔");
+            } else {
+                favoritos.push(id);
+                btnElement.classList.add('favorito-activo');
+                mostrarToast("¡Añadido a favoritos con éxito! ❤");
+            }
+
+            localStorage.setItem('wibsi_favoritos', JSON.stringify(favoritos));
+        }
+
+        function actualizarPanelVideos() {
+            const panelContainer = document.getElementById('panelVideosContainer');
+            const panelContador = document.getElementById('panelContadorVideos');
+            if (!panelContainer) return;
+
+            let misVideosPanel = JSON.parse(localStorage.getItem('wibsitihub_panel_videos')) || [];
+            panelContador.textContent = `${misVideosPanel.length} videos`;
+
+            if (misVideosPanel.length === 0) {
+                panelContainer.innerHTML = `<p style="color: #888; font-size: 13px; grid-column: 1 / -1;">No hay videos añadidos recientemente en el panel.</p>`;
+                return;
+            }
+
+            panelContainer.innerHTML = '';
+            misVideosPanel.forEach((v, idx) => {
+                const itemCard = document.createElement('div');
+                itemCard.style.cssText = "background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 10px; display: flex; gap: 10px; align-items: center; cursor: pointer;";
+                itemCard.setAttribute('onclick', `openVideo('${v.title.replace(/'/g, "\\'")}', '${v.video}', '${v.image}')`);
+                itemCard.innerHTML = `
+                    <img src="${v.image}" style="width: 50px; height: 35px; border-radius: 4px; object-fit: cover;" alt="Thumb">
+                    <div style="overflow: hidden; flex: 1;">
+                        <div style="font-size: 12px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${v.title}</div>
+                        <div style="font-size: 10px; color: #9ca3af;">Cat: ${v.categoria || 'Videos'}</div>
+                    </div>
+                `;
+                panelContainer.appendChild(itemCard);
+            });
+        }
+
+        /* ============================================================
+           INICIO: GUARDAR Y MOSTRAR DE NUEVO LOS VIDEOS SUBIDOS
+           Antes, al recargar la página, los videos subidos por el
+           usuario desaparecían de la cuadrícula principal (solo
+           quedaban en el panel de abajo). Esta función los vuelve a
+           dibujar en #videoGrid usando los datos guardados en
+           localStorage, para que no se pierdan al recargar.
+        ============================================================ */
+        function cargarVideosSubidosGuardados() {
+            const videoGrid = document.getElementById('videoGrid');
+            if (!videoGrid) return;
+
+            let misVideosPanel = JSON.parse(localStorage.getItem('wibsitihub_panel_videos')) || [];
+            if (misVideosPanel.length === 0) return;
+
+            // Insertamos del más antiguo al más nuevo para que el más reciente quede arriba
+            for (let i = misVideosPanel.length - 1; i >= 0; i--) {
+                const v = misVideosPanel[i];
+
+                // Evitar duplicar si por algún motivo ya existe una tarjeta con ese id
+                if (videoGrid.querySelector(`[data-id="${v.id}"]`)) continue;
+
+                const tituloSeguro = (v.title || 'Video').replace(/'/g, "\\'");
+                const nuevaCard = document.createElement('article');
+                nuevaCard.className = 'video-card';
+                nuevaCard.setAttribute('data-category', v.categoria || 'Videos');
+                nuevaCard.setAttribute('data-title', v.title || 'Video');
+                nuevaCard.setAttribute('data-video', v.video || '');
+                nuevaCard.setAttribute('data-image', v.image || '../assets/img/portada1.jpg');
+                nuevaCard.setAttribute('data-id', v.id);
+                nuevaCard.setAttribute('onclick', `openVideo('${tituloSeguro}', '${v.video}', '${v.image}')`);
+
+                let favoritosActuales = JSON.parse(localStorage.getItem('wibsi_favoritos')) || [];
+                const esFav = favoritosActuales.includes(v.id);
+
+                nuevaCard.innerHTML = `
+                    <div class="thumbnail" style="position: relative;">
+                        <img src="${v.image || '../assets/img/portada1.jpg'}" alt="Miniatura">
+                        <div class="thumbnail-gradient"></div>
+                        <div class="quality">HD</div>
+                        <div class="duration">03:30</div>
+                        <button class="play-button">▶</button>
+                        <div class="card-quick-actions" style="opacity: 1;">
+                            <button class="action-chip fav-btn ${esFav ? 'favorito-activo' : ''}" onclick="toggleFavoritoIndex(event, '${v.id}', this)" title="Marcar como favorito">❤</button>
+                            <button class="action-chip privado-btn" onclick="enviarAVideoPrivado(event, '${tituloSeguro}', '${v.video}', '${v.image}')" title="Guardar como privado">🔒</button>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">${v.title}</div>
+                        <div class="creator">
+                            <div class="creator-avatar">AM</div>
+                            <span>Anthony Merlos</span>
+                            <i>✓</i>
+                        </div>
+                        <div class="video-meta">
+                            <span>Subido por ti</span>
+                            <b>•</b>
+                            <span>guardado</span>
+                        </div>
+                    </div>
+                `;
+
+                videoGrid.insertBefore(nuevaCard, videoGrid.firstChild);
+            }
+        }
+        /* ============================================================
+           FIN: GUARDAR Y MOSTRAR DE NUEVO LOS VIDEOS SUBIDOS
+        ============================================================ */
+
+        /* ============================================================
+           INICIO: RECORDAR EL ÚLTIMO VIDEO VISTO AL RECARGAR LA PÁGINA
+           Guarda qué video estaba activo y, al volver a cargar la
+           página, muestra de nuevo la barra flotante con ese video
+           listo para reproducirse (no se autorreproduce por las
+           restricciones de los navegadores, pero queda visible).
+        ============================================================ */
+        function restaurarUltimoVideoAlRecargar() {
+            const datosGuardados = localStorage.getItem('wibsi_ultimo_video');
+            if (!datosGuardados) return;
+
+            try {
+                const v = JSON.parse(datosGuardados);
+                if (!v || !v.video) return;
+
+                videoActualReproduciendo = v;
+
+                const videoPlayer = document.getElementById('videoPlayer');
+                if (videoPlayer) videoPlayer.src = v.video;
+
+                mostrarBarraFlotante(v.title, v.image);
+            } catch (e) {
+                console.log('No se pudo restaurar el último video:', e);
+            }
+        }
+        /* ============================================================
+           FIN: RECORDAR EL ÚLTIMO VIDEO VISTO
+        ============================================================ */
+
+        /* ============================================================
+           INICIO: VERIFICAR SI HAY SESIÓN INICIADA (para exigir login
+           antes de subir video, tanto en PC como en móvil)
+           Revisa las claves más comunes que suele usar cuenta.html.
+           Si tu cuenta.html usa otra clave/nombre para guardar la
+           sesión, avísame y ajusto esta función para que coincida.
+        ============================================================ */
+        function haySesionIniciada() {
+            const posiblesClaves = [
+                'wibsi_sesion_iniciada',
+                'wibsi_usuario',
+                'wibsitihub_usuario',
+                'usuarioActivo',
+                'sesionIniciada'
+            ];
+            for (const clave of posiblesClaves) {
+                const valor = localStorage.getItem(clave) || sessionStorage.getItem(clave);
+                if (valor && valor !== 'false' && valor !== 'null') {
+                    return true;
+                }
+            }
+            return false;
+        }
+        /* ============================================================
+           FIN: VERIFICAR SI HAY SESIÓN INICIADA
+        ============================================================ */
+
+        function checkPassword() {
+            const passwordCorrecta = "2436anthony123privado123"; 
+            let passwordIngresada = prompt("Ingresa la contraseña para ver los videos guardados:");
+            if (passwordIngresada === passwordCorrecta) {
+                sessionStorage.setItem("wibsitihub_acceso_autorizado", "true");
+                window.location.href = "privado.html";
+            } else if (passwordIngresada !== null) {
+                alert("Contraseña incorrecta. Acceso denegado.");
+            }
+        }
+
+        function abrirModalEditar(event, index, currentTitle) {
+            event.stopPropagation();
+            document.getElementById('editIndexCard').value = index;
+            document.getElementById('inputEditTitle').value = currentTitle;
+            const modal = document.getElementById('modalEditarVideo');
+            if (modal) {
+                modal.style.display = 'flex';
+                modal.classList.add('show');
+            }
+        }
+
+        function cerrarModalEditar() {
+            const modal = document.getElementById('modalEditarVideo');
+            if (modal) modal.style.display = 'none';
+        }
+
+        function guardarEdicionVideo() {
+            const index = document.getElementById('editIndexCard').value;
+            const nuevoTitulo = document.getElementById('inputEditTitle').value.trim();
+            if (!nuevoTitulo) {
+                alert("El título no puede estar vacío.");
+                return;
+            }
+
+            const cards = document.querySelectorAll('.video-grid .video-card');
+            if (cards[index]) {
+                const titleEl = cards[index].querySelector('.video-title');
+                if (titleEl) titleEl.textContent = nuevoTitulo;
+                
+                let currentOnClick = cards[index].getAttribute('onclick');
+                if (currentOnClick) {
+                    let updatedOnClick = currentOnClick.replace(/'[^']*'/, `'${nuevoTitulo}'`);
+                    cards[index].setAttribute('onclick', updatedOnClick);
+                }
+            }
+            cerrarModalEditar();
+            mostrarToast("¡Título actualizado correctamente!");
+        }
+
+        function enviarAVideoPrivado(event, titulo, video, imagen) {
+            event.stopPropagation();
+            
+            let misPrivados = JSON.parse(localStorage.getItem('wibsitihub_videos_privados')) || [];
+            
+            const yaExiste = misPrivados.some(v => v.video === video);
+            if (yaExiste) {
+                mostrarToast("Este video ya está guardado en tu zona privada.");
+                return;
+            }
+
+            misPrivados.push({
+                title: titulo,
+                video: video,
+                image: imagen
+            });
+
+            localStorage.setItem('wibsitihub_videos_privados', JSON.stringify(misPrivados));
+            mostrarToast("¡Guardado en Zona Privada con éxito! 🔐");
+        }
+
+        const ymusicBar = document.getElementById('ymusicBar');
+        const barPlayPause = document.getElementById('barPlayPause');
+        const barTitle = document.getElementById('barTitle');
+        const barThumb = document.getElementById('barThumb');
+        const progressFilled = document.querySelector('.ymusic-progress-filled');
+        const progressBar = document.querySelector('.ymusic-progress-bar');
+        const videoPlayer = document.getElementById('videoPlayer');
+
+        function mostrarBarraFlotante(titulo, imagen) {
+            if (barTitle) barTitle.textContent = titulo || "Reproduciendo video";
+            if (barThumb && imagen) barThumb.src = imagen;
+            if (ymusicBar) {
+                ymusicBar.style.display = 'flex';
+                ymusicBar.classList.remove('closing');
+            }
+        }
+
+        function cerrarBarraFlotante(event) {
+            event.stopPropagation();
+            if (ymusicBar) {
+                ymusicBar.classList.add('closing');
+                setTimeout(() => {
+                    ymusicBar.style.display = 'none';
+                    ymusicBar.classList.remove('closing');
+                }, 300);
+            }
+            if (videoPlayer) videoPlayer.pause();
+        }
+
+        function togglePlayBar(event) {
+            event.stopPropagation();
+            if (!videoPlayer) {
+                mostrarToast("Reproductor no disponible");
+                return;
+            }
+            if (videoPlayer.paused) {
+                videoPlayer.play().catch(() => {});
+                if (barPlayPause) barPlayPause.textContent = "❚❚";
+            } else {
+                videoPlayer.pause();
+                if (barPlayPause) barPlayPause.textContent = "▶";
+            }
+        }
+
+        function toggleLikeBar(btn) {
+            btn.classList.toggle('active-state');
+            const dislikeBtn = document.getElementById('btnDislikeBar');
+            if (dislikeBtn) dislikeBtn.classList.remove('active-state');
+            mostrarToast(btn.classList.contains('active-state') ? "¡Te gusta este video!" : "Me gusta retirado");
+        }
+
+        function toggleDislikeBar(btn) {
+            btn.classList.toggle('active-state');
+            const likeBtn = document.getElementById('btnLikeBar');
+            if (likeBtn) likeBtn.classList.remove('active-state');
+            mostrarToast(btn.classList.contains('active-state') ? "Marcado como no me gusta" : "");
+        }
+
+        function toggleMuteBar(btn) {
+            if (!videoPlayer) return;
+            videoPlayer.muted = !videoPlayer.muted;
+            btn.textContent = videoPlayer.muted ? "🔇" : "🔊";
+            mostrarToast(videoPlayer.muted ? "Silenciado" : "Audio activado");
+        }
+
+        function toggleActivo(btn) {
+            btn.classList.toggle('active-state');
+            const title = btn.getAttribute('title');
+            mostrarToast(btn.classList.contains('active-state') ? `${title}: Activado` : `${title}: Desactivado`);
+        }
+
+        function controlAnterior(event) {
+            event.stopPropagation();
+            if (typeof window.videosListaOriginalPerfil === 'undefined' || window.videosListaOriginalPerfil.length === 0) {
+                mostrarToast("Reproduciendo video anterior");
+                return;
+            }
+            if (typeof indiceVideoActual !== 'undefined' && indiceVideoActual > 0) {
+                indiceVideoActual--;
+                let v = window.videosListaOriginalPerfil[indiceVideoActual];
+                openVideo(v.title, v.video, v.image);
+            } else {
+                mostrarToast("Este es el primer video");
+            }
+        }
+
+        function controlSiguiente(event) {
+            event.stopPropagation();
+            if (typeof window.videosListaOriginalPerfil === 'undefined' || window.videosListaOriginalPerfil.length === 0) {
+                mostrarToast("Reproduciendo siguiente video");
+                return;
+            }
+            if (typeof indiceVideoActual !== 'undefined' && indiceVideoActual < window.videosListaOriginalPerfil.length - 1) {
+                indiceVideoActual++;
+                let v = window.videosListaOriginalPerfil[indiceVideoActual];
+                openVideo(v.title, v.video, v.image);
+            } else {
+                mostrarToast("No hay más videos en la lista");
+            }
+        }
+
+        function mostrarMenuOpciones(event) {
+            event.stopPropagation();
+            alert("Opciones adicionales: Calidad, Velocidad de reproducción, Reportar.");
+        }
+
+        function mostrarToast(mensaje) {
+            if (!mensaje) return;
+            const toast = document.getElementById('toast');
+            if (toast) {
+                toast.querySelector('p').textContent = mensaje;
+                toast.style.display = 'flex';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 2500);
+            }
+        }
+
+        if (videoPlayer) {
+            videoPlayer.addEventListener('play', () => {
+                if (barPlayPause) barPlayPause.textContent = "❚❚";
+            });
+            videoPlayer.addEventListener('pause', () => {
+                if (barPlayPause) barPlayPause.textContent = "▶";
+            });
+
+            videoPlayer.addEventListener('timeupdate', () => {
+                if (!isNaN(videoPlayer.duration) && videoPlayer.duration > 0) {
+                    const porcentaje = (videoPlayer.currentTime / videoPlayer.duration) * 100;
+                    if (progressFilled) progressFilled.style.width = `${porcentaje}%`;
+                    
+                    const tiempoActualFmt = formatTime(videoPlayer.currentTime);
+                    const duracionTotalFmt = formatTime(videoPlayer.duration);
+                    const timeDisplay = document.querySelector('.ymusic-time');
+                    if (timeDisplay) timeDisplay.textContent = `${tiempoActualFmt} / ${duracionTotalFmt}`;
+                }
+            });
+        }
+
+        if (progressBar) {
+            progressBar.addEventListener('click', (e) => {
+                const rect = progressBar.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const width = rect.width;
+                if (videoPlayer && !isNaN(videoPlayer.duration) && videoPlayer.duration > 0) {
+                    const nuevaPosicion = (clickX / width) * videoPlayer.duration;
+                    videoPlayer.currentTime = nuevaPosicion;
+                    const porcentaje = (nuevaPosicion / videoPlayer.duration) * 100;
+                    if (progressFilled) progressFilled.style.width = `${porcentaje}%`;
+                }
+            });
+        }
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return "0:00";
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        function openVideo(title, videoSrc, imageSrc) {
+            // Guardar datos actuales para que el botón de compartir y guardar sepan qué video registrar
+            videoActualReproduciendo = {
+                title: title,
+                video: videoSrc,
+                image: imageSrc
+            };
+
+            // INICIO: recordar este video para poder mostrarlo de nuevo si se recarga la página
+            localStorage.setItem('wibsi_ultimo_video', JSON.stringify(videoActualReproduciendo));
+            // FIN: recordar video
+
+            let historialVideos = JSON.parse(localStorage.getItem('wibsitihub_historial_videos')) || [];
+            
+            const nuevoRegistro = {
+                title: title,
+                video: videoSrc,
+                image: imageSrc,
+                fecha: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+
+            historialVideos.unshift(nuevoRegistro);
+            localStorage.setItem('wibsitihub_historial_videos', JSON.stringify(historialVideos));
+
+            const videoModal = document.getElementById('videoModal');
+            const playerTitle = document.getElementById('playerTitle');
+            const videoPlayer = document.getElementById('videoPlayer');
+
+            if (playerTitle) playerTitle.textContent = title;
+            if (videoPlayer) {
+                videoPlayer.src = videoSrc;
+                videoPlayer.play().catch(() => {});
+            }
+
+            if (videoModal) {
+                videoModal.classList.add('show');
+                videoModal.style.display = 'flex';
+                document.body.style.overflow = "hidden";
+            }
+
+            mostrarBarraFlotante(title, imageSrc);
+        }
+
+        function minimizarAReproductorBarra() {
+            const videoModal = document.getElementById('videoModal');
+            if (videoModal) {
+                videoModal.classList.remove('show');
+                videoModal.style.display = 'none';
+                document.body.style.overflow = "auto";
+            }
+        }
+
+        function abrirModalDesdeBarra() {
+            const videoModal = document.getElementById('videoModal');
+            if (videoModal) {
+                videoModal.classList.add('show');
+                videoModal.style.display = 'flex';
+                document.body.style.overflow = "hidden";
+            }
+            if (ymusicBar) {
+                ymusicBar.style.display = 'none';
+            }
+        }
+
+     </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

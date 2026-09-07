@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WibsiProject - Colecciones y Categorías</title>
+    <link rel="icon" href="../assets/img/colecciones.png" type="image/png">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="logowitsi.png" type="image/png">
+    <style>
+        :root {
+            --bg-deep: #020205;
+            --surface: rgba(12, 12, 20, 0.85);
+            --surface-hover: rgba(22, 22, 35, 0.95);
+            --border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-1: #6366f1;
+            --accent-2: #a855f7;
+            --gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 20px 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin: 0;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .back-btn:hover {
+            background: var(--accent-1);
+            border-color: var(--accent-1);
+        }
+
+        .grid-categorias {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .cat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cat-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--accent-1);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.25);
+            background: var(--surface-hover);
+        }
+
+        .cat-icon { font-size: 40px; margin-bottom: 15px; }
+        .cat-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+        .cat-desc { font-size: 13px; color: var(--text-muted); }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Selecciona una Categoría</h1>
+            <button class="back-btn" onclick="window.location.href='index.html'">← Volver al Inicio</button>
+        </div>
+
+        <div class="grid-categorias">
+            <!-- Categoria Gaming -->
+            <div class="cat-card" onclick="irACategoria('gaming')">
+                <div class="cat-icon">🕹️</div>
+                <div class="cat-title">Gaming</div>
+                <div class="cat-desc">Gameplays, directos y contenido interactivo de videojuegos.</div>
+            </div>
+
+            <!-- Categoria Phonk -->
+            <div class="cat-card" onclick="irACategoria('phonk')">
+                <div class="cat-icon">⚡</div>
+                <div class="cat-title">Phonk</div>
+                <div class="cat-desc">Drift beats, mezclas agresivas y música urbana electrónica.</div>
+            </div>
+
+            <!-- Categoria Música -->
+            <div class="cat-card" onclick="irACategoria('musica')">
+                <div class="cat-icon">🎵</div>
+                <div class="cat-title">Música</div>
+                <div class="cat-desc">Sets continuos, lofi para programar y recopilaciones de audio.</div>
+            </div>
+
+            <!-- Categoria Cortos -->
+            <div class="cat-card" onclick="irACategoria('cortos')">
+                <div class="cat-icon">🎬</div>
+                <div class="cat-title">Cortos</div>
+                <div class="cat-desc">Clips rápidos, animaciones y videos de formato dinámico.</div>
+            </div>
+
+            <!-- Categoria Más -->
+            <div class="cat-card" onclick="irACategoria('mas')">
+                <div class="cat-icon">🌟</div>
+                <div class="cat-title">Más</div>
+                <div class="cat-desc">Contenido especial, herramientas y sorpresas del sistema.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function irACategoria(categoriaID) {
+            // Redirige al index enviando el parámetro 'cat' limpio en la URL
+            window.location.href = `index.html?cat=${categoriaID}`;
+        }
+    </script>
+</body>
+</html>

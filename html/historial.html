@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial - WibsiProject</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../assets/img/historial.png" type="image/png">
+    <style>
+        body.dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        .historial-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        .top-nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .btn-volver {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s, transform 0.2s;
+        }
+        .btn-volver:hover {
+            background: #4f46e5;
+            transform: scale(1.02);
+        }
+        .historial-card {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 12px;
+            gap: 15px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+        .historial-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateY(-2px);
+        }
+        .historial-thumb-container {
+            position: relative;
+            width: 120px;
+            height: 70px;
+            border-radius: 6px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .historial-thumb {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .play-overlay-icon {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .historial-card:hover .play-overlay-icon {
+            opacity: 1;
+        }
+        .historial-info {
+            flex: 1;
+        }
+        .historial-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+        .historial-date {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+        .btn-limpiar {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-limpiar:hover {
+            background: #dc2626;
+        }
+    </style>
+</head>
+<body class="dark-mode">
+
+    <div class="historial-container">
+        <!-- Barra superior con botón de volver y vaciar historial -->
+        <div class="top-nav-bar">
+            <a href="index.html" class="btn-volver">
+                <span>←</span> Volver a Inicio
+            </a>
+            <button class="btn-limpiar" onclick="limpiarHistorial()">Vaciar Historial</button>
+        </div>
+
+        <h1 style="margin-bottom: 20px;">Historial de Reproducción 💻️</h1>
+
+        <div id="listaHistorial">
+            <!-- Los elementos del historial se cargarán aquí automáticamente -->
+        </div>
+    </div>
+
+    <!-- Modal Reproductor integrado para ver los videos del historial -->
+    <div class="modal" id="videoModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center;">
+        <div class="player-window" style="width: 90%; max-width: 800px; background: #1e1e24; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
+            <div class="player-header" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: #121216;">
+                <div class="player-brand" style="font-weight: bold; color: #fff;">WIBSIPROJECT<span>. REPRODUCTOR</span></div>
+                <button onclick="cerrarModalVideo()" style="background: transparent; border: none; color: #fff; font-size: 18px; cursor: pointer;">✕</button>
+            </div>
+            <div class="player" style="position: relative; width: 100%; background: #000; aspect-ratio: 16/9;">
+                <video id="videoPlayer" controls playsinline style="width: 100%; height: 100%;"></video>
+            </div>
+            <div class="player-details" style="padding: 15px 20px;">
+                <h2 id="playerTitle" style="font-size: 18px; color: #fff; margin-bottom: 5px;">Video</h2>
+                <p style="font-size: 13px; color: #9ca3af;">Reproduciendo desde tu historial de WibsiProject.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderizarHistorial();
+        });
+
+        function renderizarHistorial() {
+            const contenedor = document.getElementById('listaHistorial');
+            const historial = JSON.parse(localStorage.getItem('wibsitihub_historial_videos')) || [];
+
+            if (historial.length === 0) {
+                contenedor.innerHTML = `<p style="color: #888; font-style: italic;">No has reproducido ningún video o música todavía.</p>`;
+                return;
+            }
+
+            contenedor.innerHTML = '';
+            historial.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'historial-card';
+                // Al hacer clic en la tarjeta se abre el video directamente
+                card.setAttribute('onclick', `reproducirVideoHistorial('${item.title.replace(/'/g, "\\'")}', '${item.video}')`);
+                
+                card.innerHTML = `
+                    <div class="historial-thumb-container">
+                        <img src="${item.image || '../assets/img/portada1.jpg'}" class="historial-thumb" alt="Miniatura">
+                        <div class="play-overlay-icon">▶</div>
+                    </div>
+                    <div class="historial-info">
+                        <div class="historial-title">${item.title}</div>
+                        <div class="historial-date">Visto el: ${item.fecha || 'Recientemente'}</div>
+                    </div>
+                    <button style="background:transparent; border:none; color:#ef4444; cursor:pointer; font-size:18px; padding: 10px;" onclick="event.stopPropagation(); eliminarItemHistorial(${index})" title="Eliminar del historial">✕</button>
+                `;
+                contenedor.appendChild(card);
+            });
+        }
+
+        function reproducirVideoHistorial(title, videoSrc) {
+            const videoModal = document.getElementById('videoModal');
+            const playerTitle = document.getElementById('playerTitle');
+            const videoPlayer = document.getElementById('videoPlayer');
+
+            if (playerTitle) playerTitle.textContent = title;
+            if (videoPlayer) {
+                videoPlayer.src = videoSrc;
+                videoPlayer.play().catch(() => {});
+            }
+
+            if (videoModal) {
+                videoModal.style.display = 'flex';
+                document.body.style.overflow = "hidden";
+            }
+        }
+
+        function cerrarModalVideo() {
+            const videoModal = document.getElementById('videoModal');
+            const videoPlayer = document.getElementById('videoPlayer');
+            if (videoPlayer) videoPlayer.pause();
+            if (videoModal) {
+                videoModal.style.display = 'none';
+                document.body.style.overflow = "auto";
+            }
+        }
+
+        function eliminarItemHistorial(index) {
+            let historial = JSON.parse(localStorage.getItem('wibsitihub_historial_videos')) || [];
+            historial.splice(index, 1);
+            localStorage.setItem('wibsitihub_historial_videos', JSON.stringify(historial));
+            renderizarHistorial();
+        }
+
+        function limpiarHistorial() {
+            if (confirm("¿Estás seguro de que deseas vaciar todo tu historial?")) {
+                localStorage.removeItem('wibsitihub_historial_videos');
+                renderizarHistorial();
+            }
+        }
+    </script>
+</body>
+</html>

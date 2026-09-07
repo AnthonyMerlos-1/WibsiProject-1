@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../assets/img/Wi.png" type="image/png">
+    <title>WitiIA - WIBSIPROJECT</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --bg-main: #f8fafc;
+            --bg-sidebar: #ffffff;
+            --bg-card: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --accent-color: #6366f1;
+            --accent-hover: #4f46e5;
+            --bubble-incoming: #f1f5f9;
+            --bubble-outgoing: #6366f1;
+            --bubble-outgoing-text: #ffffff;
+            --input-bg: #f8fafc;
+        }
+
+        body.dark-theme {
+            --bg-main: #0d0e12;
+            --bg-sidebar: #16181d;
+            --bg-card: #16181d;
+            --border-color: #232731;
+            --text-primary: #ffffff;
+            --text-secondary: #8a99ad;
+            --accent-color: #5865F2;
+            --accent-hover: #4752C4;
+            --bubble-incoming: #1e222a;
+            --bubble-outgoing: #5865F2;
+            --bubble-outgoing-text: #ffffff;
+            --input-bg: #0f1015;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        #auth-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .auth-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 35px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .auth-card h2 {
+            margin-bottom: 25px;
+            font-size: 24px;
+            color: var(--text-primary);
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus {
+            border-color: var(--accent-color);
+            outline: none;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            font-size: 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        #chat-app {
+            display: none;
+            width: 100%;
+            height: 100vh;
+            background: var(--bg-main);
+        }
+
+        .app-layout {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        .sidebar {
+            width: 340px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-profile-info h4 {
+            font-size: 15px;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .user-profile-info span {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .sidebar-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .btn-icon-top {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .btn-icon-top:hover {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .btn-new-chat {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .btn-new-chat:hover { background: var(--accent-hover); }
+
+        .chats-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .chat-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: background 0.2s;
+            position: relative;
+        }
+
+        .chat-item:hover, .chat-item.active {
+            background: var(--input-bg);
+        }
+
+        .chat-item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            overflow: hidden;
+            flex: 1;
+        }
+
+        .chat-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: var(--accent-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+
+        .chat-info {
+            overflow: hidden;
+        }
+
+        .chat-info h5 {
+            font-size: 13px;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: 600;
+        }
+
+        .chat-info p {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Menú de 3 puntos para cada chat */
+        .chat-options-container {
+            position: relative;
+        }
+
+        .btn-three-dots {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: color 0.2s, background 0.2s;
+        }
+
+        .btn-three-dots:hover {
+            color: var(--text-primary);
+            background: var(--border-color);
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 30px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            z-index: 50;
+            width: 140px;
+            overflow: hidden;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .dropdown-item {
+            padding: 10px 14px;
+            font-size: 12px;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background: var(--input-bg);
+        }
+
+        .dropdown-item.danger {
+            color: #ef4444;
+        }
+        .dropdown-item.danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-main);
+        }
+
+        .chat-header-bar {
+            padding: 15px 25px;
+            background: var(--bg-sidebar);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .messages-container {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background-image: radial-gradient(circle, var(--border-color) 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 14px;
+            line-height: 1.5;
+            position: relative;
+            animation: messagePop 0.3s ease-out;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+
+        .message.incoming {
+            background: var(--bubble-incoming);
+            color: var(--text-primary);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .message.outgoing {
+            background: var(--bubble-outgoing);
+            color: var(--bubble-outgoing-text);
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+
+        .message-time {
+            font-size: 10px;
+            color: inherit;
+            opacity: 0.7;
+            text-align: right;
+            margin-top: 6px;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            background: var(--bubble-incoming);
+            border: 1px solid var(--border-color);
+            padding: 12px 16px;
+            border-radius: 14px;
+            border-bottom-left-radius: 4px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            align-items: center;
+            gap: 8px;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dots span {
+            width: 6px;
+            height: 6px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            animation: typingBounce 1.2s infinite ease-in-out;
+        }
+
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingBounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+
+        .suggestions-bar {
+            padding: 8px 20px;
+            background: var(--bg-sidebar);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+        }
+
+        .suggestion-chip {
+            background: var(--input-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .suggestion-chip:hover {
+            background: var(--accent-color);
+            color: #fff;
+            border-color: var(--accent-color);
+        }
+
+        .chat-input-bar {
+            padding: 14px 20px;
+            background: var(--bg-sidebar);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-input-bar input {
+            flex: 1;
+            padding: 12px 18px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .chat-input-bar input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .action-icon-btn {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-icon-btn:hover {
+            color: var(--text-primary);
+            background: var(--border-color);
+        }
+
+        .action-icon-btn.recording {
+            color: #ef4444;
+            border-color: #ef4444;
+            animation: pulseRecord 1.2s infinite ease-in-out;
+        }
+
+        .action-icon-btn.send-btn {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+        .action-icon-btn.send-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .recording-indicator {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 6px 14px;
+            border-radius: 20px;
+            color: #ef4444;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .wave-bars {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            height: 14px;
+        }
+
+        .wave-bar {
+            width: 3px;
+            height: 100%;
+            background: #ef4444;
+            animation: waveAnim 0.8s infinite ease-in-out alternate;
+        }
+
+        .wave-bar:nth-child(2) { animation-delay: 0.2s; }
+        .wave-bar:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes waveAnim {
+            0% { transform: scaleY(0.3); }
+            100% { transform: scaleY(1); }
+        }
+
+        @keyframes pulseRecord {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.97); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes messagePop {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .back-home-link {
+            display: inline-block;
+            margin-top: 15px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            text-align: center;
+            width: 100%;
+            font-weight: 500;
+        }
+        .back-home-link:hover { color: var(--text-primary); }
+    </style>
+</head>
+<body class="dark-theme">
+
+    <div id="auth-screen">
+        <div class="auth-card">
+            <h2>WitiIA & Chats WIBSIPROJECT</h2>
+            <form id="loginForm" onsubmit="iniciarSesion(event)">
+                <div class="form-group">
+                    <label>Tu Nombre</label>
+                    <input type="text" id="regName" placeholder="Ej. Anthony" required>
+                </div>
+                <div class="form-group">
+                    <label>Tu Correo Electrónico</label>
+                    <input type="email" id="regEmail" placeholder="tucorreo@dominio.com" required>
+                </div>
+                <button type="submit" class="btn-primary">Ingresar a mi cuenta</button>
+            </form>
+            <a href="index.html" class="btn-primary" style="margin-top: 15px;">Ir al inicio (index.html)</a>
+        </div>
+    </div>
+
+    <div id="chat-app">
+        <div class="app-layout">
+            
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <div class="user-profile-info">
+                        <h4 id="displayUserName">Usuario</h4>
+                        <span id="displayUserEmail">correo@dominio.com</span>
+                    </div>
+                    <div class="sidebar-actions">
+                        <a href="index.html" class="btn-icon-top" title="Ir al inicio (index.html)">🏠</a>
+                        <button class="btn-icon-top" onclick="alternarTemaVisual()" title="Cambiar Tema (Blanco/Negro)" id="themeToggleBtn">☀️</button>
+                        <button class="btn-new-chat" onclick="crearNuevoChat()">+ Nuevo</button>
+                    </div>
+                </div>
+
+                <div class="chats-list" id="chatsList">
+                    <!-- Los chats se cargan aquí dinámicamente -->
+                </div>
+            </div>
+
+            <div class="chat-main">
+                <div class="chat-header-bar">
+                    <div class="chat-header-left">
+                        <div class="chat-avatar" id="activeChatAvatar">🤖</div>
+                        <div>
+                            <h4 id="activeChatName" style="font-size: 15px; font-weight: 600;">WitiIA - Asistente</h4>
+                            <span id="activeChatStatus" style="font-size: 12px; color: #10b981;">En línea</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="messages-container" id="messagesContainer">
+                    <div class="typing-indicator" id="typingIndicator">
+                        <span>WitiIA está escribiendo (<span id="typingSeconds">0</span>s)</span>
+                        <div class="typing-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="suggestions-bar" id="suggestionsBar"></div>
+
+                <div id="recordingBox" style="padding: 0 20px; display: none;">
+                    <div class="recording-indicator">
+                        <span>Grabando audio...</span>
+                        <div class="wave-bars">
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-input-bar">
+                    <input type="text" id="messageInput" placeholder="Escribe un mensaje o pregunta matemática..." onkeypress="chequearEnter(event)">
+                    <button class="action-icon-btn" id="micBtn" onclick="toggleMicrofono()" title="Micrófono">🎤</button>
+                    <button class="action-icon-btn send-btn" onclick="enviarMensajeTexto()" title="Enviar">➤</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const bancoPreguntasWitiIA = [
+            { q: "¿Por qué se llama WIBSIPROJECT?", r: "WIBSIPROJECT nace de la fusión entre innovación multimedia y un espacio libre para creadores." },
+            { q: "¿Cómo funcionan las categorías Phonk y Gaming?", r: "Filtran multimedia al instante según tus gustos y videos en tendencia." },
+            { q: "¿Qué encuentro en el Panel de Videos Añadidos?", r: "Tu panel de control personal para monitorear archivos multimedia de tu sesión." },
+            { q: "¿Por qué cada cuenta registrada es independiente?", r: "Porque adapta el historial, el reloj de actividad y las preferencias por separado." },
+            { q: "¿Cómo uso el botón 'Sorpréndeme'?", r: "Te transporta de manera aleatoria a contenido exclusivo de la plataforma." },
+            { q: "¿Por qué este proyecto es tal?", r: "Este proyecto es una plataforma web completa creada para centralizar multimedia, herramientas de chat y dinamismo en un solo lugar." },
+            { q: "¿Por qué funciona tan bien?", r: "Funciona eficientemente gracias al uso de tecnologías web puras, estructuras modulares y sincronización fluida en el lado del cliente." },
+            { q: "¿Por qué hay errores?", r: "Los errores pueden ocurrir por incompatibilidades de navegador, fallos en localStorage o interrupciones en la red al cargar recursos." },
+            { q: "¿Para qué sirve esto y dónde está?", r: "Esto sirve como un centro de entretenimiento y herramientas de interacción; se aloja y ejecuta directamente en tu navegador web." },
+            { q: "¿Quién lo creó y para qué?", r: "Fue creado por Anthony Merlos para centralizar proyectos interactivos, herramientas multimedia y gestión de usuarios." },
+            { q: "¿Qué errores puede llevar probablemente?", r: "Podría presentar pérdida de datos si se limpia el localStorage, problemas con permisos de micrófono o conflictos de renderizado CSS en pantallas muy pequeñas." },
+            { q: "¿Cómo te llamas?", r: "Me llamo WitiIA, tu asistente virtual dedicado dentro de WIBSIPROJECT." },
+            { q: "Explícame un algoritmo básico", r: "Un algoritmo es una secuencia de pasos lógicos y finitos para resolver un problema informático o matemático." },
+            { q: "¿Qué es una función en programación?", r: "Es un bloque de código reutilizable que realiza una tarea específica cuando es invocado." },
+            { q: "Dime conceptos de geometría y código", r: "En geometría calculamos áreas, perímetros y coordenadas (como vectores en HTML5 Canvas), mientras que en código estructuramos lógica condicional y bucles." },
+            { q: "¿Qué es la programación orientada a objetos?", r: "Es un paradigma de programación que utiliza clases y objetos para encapsular datos y comportamientos reutilizables." },
+            { q: "¿Cómo optimizar una consulta SQL?", r: "Se pueden utilizar índices adecuados, evitar consultas anidadas innecesarias y seleccionar únicamente las columnas requeridas." },
+            { q: "¿Para qué sirve HTML semántico?", r: "Permite estructurar el contenido web de manera significativa para navegadores, motores de búsqueda y tecnologías de asistencia." },
+            { q: "¿Qué es un framework de desarrollo?", r: "Es un conjunto de herramientas, librerías y convenciones predefinidas que facilitan y aceleran la construcción de software." },
+            { q: "¿Cómo funciona el control de versiones con Git?", r: "Permite rastrear cambios en el código fuente, colaborar con otros desarrolladores y fusionar diferentes ramas de trabajo de forma segura." }
+        ];
+
+        let usuarioActual = { nombre: "", correo: "" };
+        let chatActivoId = "";
+        let esGrabandoVoz = false;
+        let recognition = null;
+        let typingInterval = null;
+
+        let listaChats = {};
+        let conversaciones = {};
+        let temaActual = "dark"; // 'dark' o 'light'
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const usuarioGuardado = localStorage.getItem('witiia_usuario');
+            const chatsGuardados = localStorage.getItem('witiia_lista_chats');
+            const mensajesGuardados = localStorage.getItem('witiia_conversaciones');
+            const temaGuardado = localStorage.getItem('witiia_tema');
+
+            if (temaGuardado) {
+                temaActual = temaGuardado;
+                aplicarTemaVisual(temaActual);
+            }
+
+            if (chatsGuardados) listaChats = JSON.parse(chatsGuardados);
+            if (mensajesGuardados) conversaciones = JSON.parse(mensajesGuardados);
+
+            if (usuarioGuardado) {
+                usuarioActual = JSON.parse(usuarioGuardado);
+                document.getElementById('displayUserName').innerText = usuarioActual.nombre;
+                document.getElementById('displayUserEmail').innerText = usuarioActual.correo;
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('chat-app').style.display = 'block';
+
+                if (Object.keys(listaChats).length === 0) {
+                    crearNuevoChatInicial();
+                } else {
+                    renderizarListaChats();
+                    seleccionarChat(Object.keys(listaChats)[0]);
+                }
+                inicializarReconocimientoVoz();
+            }
+
+            // Cerrar menú de 3 puntos al hacer clic fuera
+            window.addEventListener('click', () => {
+                document.querySelectorAll('.dropdown-menu').forEach(menu => menu.classList.remove('show'));
+            });
+        });
+
+        function alternarTemaVisual() {
+            temaActual = temaActual === 'dark' ? 'light' : 'dark';
+            aplicarTemaVisual(temaActual);
+            localStorage.setItem('witiia_tema', temaActual);
+        }
+
+        function aplicarTemaVisual(tema) {
+            const btn = document.getElementById('themeToggleBtn');
+            if (tema === 'light') {
+                document.body.classList.remove('dark-theme');
+                if (btn) btn.innerText = "🌙";
+            } else {
+                document.body.classList.add('dark-theme');
+                if (btn) btn.innerText = "☀️";
+            }
+        }
+
+        function iniciarSesion(e) {
+            e.preventDefault();
+            const nombre = document.getElementById('regName').value.trim();
+            const correo = document.getElementById('regEmail').value.trim().toLowerCase();
+
+            if (!nombre || !correo) return;
+
+            usuarioActual = { nombre, correo };
+            localStorage.setItem('witiia_usuario', JSON.stringify(usuarioActual));
+
+            document.getElementById('displayUserName').innerText = nombre;
+            document.getElementById('displayUserEmail').innerText = correo;
+
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('chat-app').style.display = 'block';
+
+            if (Object.keys(listaChats).length === 0) {
+                crearNuevoChatInicial();
+            } else {
+                renderizarListaChats();
+                seleccionarChat(Object.keys(listaChats)[0]);
+            }
+            inicializarReconocimientoVoz();
+        }
+
+        function crearNuevoChatInicial() {
+            const idUnico = 'chat_' + Date.now();
+            listaChats[idUnico] = { id: idUnico, titulo: "WitiIA - Asistente", avatar: "🤖", fecha: obtenerHoraActual() };
+            conversaciones[idUnico] = [
+                { remitente: "ia", texto: "¡Hola! ¿Qué tal? ¿Cómo te va? Soy WitiIA. Pregúntame lo que sea sobre código, matemáticas, el proyecto o charla general.", hora: obtenerHoraActual() }
+            ];
+            guardarEnLocalStorage();
+            renderizarListaChats();
+            seleccionarChat(idUnico);
+        }
+
+        function crearNuevoChat() {
+            const idUnico = 'chat_' + Date.now();
+            const numeroChat = Object.keys(listaChats).length + 1;
+            listaChats[idUnico] = { id: idUnico, titulo: `Chat #${numeroChat}`, avatar: "💬", fecha: obtenerHoraActual() };
+            conversaciones[idUnico] = [
+                { remitente: "ia", texto: `Nuevo chat iniciado. ¿En qué te puedo ayudar hoy?`, hora: obtenerHoraActual() }
+            ];
+            guardarEnLocalStorage();
+            renderizarListaChats();
+            seleccionarChat(idUnico);
+        }
+
+        function guardarEnLocalStorage() {
+            localStorage.setItem('witiia_lista_chats', JSON.stringify(listaChats));
+            localStorage.setItem('witiia_conversaciones', JSON.stringify(conversaciones));
+        }
+
+        function renderizarListaChats() {
+            const contenedor = document.getElementById('chatsList');
+            contenedor.innerHTML = '';
+
+            Object.values(listaChats).forEach(chat => {
+                const div = document.createElement('div');
+                div.className = `chat-item ${chat.id === chatActivoId ? 'active' : ''}`;
+
+                const ultimosMensajes = conversaciones[chat.id];
+                const ultimoTexto = ultimosMensajes && ultimosMensajes.length > 0 ? ultimosMensajes[ultimosMensajes.length - 1].texto : "Sin mensajes";
+
+                div.innerHTML = `
+                    <div class="chat-item-left" onclick="seleccionarChat('${chat.id}')">
+                        <div class="chat-avatar">${chat.avatar}</div>
+                        <div class="chat-info">
+                            <h5>${chat.titulo}</h5>
+                            <p>${ultimoTexto}</p>
+                        </div>
+                    </div>
+                    <div class="chat-options-container" onclick="event.stopPropagation()">
+                        <button class="btn-three-dots" onclick="toggleMenuChat(event, '${chat.id}')">⋮</button>
+                        <div class="dropdown-menu" id="menu_${chat.id}">
+                            <div class="dropdown-item" onclick="renombrarChat('${chat.id}')">✏️ Renombrar</div>
+                            <div class="dropdown-item danger" onclick="eliminarChat('${chat.id}')">🗑️ Eliminar</div>
+                        </div>
+                    </div>
+                `;
+                contenedor.appendChild(div);
+            });
+        }
+
+        function toggleMenuChat(event, id) {
+            event.stopPropagation();
+            document.querySelectorAll('.dropdown-menu').forEach(m => {
+                if (m.id !== `menu_${id}`) m.classList.remove('show');
+            });
+            const menu = document.getElementById(`menu_${id}`);
+            menu.classList.toggle('show');
+        }
+
+        function renombrarChat(id) {
+            const nuevoNombre = prompt("Ingresa el nuevo nombre para este chat:", listaChats[id].titulo);
+            if (nuevoNombre && nuevoNombre.trim() !== "") {
+                listaChats[id].titulo = nuevoNombre.trim();
+                guardarEnLocalStorage();
+                renderizarListaChats();
+            }
+        }
+
+        function eliminarChat(id) {
+            if (Object.keys(listaChats).length <= 1) {
+                alert("Debes tener al menos un chat activo.");
+                return;
+            }
+            if (confirm("¿Estás seguro de eliminar este chat?")) {
+                delete listaChats[id];
+                delete conversaciones[id];
+                guardarEnLocalStorage();
+                
+                const remainingIds = Object.keys(listaChats);
+                if (remainingIds.length > 0) {
+                    seleccionarChat(remainingIds[0]);
+                }
+                renderizarListaChats();
+            }
+        }
+
+        function seleccionarChat(id) {
+            chatActivoId = id;
+            const chatInfo = listaChats[id];
+            if (!chatInfo) return;
+
+            document.getElementById('activeChatName').innerText = chatInfo.titulo;
+            document.getElementById('activeChatAvatar').innerText = chatInfo.avatar;
+            document.getElementById('activeChatStatus').innerText = "En línea • Guardado localmente";
+            document.getElementById('suggestionsBar').style.display = 'flex';
+
+            renderizarListaChats();
+            actualizarVistaMensajes();
+        }
+
+        function cargarPreguntasAleatorias() {
+            const container = document.getElementById('suggestionsBar');
+            container.innerHTML = '';
+            const seleccionadas = [...bancoPreguntasWitiIA].sort(() => 0.5 - Math.random()).slice(0, 5);
+
+            seleccionadas.forEach(item => {
+                const chip = document.createElement('div');
+                chip.className = 'suggestion-chip';
+                chip.innerText = item.q;
+                chip.onclick = () => enviarPreguntaRapida(item.q, item.r);
+                container.appendChild(chip);
+            });
+        }
+
+        function enviarPreguntaRapida(pregunta, respuesta) {
+            agregarMensajeAConversacion(chatActivoId, 'outgoing', pregunta);
+            simularEscrituraIA(respuesta);
+        }
+
+        function evaluarMatematicasTexto(texto) {
+            const limpio = texto.replace(/[^0-9+\-*/().]/g, '');
+            if (/[0-9]/.test(limpio) && /[+\-*/]/.test(limpio)) {
+                try {
+                    const resultado = Function('"use strict"; return (' + limpio + ')')();
+                    if (!isNaN(resultado) && isFinite(resultado)) {
+                        return `Resultado del cálculo matemático:\n Expresión: [ ${limpio} ]\n 🧮 Valor exacto: ${resultado}`;
+                    }
+                } catch (e) {}
+            }
+            return null;
+        }
+
+        function enviarMensajeTexto() {
+            const input = document.getElementById('messageInput');
+            const texto = input.value.trim();
+            if (!texto) return;
+
+            if (listaChats[chatActivoId].titulo.startsWith("Chat #") || listaChats[chatActivoId].titulo === "WitiIA - Asistente") {
+                listaChats[chatActivoId].titulo = texto.length > 22 ? texto.substring(0, 22) + '...' : texto;
+            }
+
+            agregarMensajeAConversacion(chatActivoId, 'outgoing', texto);
+            input.value = "";
+
+            let respuestaIa = "Entendido. Sigo dedicado a ayudarte con cualquier duda sobre el proyecto, código o algoritmos matemáticos.";
+            const textoLower = texto.toLowerCase();
+
+            const resultadoMatematico = evaluarMatematicasTexto(texto);
+            if (resultadoMatematico) {
+                respuestaIa = resultadoMatematico;
+            } else if (textoLower.includes("hola") || textoLower.includes("ola") || textoLower.includes("que tal") || textoLower.includes("como te va") || textoLower.includes("cm estas") || textoLower.includes("como estas") || textoLower.includes("todo bien")) {
+                respuestaIa = "¡Hola! Todo bien por aquí, con excelente energía. ¿Qué tal te va a ti? ¿De qué tema de programación, algoritmos o matemáticas platicamos hoy?";
+            } else if (textoLower.includes("k paso") || textoLower.includes("no mames") || textoLower.includes("mams paso") || textoLower.includes("mira este error") || textoLower.includes("error raro")) {
+                respuestaIa = "¡Vaya! Parece que encontraste un comportamiento extraño o un error raro. Analicemos el código o la consola para solucionarlo de inmediato.";
+            } else if (textoLower.includes("como te llamas") || textoLower.includes("quien eres")) {
+                respuestaIa = "Me llamo WitiIA, tu asistente virtual dedicado dentro de WIBSIPROJECT.";
+            } else {
+                let encontrado = false;
+                bancoPreguntasWitiIA.forEach(item => {
+                    const keywords = item.q.toLowerCase().replace(/[¿?]/g, '').split(' ');
+                    const matchCount = keywords.filter(kw => kw.length > 3 && textoLower.includes(kw)).length;
+                    if (!encontrado && (matchCount > 0 || textoLower.includes(item.q.toLowerCase().slice(3, 10)))) {
+                        respuestaIa = item.r;
+                        encontrado = true;
+                    }
+                });
+            }
+
+            simularEscrituraIA(respuestaIa);
+        }
+
+        function simularEscrituraIA(respuesta) {
+            const typingIndicator = document.getElementById('typingIndicator');
+            const typingSeconds = document.getElementById('typingSeconds');
+            const container = document.getElementById('messagesContainer');
+            
+            typingIndicator.style.display = 'flex';
+            container.scrollTop = container.scrollHeight;
+
+            let segundos = 0;
+            typingSeconds.innerText = segundos;
+
+            if (typingInterval) clearInterval(typingInterval);
+            typingInterval = setInterval(() => {
+                segundos++;
+                typingSeconds.innerText = segundos;
+            }, 1000);
+
+            const tiempoEspera = Math.max(1200, respuesta.length * 15);
+
+            setTimeout(() => {
+                clearInterval(typingInterval);
+                typingIndicator.style.display = 'none';
+                agregarMensajeAConversacion(chatActivoId, 'incoming', respuesta);
+                cargarPreguntasAleatorias();
+            }, tiempoEspera);
+        }
+
+        function agregarMensajeAConversacion(idChat, tipo, texto) {
+            if (!conversaciones[idChat]) conversaciones[idChat] = [];
+            conversaciones[idChat].push({
+                remitente: tipo === 'outgoing' ? 'user' : 'ia',
+                texto: texto,
+                hora: obtenerHoraActual()
+            });
+            guardarEnLocalStorage();
+            renderizarListaChats();
+            actualizarVistaMensajes();
+        }
+
+        function actualizarVistaMensajes() {
+            const container = document.getElementById('messagesContainer');
+            const typingIndicator = document.getElementById('typingIndicator');
+            
+            container.innerHTML = '';
+            const mensagens = conversaciones[chatActivoId] || [];
+            
+            mensagens.forEach(msg => {
+                const div = document.createElement('div');
+                const esSaliente = (msg.remitente === 'user');
+                div.className = `message ${esSaliente ? 'outgoing' : 'incoming'}`;
+                div.innerHTML = `
+                    <div>${msg.texto}</div>
+                    <div class="message-time">${msg.hora}</div>
+                `;
+                container.appendChild(div);
+            });
+
+            container.appendChild(typingIndicator);
+            container.scrollTop = container.scrollHeight;
+            cargarPreguntasAleatorias();
+        }
+
+        function chequearEnter(e) {
+            if (e.key === 'Enter') enviarMensajeTexto();
+        }
+
+        function obtenerHoraActual() {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            return hours + ':' + minutes + ' ' + ampm;
+        }
+
+        function inicializarReconocimientoVoz() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                recognition = new SpeechRecognition();
+                recognition.lang = 'es-ES';
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+
+                recognition.onresult = (event) => {
+                    const speechResult = event.results[0][0].transcript;
+                    document.getElementById('messageInput').value = speechResult;
+                    detenerGrabacionVisual();
+                    enviarMensajeTexto();
+                };
+
+                recognition.onerror = () => detenerGrabacionVisual();
+                recognition.onend = () => detenerGrabacionVisual();
+            }
+        }
+
+        function toggleMicrofono() {
+            if (!recognition) {
+                alert("Tu navegador no soporta el reconocimiento de voz.");
+                return;
+            }
+
+            const micBtn = document.getElementById('micBtn');
+            const recordingBox = document.getElementById('recordingBox');
+
+            if (!esGrabandoVoz) {
+                try {
+                    recognition.start();
+                    esGrabandoVoz = true;
+                    micBtn.classList.add('recording');
+                    recordingBox.style.display = 'block';
+                } catch (err) {
+                    console.log(err);
+                }
+            } else {
+                recognition.stop();
+                detenerGrabacionVisual();
+            }
+        }
+
+        function detenerGrabacionVisual() {
+            esGrabandoVoz = false;
+            document.getElementById('micBtn').classList.remove('recording');
+            document.getElementById('recordingBox').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

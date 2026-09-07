@@ -1,0 +1,2133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="icon" href="../assets/img/Wshorts.png" type="image/png">
+<title>Wshorts — WibsiProject </title>
+<style>
+    :root{
+        --bg: #0a0a0f;
+        --panel: rgba(18,18,24,0.92);
+        --panel-2: rgba(255,255,255,0.05);
+        --border: rgba(255,255,255,0.09);
+        --accent: #6366f1;
+        --accent-2: #8b5cf6;
+        --accent-grad: linear-gradient(135deg,#6366f1,#a855f7);
+        --text: #f3f4f6;
+        --muted: #9ca3af;
+        --danger: #f43f5e;
+        --gold: #f59e0b;
+        --radius: 14px;
+        --shadow: 0 20px 50px rgba(0,0,0,0.55);
+    }
+    *{box-sizing:border-box;}
+    html,body{
+        margin:0;padding:0;
+        background:var(--bg);
+        color:var(--text);
+        font-family: "Segoe UI", Inter, system-ui, -apple-system, sans-serif;
+        height:100%;
+        overflow-x:hidden;
+    }
+    a{color:inherit;text-decoration:none;}
+    button{font-family:inherit;}
+
+    /* Fondos ambientales, mismo lenguaje visual que index.html */
+    .ambient{
+        position:fixed; z-index:0; border-radius:50%;
+        filter:blur(120px); opacity:.35; pointer-events:none;
+    }
+    .ambient-one{
+        width:520px;height:520px; top:-160px; left:-120px;
+        background: radial-gradient(circle, var(--accent), transparent 70%);
+    }
+    .ambient-two{
+        width:480px;height:480px; bottom:-140px; right:-120px;
+        background: radial-gradient(circle, var(--accent-2), transparent 70%);
+    }
+
+    /* ---------- TOPBAR ---------- */
+    .topbar{
+        position:sticky; top:0; z-index:50;
+        display:flex; align-items:center; justify-content:space-between;
+        gap:16px; padding:14px 24px;
+        background: rgba(10,10,15,0.72);
+        backdrop-filter: blur(14px);
+        border-bottom:1px solid var(--border);
+    }
+    .brand{ display:flex; align-items:center; gap:10px; cursor:pointer;}
+    .brand-symbol{
+        width:38px;height:38px;border-radius:10px;
+        background:var(--accent-grad);
+        display:flex;align-items:center;justify-content:center;
+        font-weight:800; font-size:18px;
+    }
+    .brand-name{font-weight:800; letter-spacing:.5px; font-size:15px;}
+    .brand-name span{color:var(--accent);}
+    .brand-sub{font-size:10px; letter-spacing:2px; color:var(--muted);}
+    .topbar-actions{display:flex; align-items:center; gap:10px;}
+    .top-button{
+        display:flex; align-items:center; gap:6px;
+        background: var(--panel-2); border:1px solid var(--border);
+        color:var(--text); padding:9px 14px; border-radius:10px;
+        cursor:pointer; font-size:13px; font-weight:600;
+        transition: all .2s ease;
+    }
+    .top-button:hover{ background: rgba(99,102,241,0.18); border-color: var(--accent);}
+    .top-button.ghost{ background:transparent; }
+    .profile-button{
+        display:flex; align-items:center; gap:8px;
+        background: var(--panel-2); border:1px solid var(--border);
+        color:var(--text); padding:6px 12px 6px 6px; border-radius:30px;
+        cursor:pointer; font-size:13px; font-weight:600;
+        transition: all .2s ease;
+    }
+    .profile-button:hover{ background: rgba(99,102,241,0.18); border-color: var(--accent);}
+    .profile-avatar-sm{
+        width:28px;height:28px;border-radius:50%; object-fit:cover;
+        background:var(--accent-grad); display:flex; align-items:center; justify-content:center;
+        font-weight:800; font-size:12px; flex-shrink:0;
+    }
+
+    /* ---------- LAYOUT ---------- */
+    .app{ display:flex; position:relative; z-index:1; min-height:calc(100vh - 66px); }
+
+    .sidebar{
+        width:230px; flex-shrink:0; padding:20px 14px;
+        border-right:1px solid var(--border);
+        position:sticky; top:66px; height:calc(100vh - 66px); overflow-y:auto;
+    }
+    .section-label{ font-size:11px; letter-spacing:1.5px; color:var(--muted); margin:14px 10px 8px;}
+    .side-link{
+        width:100%; display:flex; align-items:center; gap:10px;
+        background:transparent; border:none; color:var(--text);
+        padding:10px 12px; border-radius:10px; cursor:pointer;
+        font-size:14px; text-align:left; margin-bottom:2px;
+        transition: background .2s ease;
+    }
+    .side-link:hover{ background: var(--panel-2); }
+    .side-link.active{ background: rgba(99,102,241,0.18); color:#c7d2fe; font-weight:600;}
+
+    /* ---------- FEED ---------- */
+    .feed-wrap{
+        flex:1; display:flex; justify-content:center;
+        padding:24px 16px 100px;
+    }
+    .feed{
+        width:420px; max-width:100%;
+        height: calc(100vh - 66px - 48px);
+        overflow-y:scroll; scroll-snap-type: y mandatory;
+        border-radius: 22px;
+        scrollbar-width:none;
+    }
+    .feed::-webkit-scrollbar{ display:none; }
+
+    .short-card{
+        position:relative;
+        height: calc(100vh - 66px - 48px);
+        scroll-snap-align:start;
+        border-radius:22px; overflow:hidden;
+        background:#000;
+        margin-bottom:16px;
+        box-shadow: var(--shadow);
+        border:1px solid var(--border);
+    }
+    .short-media-wrap{
+        position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+        background:#000;
+    }
+    .short-card video, .short-card iframe{
+        width:100%; height:100%; object-fit:cover; border:none;
+    }
+    .short-card.is-audio .short-media-wrap{
+        background-size:cover; background-position:center;
+        filter:brightness(.55);
+    }
+    .audio-visual{
+        position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+        font-size:80px; z-index:1; opacity:.85; pointer-events:none;
+    }
+    .fx-none{filter:none;}
+    .fx-bn{filter:grayscale(1) contrast(1.1);}
+    .fx-vintage{filter:sepia(.45) saturate(1.3) contrast(1.05);}
+    .fx-brillo{filter:brightness(1.25) saturate(1.1);}
+    .fx-contraste{filter:contrast(1.4) saturate(1.2);}
+    .fx-frio{filter:hue-rotate(180deg) saturate(1.2);}
+    .fx-vignette{ filter:contrast(1.15) brightness(.95); }
+
+    .short-topfade{
+        position:absolute; top:0; left:0; right:0; height:90px;
+        background:linear-gradient(to bottom, rgba(0,0,0,.55), transparent);
+        pointer-events:none;
+    }
+    .short-botfade{
+        position:absolute; bottom:0; left:0; right:0; height:230px;
+        background:linear-gradient(to top, rgba(0,0,0,.82), transparent);
+        pointer-events:none;
+    }
+
+    .kids-badge{
+        position:absolute; top:14px; left:14px; z-index:5;
+        background: rgba(245,158,11,0.9); color:#000;
+        font-size:11px; font-weight:800; padding:5px 10px; border-radius:20px;
+        display:flex; align-items:center; gap:4px;
+    }
+    .mute-badge{
+        position:absolute; top:14px; right:14px; z-index:5;
+        width:34px;height:34px; border-radius:50%;
+        background:rgba(0,0,0,.5); border:1px solid rgba(255,255,255,.2);
+        display:flex; align-items:center; justify-content:center;
+        cursor:pointer; font-size:15px;
+    }
+
+    /* ---------- BARRA DE PROGRESO (estilo YouTube) ---------- */
+    .progress-wrap{
+        position:absolute; left:0; right:0; bottom:0; height:5px; z-index:8;
+        background:rgba(255,255,255,0.22); cursor:pointer;
+    }
+    .progress-wrap:hover{ height:8px; }
+    .progress-fill{
+        height:100%; width:0%; background:linear-gradient(90deg,#6366f1,#a855f7);
+        transition:width .12s linear;
+    }
+    .progress-wrap.no-seek{ cursor:default; }
+
+    .short-info{
+        position:absolute; left:16px; right:86px; bottom:22px; z-index:4;
+    }
+    .short-user{ display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap;}
+    .short-avatar{
+        width:34px;height:34px;border-radius:50%;
+        background:var(--accent-grad); display:flex;align-items:center;justify-content:center;
+        font-weight:800; font-size:13px; border:2px solid #fff2;
+        object-fit:cover; flex-shrink:0;
+    }
+    .short-username{ font-weight:700; font-size:14px;}
+    .short-username .subs-count{ font-weight:500; font-size:11px; color:#d1d5db; opacity:.85; margin-left:4px;}
+    .sub-btn{
+        border:none; border-radius:20px; padding:5px 12px; font-size:11.5px; font-weight:700;
+        cursor:pointer; background:var(--accent-grad); color:#fff;
+        transition: opacity .2s ease, transform .15s ease;
+    }
+    .sub-btn:active{ transform:scale(0.94); }
+    .sub-btn.subscrito{ background:var(--panel-2); border:1px solid var(--border); color:#e5e7eb; }
+    .own-menu-btn{
+        position:absolute; top:14px; right:56px; z-index:5;
+        width:34px;height:34px; border-radius:50%;
+        background:rgba(0,0,0,.5); border:1px solid rgba(255,255,255,.2);
+        display:flex; align-items:center; justify-content:center;
+        cursor:pointer; font-size:16px; color:#fff;
+    }
+    .short-title{ font-weight:700; font-size:15px; margin:0 0 4px; }
+    .short-desc{ font-size:13px; color:#e5e7eb; opacity:.92; line-height:1.4;
+        display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
+    .short-tag{ font-size:11px; color:#c7d2fe; margin-top:6px; }
+
+    .short-actions{
+        position:absolute; right:10px; bottom:30px; z-index:5;
+        display:flex; flex-direction:column; align-items:center; gap:18px;
+    }
+    .action-btn{
+        background:transparent; border:none; color:#fff; cursor:pointer;
+        display:flex; flex-direction:column; align-items:center; gap:4px;
+        font-size:22px; filter:drop-shadow(0 2px 6px rgba(0,0,0,.6));
+        transition: transform .15s ease;
+    }
+    .action-btn:active{ transform:scale(0.85); }
+    .action-btn span.count{ font-size:11px; font-weight:700; color:#e5e7eb; filter:none;}
+    .action-btn.liked{ color:var(--danger); }
+    .action-btn.faved{ color:var(--gold); }
+
+    .heart-burst{
+        position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+        font-size:110px; pointer-events:none; opacity:0; z-index:6;
+        transition: transform .5s ease, opacity .5s ease; transform:scale(0.4);
+    }
+    .heart-burst.show{ opacity:1; transform:scale(1.05);}
+
+    .play-hint{
+        position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+        font-size:60px; color:#fff; opacity:0; pointer-events:none; z-index:6;
+        transition:opacity .25s ease;
+    }
+    .play-hint.show{ opacity:.9; }
+
+    .empty-feed{
+        display:flex; flex-direction:column; align-items:center; justify-content:center;
+        height:100%; text-align:center; gap:14px; color:var(--muted); padding:30px;
+    }
+    .empty-feed .big{ font-size:44px; }
+    .empty-feed .btnvolver{
+        background:var(--accent-grad); border:none; color:#fff; padding:10px 18px;
+        border-radius:10px; font-weight:700; cursor:pointer;
+    }
+
+    /* ---------- BOTON FLOTANTE + ---------- */
+    .fab-create{
+        position:fixed; right:34px; bottom:34px; z-index:80;
+        width:64px;height:64px; border-radius:50%;
+        background:var(--accent-grad); border:none; color:#fff;
+        font-size:30px; font-weight:300; cursor:pointer;
+        display:flex; align-items:center; justify-content:center;
+        box-shadow: 0 10px 30px rgba(99,102,241,0.55), 0 0 0 6px rgba(99,102,241,0.12);
+        transition: transform .2s ease, box-shadow .2s ease;
+        animation: fabPulse 2.6s ease-in-out infinite;
+    }
+    .fab-create:hover{ transform: scale(1.08) rotate(90deg); }
+    @keyframes fabPulse{
+        0%,100%{ box-shadow: 0 10px 30px rgba(99,102,241,0.55), 0 0 0 6px rgba(99,102,241,0.12);}
+        50%{ box-shadow: 0 10px 34px rgba(139,92,246,0.7), 0 0 0 12px rgba(99,102,241,0.06);}
+    }
+
+    /* ---------- MODALES ---------- */
+    .modal-overlay{
+        position:fixed; inset:0; z-index:200; display:none;
+        align-items:center; justify-content:center;
+        background: rgba(4,4,8,0.72); backdrop-filter: blur(8px);
+        padding:20px;
+    }
+    .modal-overlay.show{ display:flex; }
+    .modal-box{
+        width:100%; max-width:560px; max-height:88vh; overflow-y:auto;
+        background: var(--panel); border:1px solid var(--border);
+        border-radius:20px; box-shadow: var(--shadow);
+        animation: popIn .25s ease;
+    }
+    @keyframes popIn{ from{ opacity:0; transform:translateY(18px) scale(.97);} to{opacity:1; transform:translateY(0) scale(1);} }
+
+    .modal-head{
+        display:flex; align-items:center; justify-content:space-between;
+        padding:18px 22px; border-bottom:1px solid var(--border);
+        position:sticky; top:0; background:var(--panel); z-index:2;
+    }
+    .modal-head h2{ margin:0; font-size:17px; display:flex; align-items:center; gap:8px;}
+    .modal-close{
+        background:var(--panel-2); border:1px solid var(--border); color:#fff;
+        width:32px;height:32px; border-radius:50%; cursor:pointer; font-size:15px;
+    }
+    .modal-body{ padding:22px; display:flex; flex-direction:column; gap:18px;}
+
+    .field label{ display:block; font-size:12.5px; color:var(--muted); margin-bottom:6px; font-weight:600;}
+    .field input[type=text], .field textarea, .field select{
+        width:100%; padding:12px; background:rgba(0,0,0,0.35);
+        border:1px solid var(--border); border-radius:10px; color:#fff;
+        font-size:14px; resize:vertical; outline:none;
+        transition:border-color .2s ease;
+    }
+    .field input:focus, .field textarea:focus, .field select:focus{ border-color:var(--accent); }
+    .row2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .hint{ font-size:11.5px; color:var(--muted); margin-top:5px; }
+
+    .filepick{
+        display:flex; align-items:center; gap:10px;
+        background:rgba(0,0,0,0.35); border:1px dashed var(--border);
+        border-radius:10px; padding:12px; cursor:pointer;
+        transition:border-color .2s ease, background .2s ease;
+    }
+    .filepick:hover{ border-color:var(--accent); background:rgba(99,102,241,0.08); }
+    .filepick .ico{ font-size:20px; }
+    .filepick small{ color:var(--muted); display:block; margin-top:2px;}
+    .filepick input{ display:none; }
+    .thumb-preview{
+        margin-top:10px; width:100%; max-height:150px; border-radius:10px;
+        object-fit:cover; display:none; border:1px solid var(--border);
+    }
+
+    .toggle-row{
+        display:flex; align-items:center; justify-content:space-between;
+        background:rgba(0,0,0,0.25); border:1px solid var(--border);
+        border-radius:10px; padding:12px 14px;
+    }
+    .toggle-row .tlabel{ font-size:13.5px; font-weight:600; }
+    .toggle-row .tsub{ font-size:11.5px; color:var(--muted); margin-top:2px;}
+    .switch{ position:relative; width:46px; height:26px; flex-shrink:0; }
+    .switch input{ opacity:0; width:0; height:0; }
+    .slider-tg{
+        position:absolute; cursor:pointer; inset:0; background:#374151;
+        border-radius:34px; transition:.25s;
+    }
+    .slider-tg:before{
+        content:""; position:absolute; height:20px; width:20px; left:3px; bottom:3px;
+        background:#fff; border-radius:50%; transition:.25s;
+    }
+    .switch input:checked + .slider-tg{ background:var(--accent-grad); }
+    .switch input:checked + .slider-tg:before{ transform:translateX(20px); }
+
+    .video-preview-box{
+        background:#000; border-radius:12px; overflow:hidden; position:relative;
+        display:none; border:1px solid var(--border);
+    }
+    .video-preview-box video, .video-preview-box audio{ width:100%; max-height:280px; display:block; }
+
+    .trim-wrap{ display:none; flex-direction:column; gap:8px; }
+    .trim-labels{ display:flex; justify-content:space-between; font-size:11.5px; color:var(--muted); }
+    .trim-sliders input[type=range]{ width:100%; accent-color:var(--accent); }
+
+    .modal-footer{
+        display:flex; gap:12px; padding:18px 22px 22px;
+        border-top:1px solid var(--border);
+    }
+    .btn{
+        flex:1; padding:13px; border-radius:12px; font-weight:700; font-size:14px;
+        cursor:pointer; border:none; transition: transform .15s ease, opacity .2s ease;
+    }
+    .btn:active{ transform:scale(0.97); }
+    .btn-primary{ background:var(--accent-grad); color:#fff; }
+    .btn-secondary{ background:var(--panel-2); color:#fff; border:1px solid var(--border); }
+    .btn-primary:disabled{ opacity:.5; cursor:not-allowed; }
+
+    /* ---------- OVERLAY DE SUBIDA ---------- */
+    .upload-overlay{
+        position:fixed; inset:0; z-index:300; display:none;
+        align-items:center; justify-content:center;
+        background: rgba(4,4,8,0.86); backdrop-filter: blur(10px);
+    }
+    .upload-overlay.show{ display:flex; }
+    .upload-card{
+        width:280px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:18px;
+    }
+    .upload-ring{
+        width:110px; height:110px; border-radius:50%;
+        background: conic-gradient(var(--accent) calc(var(--p, 0) * 1%), rgba(255,255,255,0.08) 0);
+        display:flex; align-items:center; justify-content:center;
+        transition: background .15s linear;
+        position:relative;
+    }
+    .upload-ring::before{
+        content:""; position:absolute; width:88px; height:88px; border-radius:50%; background:var(--bg);
+    }
+    .upload-ring .pct{ position:relative; z-index:2; font-weight:800; font-size:20px;}
+    .upload-title{ font-weight:700; font-size:15px;}
+    .upload-sub{ font-size:12.5px; color:var(--muted);}
+    .upload-check{ font-size:52px; color:#22c55e; display:none; animation: popIn .3s ease; }
+
+    /* ---------- COMENTARIOS ---------- */
+    .comments-box{ max-width:420px; }
+    .comments-list{ display:flex; flex-direction:column; gap:14px; max-height:340px; overflow-y:auto; }
+    .comment-item{ display:flex; gap:10px; }
+    .comment-avatar{
+        width:30px;height:30px;border-radius:50%; background:var(--accent-grad); flex-shrink:0;
+        display:flex;align-items:center;justify-content:center; font-size:12px; font-weight:800;
+    }
+    .comment-body{ background:rgba(255,255,255,0.05); border-radius:10px; padding:8px 12px; flex:1;}
+    .comment-user{ font-size:12.5px; font-weight:700; }
+    .comment-text{ font-size:13px; color:#e5e7eb; margin-top:2px; }
+    .comment-empty{ text-align:center; color:var(--muted); font-size:13px; padding:20px 0;}
+    .comment-input-row{ display:flex; gap:10px; margin-top:14px; }
+    .comment-input-row input{
+        flex:1; padding:11px; border-radius:10px; border:1px solid var(--border);
+        background:rgba(0,0,0,0.35); color:#fff; font-size:13.5px; outline:none;
+    }
+    .comment-input-row button{
+        background:var(--accent-grad); border:none; color:#fff; padding:0 16px;
+        border-radius:10px; font-weight:700; cursor:pointer;
+    }
+    .comments-disabled{ text-align:center; color:var(--muted); padding:30px 10px; font-size:13.5px; }
+
+    /* ---------- PERFIL ---------- */
+    .perfil-foto-picker{
+        display:flex; align-items:center; gap:16px;
+    }
+    .perfil-foto-preview{
+        width:76px;height:76px;border-radius:50%; object-fit:cover;
+        background:var(--accent-grad); display:flex; align-items:center; justify-content:center;
+        font-weight:800; font-size:26px; border:2px solid var(--border); flex-shrink:0;
+    }
+    .perfil-stats{
+        display:flex; gap:22px; background:rgba(255,255,255,0.05); border:1px solid var(--border);
+        border-radius:12px; padding:14px 18px;
+    }
+    .perfil-stat b{ display:block; font-size:18px; }
+    .perfil-stat span{ font-size:11.5px; color:var(--muted); }
+
+    /* ---------- COMPARTIR ---------- */
+    .share-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+    .share-opt{
+        display:flex; flex-direction:column; align-items:center; gap:6px;
+        background:rgba(255,255,255,0.05); border:1px solid var(--border);
+        border-radius:12px; padding:14px 6px; cursor:pointer; font-size:11.5px; color:#e5e7eb;
+        transition: background .2s ease, transform .15s ease;
+    }
+    .share-opt:hover{ background:rgba(99,102,241,0.15); transform:translateY(-2px); }
+    .share-opt .ico{ font-size:24px; }
+
+    /* ---------- TOAST ---------- */
+    .toast{
+        position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+        background: rgba(18,18,24,0.95); border:1px solid var(--border);
+        color:#fff; padding:12px 20px; border-radius:12px; display:none;
+        align-items:center; gap:10px; z-index:400; font-size:13.5px;
+        box-shadow: var(--shadow); backdrop-filter: blur(10px);
+    }
+    .toast span{ color:#22c55e; font-weight:800; }
+
+    @media (max-width: 900px){
+        .sidebar{ display:none; }
+        .feed{ width:100%; }
+    }
+    @media (max-width: 520px){
+        .short-info{ right:76px; }
+        .fab-create{ right:18px; bottom:18px; width:58px; height:58px; font-size:26px;}
+        .row2{ grid-template-columns:1fr; }
+        .share-grid{ grid-template-columns:repeat(3,1fr); }
+    }
+</style>
+</head>
+<body>
+
+<div class="ambient ambient-one"></div>
+<div class="ambient ambient-two"></div>
+
+<header class="topbar">
+    <div class="brand" onclick="window.location.href='index.html'">
+        <div class="brand-symbol">W</div>
+        <div>
+            <div class="brand-name">WibsiProject <span>.</span></div>
+            <div class="brand-sub">WSHORTS</div>
+        </div>
+    </div>
+    <div class="topbar-actions">
+        <button class="top-button ghost" onclick="window.location.href='index.html'">← Inicio</button>
+        <button class="top-button" id="btnMuteAll">🔊 Sonido</button>
+        <button class="profile-button" id="btnMiPerfil" onclick="abrirModalPerfil(false)">
+            <span class="profile-avatar-sm" id="topbarAvatar">👤</span>
+            <span id="topbarNombre">Mi cuenta</span>
+        </button>
+    </div>
+</header>
+
+<div class="app">
+    <aside class="sidebar">
+        <div class="section-label">NAVEGACIÓN</div>
+        <button class="side-link active" id="sideInicio"><span>⌂</span> Inicio</button>
+        <button class="side-link" onclick="window.location.href='tendencias.html'"><span>🎁</span> Tendencias</button>
+        <button class="side-link active"><span>🎬</span> Wshorts</button>
+
+        <div class="section-label">TU ESPACIO</div>
+
+        <button class="side-link" id="sideFavoritos">
+            <span>💌</span> Favoritos</button>
+
+        <button class="side-link" id="sideRecientes">
+            <span>⏰</span> Recientes
+        </button>
+
+        <div class="section-label">CREAR</div>
+        <button class="side-link" onclick="abrirModalCrear()"><span>➕️</span> Nuevo Short</button>
+    </aside>
+
+    <div class="feed-wrap">
+        <div class="feed" id="feed"></div>
+    </div>
+</div>
+
+<button class="fab-create" id="fabCrear" onclick="abrirModalCrear()" title="Crear nuevo Short">＋</button>
+
+<!-- MODAL: CREAR SHORT -->
+<div class="modal-overlay" id="modalCrear">
+    <div class="modal-box">
+        <div class="modal-head">
+            <h2>🎬 Crear Short</h2>
+            <button class="modal-close" onclick="cerrarModalCrear()">✕</button>
+        </div>
+        <div class="modal-body">
+
+            <div class="field">
+                <label>Nombre del Short</label>
+                <input type="text" id="fTitulo" placeholder="Ej: Drift nocturno phonk" autocomplete="off">
+            </div>
+
+            <div class="field">
+                <label>Descripción</label>
+                <textarea id="fDescripcion" rows="3" placeholder="Cuenta de qué trata tu short..."></textarea>
+            </div>
+
+            <div class="field">
+                <label>Video o audio (sube un archivo o pega un enlace de YouTube / video / cualquier página)</label>
+                <label class="filepick">
+                    <span class="ico">📁</span>
+                    <div>
+                        <div id="videoFileName">Seleccionar archivo desde el explorador</div>
+                        <small>Video: MP4, WEBM, MOV, MKV · Audio: MP3, WAV, OGG, M4A</small>
+                    </div>
+                    <input type="file" id="fVideoFile" accept="video/*,audio/*,.mp4,.webm,.mov,.mkv,.mp3,.wav,.ogg,.m4a">
+                </label>
+                <input type="text" id="fVideoUrl" style="margin-top:10px;" placeholder="https://www.youtube.com/watch?v=... o enlace .mp4/.mp3 o cualquier página" autocomplete="off">
+                <div class="hint">Puedes subir un archivo O pegar un enlace (no ambos a la vez).</div>
+                <div class="video-preview-box" id="videoPreviewBox">
+                    <video id="videoPreviewEl" muted playsinline style="display:none;"></video>
+                    <audio id="audioPreviewEl" controls style="display:none; width:100%;"></audio>
+                </div>
+                <div class="trim-wrap" id="trimWrap">
+                    <div class="trim-labels"><span>✂️ Recortar Short</span><span id="trimTimes">0:00 - 0:00</span></div>
+                    <div class="trim-sliders">
+                        <input type="range" id="trimStart" min="0" max="100" value="0">
+                        <input type="range" id="trimEnd" min="0" max="100" value="100">
+                    </div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>Miniatura (solo explorador de archivos)</label>
+                <label class="filepick">
+                    <span class="ico">🖼️</span>
+                    <div>
+                        <div id="thumbFileName">Seleccionar imagen de miniatura</div>
+                        <small>JPG, PNG o WEBP</small>
+                    </div>
+                    <input type="file" id="fThumbFile" accept="image/*">
+                </label>
+                <img id="thumbPreview" class="thumb-preview">
+            </div>
+
+            <div class="field">
+                <label>Efectos de video</label>
+                <select id="fEfecto">
+                    <option value="fx-none">Ninguno</option>
+                    <option value="fx-bn">Blanco y negro</option>
+                    <option value="fx-vintage">Vintage</option>
+                    <option value="fx-brillo">Brillo alto</option>
+                    <option value="fx-contraste">Contraste dramático</option>
+                    <option value="fx-frio">Tono frío</option>
+                    <option value="fx-vignette">Cine / Viñeta</option>
+                </select>
+            </div>
+
+            <div class="toggle-row">
+                <div>
+                    <div class="tlabel">Contenido para niños</div>
+                    <div class="tsub">Marca si este short es apto y dirigido a niños</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="fKids">
+                    <span class="slider-tg"></span>
+                </label>
+            </div>
+
+            <div class="toggle-row">
+                <div>
+                    <div class="tlabel">Permitir comentarios</div>
+                    <div class="tsub">Los usuarios podrán comentar este short</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="fComentarios" checked>
+                    <span class="slider-tg"></span>
+                </label>
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="cerrarModalCrear()">Cancelar</button>
+            <button class="btn btn-primary" id="btnPublicar" onclick="publicarShort()">Publicar Short ✦</button>
+        </div>
+    </div>
+</div>
+
+<!-- OVERLAY: SUBIENDO VIDEO -->
+<div class="upload-overlay" id="uploadOverlay">
+    <div class="upload-card">
+        <div class="upload-ring" id="uploadRing" style="--p:0;">
+            <span class="pct" id="uploadPct">0%</span>
+        </div>
+        <div class="upload-check" id="uploadCheck">✅</div>
+        <div class="upload-title" id="uploadTitle">Subiendo tu Short...</div>
+        <div class="upload-sub" id="uploadSub">No cierres esta ventana</div>
+        <button class="btn btn-secondary" id="btnCancelarSubida" style="width:100%;" onclick="cancelarSubida()">Cancelar subida</button>
+    </div>
+</div>
+
+<!-- MODAL: COMENTARIOS -->
+<div class="modal-overlay" id="modalComentarios">
+    <div class="modal-box comments-box">
+        <div class="modal-head">
+            <h2>💬 Comentarios</h2>
+            <button class="modal-close" onclick="cerrarComentarios()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div id="comentariosContenido"></div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: PERFIL / CUENTA -->
+<div class="modal-overlay" id="modalPerfil">
+    <div class="modal-box" style="max-width:460px;">
+        <div class="modal-head">
+            <h2 id="perfilModalTitulo">👤 Tu cuenta en Wshorts</h2>
+            <button class="modal-close" id="btnCerrarPerfil" onclick="cerrarModalPerfil()">✕</button>
+        </div>
+        <div class="modal-body">
+            <p class="hint" id="perfilIntroTexto">Elige un nombre para que tus shorts, suscriptores y comentarios se guarden bajo tu cuenta en este navegador.</p>
+
+            <div class="perfil-foto-picker">
+                <div class="perfil-foto-preview" id="perfilFotoPreview">👤</div>
+                <label class="filepick" style="flex:1;">
+                    <span class="ico">🖼️</span>
+                    <div>
+                        <div id="perfilFotoNombre">Foto de perfil (opcional)</div>
+                        <small>JPG, PNG o WEBP</small>
+                    </div>
+                    <input type="file" id="fPerfilFoto" accept="image/*">
+                </label>
+            </div>
+
+            <div class="field">
+                <label>Nombre de usuario</label>
+                <input type="text" id="fPerfilNombre" placeholder="Ej: Ana Phonk" autocomplete="off" maxlength="40">
+            </div>
+
+            <div class="perfil-stats" id="perfilStatsBox" style="display:none;">
+                <div class="perfil-stat"><b id="perfilStatShorts">0</b><span>Shorts</span></div>
+                <div class="perfil-stat"><b id="perfilStatSubs">0</b><span>Suscriptores</span></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="btnCancelarPerfil" onclick="cerrarModalPerfil()">Cancelar</button>
+            <button class="btn btn-primary" onclick="guardarPerfilActual()">Guardar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: EDITAR / ELIMINAR SHORT -->
+<div class="modal-overlay" id="modalEditarShort">
+    <div class="modal-box">
+        <div class="modal-head">
+            <h2>✎ Editar tu Short</h2>
+            <button class="modal-close" onclick="cerrarEditarShort()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="field">
+                <label>Nombre del Short</label>
+                <input type="text" id="eTitulo" placeholder="Nombre del short" autocomplete="off">
+            </div>
+            <div class="field">
+                <label>Descripción</label>
+                <textarea id="eDescripcion" rows="3"></textarea>
+            </div>
+            <div class="field" id="eEnlaceCampo">
+                <label>Enlace del video/audio</label>
+                <input type="text" id="eEnlace" placeholder="https://..." autocomplete="off">
+                <div class="hint">Puedes actualizar la dirección (URL) de este short.</div>
+            </div>
+            <div class="field" id="eArchivoCampo">
+                <label>Reemplazar archivo (opcional)</label>
+                <label class="filepick">
+                    <span class="ico">📁</span>
+                    <div>
+                        <div id="eArchivoNombre">Seleccionar nuevo archivo</div>
+                        <small>Sube un archivo nuevo para reemplazar el actual</small>
+                    </div>
+                    <input type="file" id="eArchivoFile" accept="video/*,audio/*">
+                </label>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" style="background:rgba(244,63,94,0.15); border:1px solid var(--danger); color:#fecdd3;" onclick="eliminarShortDesdeEditor()">🗑️ Eliminar</button>
+            <button class="btn btn-primary" onclick="guardarEdicionShort()">Guardar cambios</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: COMPARTIR -->
+<div class="modal-overlay" id="modalCompartir">
+    <div class="modal-box" style="max-width:420px;">
+        <div class="modal-head">
+            <h2>↗ Compartir Short</h2>
+            <button class="modal-close" onclick="cerrarCompartir()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="share-grid">
+                <div class="share-opt" onclick="compartirEn('link')">
+                    <span class="ico">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                    </span>Copiar enlace
+                </div>
+                <div class="share-opt" onclick="compartirEn('descargar')">
+                    <span class="ico">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    </span>Descargar
+                </div>
+                <div class="share-opt" onclick="compartirEn('whatsapp')">
+                    <span class="ico" style="color: #25D366;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                    </span>WhatsApp
+                </div>
+                <div class="share-opt" onclick="compartirEn('facebook')">
+                    <span class="ico" style="color: #1877F2;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    </span>Facebook
+                </div>
+                <div class="share-opt" onclick="compartirEn('twitter')">
+                    <span class="ico" style="color: #fff;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                    </span>X / Twitter
+                </div>
+                <div class="share-opt" onclick="compartirEn('telegram')">
+                    <span class="ico" style="color: #229ED9;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18 1.897-.962 6.502-1.359 8.627-.168.9-.5 1.201-.82 1.23-.697.064-1.228-.46-1.901-.903-1.056-.693-1.653-1.124-2.678-1.8-1.185-.781-.417-1.21.258-1.911.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635.099-.002.321.023.465.141.119.098.152.228.163.33.016.116.033.378.019.582z"/></svg>
+                    </span>Telegram
+                </div>
+                <div class="share-opt" onclick="compartirEn('correo')">
+                    <span class="ico">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    </span>Correo
+                </div>
+                <div class="share-opt" onclick="compartirEn('nativo')">
+                    <span class="ico">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                    </span>Más opciones
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast">
+    <span>✓</span>
+    <p id="toastMsg">Listo</p>
+</div>
+
+<script>
+/* =========================================================
+   WSHORTS — Lógica completa con mensajes y sin recargas
+   Videos/audios reales se guardan en IndexedDB (no en
+   localStorage) para evitar el error de "cuota excedida"
+   que hacía que los shorts subidos desaparecieran.
+   ========================================================= */
+const STORAGE_KEY   = 'wibsitihub_wshorts_data';
+const SONIDO_KEY    = 'wibsitihub_wshorts_sonido';
+const PERFILES_KEY  = 'wibsitihub_wshorts_perfiles';
+const PERFIL_ID_KEY = 'wibsitihub_wshorts_perfil_actual';
+const DB_NAME       = 'wibsitihub_wshorts_db';
+const DB_VERSION    = 1;
+const STORE_MEDIA   = 'mediaBlobs';
+
+let shorts = [];
+let perfiles = {};              // id -> {id, nombre, foto, suscriptoresBase, suscriptores:[ids], fecha}
+let perfilActualId = null;
+let vistaActual = 'todos';     // 'todos' | 'favoritos' | 'recientes'
+let shortActivoId = null;
+let editandoShortId = null;
+let editArchivoBlob = null;
+let editArchivoTipo = null;
+let archivoMediaBlob = null;   // Blob del archivo elegido (video o audio)
+let archivoMediaTipo = null;   // 'video' | 'audio'
+let archivoMediaNombre = '';
+let archivoMediaObjectUrl = null;
+let archivoThumbBase64 = null; // las miniaturas sí caben en localStorage
+let subidaCancelada = false;
+let sonidoGlobalActivo = false; // false = todo silenciado por defecto (autoplay)
+const mediaObjectUrls = {};     // id -> object URL creada desde IndexedDB, para poder revocarla
+
+/* ---------- IndexedDB: guardado real de video/audio ---------- */
+function abrirDB(){
+    return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, DB_VERSION);
+        req.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if(!db.objectStoreNames.contains(STORE_MEDIA)){
+                db.createObjectStore(STORE_MEDIA);
+            }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+    });
+}
+async function guardarMediaBlob(id, blob){
+    const db = await abrirDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_MEDIA, 'readwrite');
+        tx.objectStore(STORE_MEDIA).put(blob, id);
+        tx.oncomplete = () => resolve(true);
+        tx.onerror = () => reject(tx.error);
+    });
+}
+async function obtenerMediaBlob(id){
+    const db = await abrirDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_MEDIA, 'readonly');
+        const req = tx.objectStore(STORE_MEDIA).get(id);
+        req.onsuccess = () => resolve(req.result || null);
+        req.onerror = () => reject(req.error);
+    });
+}
+async function borrarMediaBlob(id){
+    try{
+        const db = await abrirDB();
+        return new Promise((resolve) => {
+            const tx = db.transaction(STORE_MEDIA, 'readwrite');
+            tx.objectStore(STORE_MEDIA).delete(id);
+            tx.oncomplete = () => resolve(true);
+            tx.onerror = () => resolve(false);
+        });
+    }catch(e){ return false; }
+}
+
+/* ---------- Utilidades ---------- */
+function mostrarToast(msg){
+    const toast = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    toast.style.display = 'flex';
+    clearTimeout(toast._t);
+    toast._t = setTimeout(()=> toast.style.display='none', 2600);
+}
+function formatTime(s){
+    if(isNaN(s) || !isFinite(s)) return "0:00";
+    const m = Math.floor(s/60), sec = Math.floor(s%60);
+    return `${m}:${sec<10?'0':''}${sec}`;
+}
+function uid(){ return 'sh_' + Date.now() + '_' + Math.random().toString(36).slice(2,8); }
+
+function getYoutubeId(url){
+    const m = url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/);
+    return m ? m[1] : null;
+}
+function esEnlaceDeVideoDirecto(url){
+    return /\.(mp4|webm|ogv|mov|m4v)(\?.*)?$/i.test(url);
+}
+function esEnlaceDeAudioDirecto(url){
+    return /\.(mp3|wav|ogg|m4a|aac|flac)(\?.*)?$/i.test(url);
+}
+
+/* ---------- Preferencia global de sonido ---------- */
+function cargarPreferenciaSonido(){
+    try{
+        sonidoGlobalActivo = localStorage.getItem(SONIDO_KEY) === '1';
+    }catch(e){ sonidoGlobalActivo = false; }
+    actualizarBotonSonidoGlobal();
+}
+function guardarPreferenciaSonido(){
+    try{ localStorage.setItem(SONIDO_KEY, sonidoGlobalActivo ? '1' : '0'); }catch(e){}
+}
+function actualizarBotonSonidoGlobal(){
+    const btn = document.getElementById('btnMuteAll');
+    btn.textContent = sonidoGlobalActivo ? '🔊 Sonido' : '🔇 Sonido';
+}
+
+/* ---------- Cuentas / Perfiles (locales a este navegador, sin contraseña) ---------- */
+function perfilesDemo(){
+    return {
+        'perfil_wibsitihub_lab': { id:'perfil_wibsitihub_lab', nombre:'Wibsitihub Lab', foto:'', suscriptoresBase:340, suscriptores:[], fecha:Date.now() },
+        'perfil_phonk_nation':   { id:'perfil_phonk_nation',   nombre:'Phonk Nation',   foto:'', suscriptoresBase:912, suscriptores:[], fecha:Date.now() },
+        'perfil_night_archive':  { id:'perfil_night_archive',  nombre:'Night Archive',  foto:'', suscriptoresBase:157, suscriptores:[], fecha:Date.now() }
+    };
+}
+function cargarPerfiles(){
+    try{
+        const raw = localStorage.getItem(PERFILES_KEY);
+        perfiles = raw ? JSON.parse(raw) : perfilesDemo();
+    }catch(e){ perfiles = perfilesDemo(); }
+    if(!raw_ok(perfiles)) perfiles = perfilesDemo();
+    try{ perfilActualId = localStorage.getItem(PERFIL_ID_KEY) || null; }catch(e){ perfilActualId = null; }
+}
+function raw_ok(obj){ return obj && typeof obj === 'object'; }
+function guardarPerfiles(){
+    try{
+        localStorage.setItem(PERFILES_KEY, JSON.stringify(perfiles));
+        return true;
+    }catch(e){
+        mostrarToast("⚠️ No se pudo guardar la información de tu cuenta.");
+        return false;
+    }
+}
+function obtenerPerfil(id){
+    return perfiles[id] || null;
+}
+function obtenerPerfilActual(){
+    return perfilActualId ? obtenerPerfil(perfilActualId) : null;
+}
+function contarShortsDe(perfilId){
+    return shorts.filter(s => s.autorId === perfilId).length;
+}
+function contarSuscriptoresDe(perfilId){
+    const p = obtenerPerfil(perfilId);
+    if(!p) return 0;
+    return (p.suscriptoresBase||0) + (p.suscriptores||[]).length;
+}
+function estaSuscrito(perfilId){
+    const p = obtenerPerfil(perfilId);
+    if(!p || !perfilActualId) return false;
+    return (p.suscriptores||[]).includes(perfilActualId);
+}
+function avatarHtmlAutor(autorId, nombreFallback, tamanoClase){
+    const p = obtenerPerfil(autorId);
+    const cls = tamanoClase || 'short-avatar';
+    if(p && p.foto){
+        return `<img class="${cls}" src="${p.foto}" alt="${escapeHtml(p.nombre)}">`;
+    }
+    const nombre = (p ? p.nombre : nombreFallback) || 'W';
+    return `<div class="${cls}">${escapeHtml(nombre.substring(0,2).toUpperCase())}</div>`;
+}
+
+function actualizarUIPerfilTopbar(){
+    const p = obtenerPerfilActual();
+    const av = document.getElementById('topbarAvatar');
+    const nm = document.getElementById('topbarNombre');
+    if(!p){
+        av.innerHTML = '👤';
+        nm.textContent = 'Mi cuenta';
+        return;
+    }
+    av.innerHTML = p.foto ? `<img src="${p.foto}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : escapeHtml(p.nombre.substring(0,2).toUpperCase());
+    nm.textContent = p.nombre;
+}
+
+let _fotoPerfilTemp = '';
+function abrirModalPerfil(obligatorio){
+    const p = obtenerPerfilActual();
+    _fotoPerfilTemp = p ? (p.foto || '') : '';
+    document.getElementById('fPerfilNombre').value = p ? p.nombre : '';
+    document.getElementById('fPerfilFoto').value = '';
+    document.getElementById('perfilFotoNombre').textContent = 'Foto de perfil (opcional)';
+    const preview = document.getElementById('perfilFotoPreview');
+    if(_fotoPerfilTemp){
+        preview.innerHTML = `<img src="${_fotoPerfilTemp}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+    } else {
+        preview.textContent = (p ? p.nombre.substring(0,2).toUpperCase() : '👤');
+    }
+
+    const statsBox = document.getElementById('perfilStatsBox');
+    if(p){
+        statsBox.style.display = 'flex';
+        document.getElementById('perfilStatShorts').textContent = contarShortsDe(p.id);
+        document.getElementById('perfilStatSubs').textContent = contarSuscriptoresDe(p.id);
+    } else {
+        statsBox.style.display = 'none';
+    }
+
+    document.getElementById('perfilModalTitulo').textContent = p ? '👤 Tu cuenta en Wshorts' : '👋 ¡Bienvenido a Wshorts!';
+    document.getElementById('perfilIntroTexto').textContent = p
+        ? 'Actualiza tu nombre o tu foto de perfil. Se guardan en este navegador.'
+        : 'Elige un nombre para entrar. No necesitas contraseña: tus shorts, suscriptores y comentarios se guardarán bajo este nombre en este navegador.';
+
+    const btnCerrar = document.getElementById('btnCerrarPerfil');
+    const btnCancelar = document.getElementById('btnCancelarPerfil');
+    const esObligatorio = obligatorio && !p;
+    btnCerrar.style.display = esObligatorio ? 'none' : 'flex';
+    btnCancelar.style.display = esObligatorio ? 'none' : 'block';
+
+    document.getElementById('modalPerfil').classList.add('show');
+}
+function cerrarModalPerfil(){
+    if(!obtenerPerfilActual()) return; // no se puede cerrar sin haber creado el perfil
+    document.getElementById('modalPerfil').classList.remove('show');
+}
+document.getElementById('fPerfilFoto').addEventListener('change', function(e){
+    const file = e.target.files[0];
+    if(!file) return;
+    document.getElementById('perfilFotoNombre').textContent = file.name;
+    const reader = new FileReader();
+    reader.onload = function(ev){
+        _fotoPerfilTemp = ev.target.result;
+        const preview = document.getElementById('perfilFotoPreview');
+        preview.innerHTML = `<img src="${_fotoPerfilTemp}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+    };
+    reader.readAsDataURL(file);
+});
+function guardarPerfilActual(){
+    const nombre = document.getElementById('fPerfilNombre').value.trim();
+    if(!nombre){
+        mostrarToast("📛 Escribe un nombre para tu cuenta");
+        return;
+    }
+    let p = obtenerPerfilActual();
+    if(!p){
+        const nuevoId = 'perfil_' + uid();
+        p = { id: nuevoId, nombre:'', foto:'', suscriptoresBase:0, suscriptores:[], fecha:Date.now() };
+        perfiles[nuevoId] = p;
+        perfilActualId = nuevoId;
+        try{ localStorage.setItem(PERFIL_ID_KEY, perfilActualId); }catch(e){}
+    }
+    const nombreAnterior = p.nombre;
+    p.nombre = nombre;
+    p.foto = _fotoPerfilTemp || '';
+    guardarPerfiles();
+
+    // Si el nombre cambió, refleja el nuevo nombre en los shorts que ya publicó este usuario
+    if(nombreAnterior !== nombre){
+        shorts.forEach(s => { if(s.autorId === p.id) s.usuario = nombre; });
+        guardarShorts();
+    }
+
+    actualizarUIPerfilTopbar();
+    document.getElementById('modalPerfil').classList.remove('show');
+    renderShorts();
+    mostrarToast(nombreAnterior ? "Perfil actualizado ✔️" : `¡Bienvenido, ${nombre}! 🎉`);
+}
+
+function toggleSuscripcion(autorId){
+    if(!perfilActualId){ abrirModalPerfil(true); return; }
+    if(autorId === perfilActualId){
+        mostrarToast("No puedes suscribirte a tu propia cuenta 🙂");
+        return;
+    }
+    const p = obtenerPerfil(autorId);
+    if(!p) return;
+    p.suscriptores = p.suscriptores || [];
+    const idx = p.suscriptores.indexOf(perfilActualId);
+    if(idx === -1){
+        p.suscriptores.push(perfilActualId);
+        mostrarToast(`Te suscribiste a ${p.nombre} 🔔`);
+    } else {
+        p.suscriptores.splice(idx, 1);
+        mostrarToast(`Ya no sigues a ${p.nombre}`);
+    }
+    guardarPerfiles();
+
+    document.querySelectorAll(`.sub-btn[data-autor="${autorId}"]`).forEach(btn => {
+        const suscrito = estaSuscrito(autorId);
+        btn.classList.toggle('subscrito', suscrito);
+        btn.textContent = suscrito ? 'Suscrito ✓' : 'Suscribirse';
+    });
+    document.querySelectorAll(`.subs-count[data-autor="${autorId}"]`).forEach(el => {
+        el.textContent = `· ${contarSuscriptoresDe(autorId)} suscriptores`;
+    });
+}
+
+/* ---------- Almacenamiento (metadatos en localStorage) ---------- */
+function cargarShorts(){
+    try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(raw){
+            shorts = JSON.parse(raw);
+        } else {
+            shorts = shortsDemo();
+            guardarShorts();
+        }
+    }catch(e){
+        shorts = shortsDemo();
+    }
+}
+function guardarShorts(){
+    try{
+        // Nunca se guardan blobs pesados aquí: sólo metadatos + miniaturas pequeñas.
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(shorts));
+        return true;
+    }catch(e){
+        mostrarToast("⚠️ No se pudieron guardar los datos del short (espacio lleno).");
+        return false;
+    }
+}
+function shortsDemo(){
+    return [
+        {
+            id: uid(), tipo:'video', src:'../assets/videos/phonk3.mp4', thumb:'../assets/img/paisaje.jpg',
+            titulo:'Dentro del futuro digital', descripcion:'Un viaje visual por el futuro digital. #wshorts',
+            usuario:'Wibsitihub Lab', autorId:'perfil_wibsitihub_lab', kids:false, comentariosActivos:true, efecto:'fx-none',
+            trimStart:0, trimEnd:0, likes:128, favoritos:0, comentarios:[], liked:false, faved:false,
+            fecha: Date.now()
+        },
+        {
+            id: uid(), tipo:'video', src:'../assets/videos/carro.mp4', thumb:'../assets/img/tortuga.jpg',
+            titulo:'Drift Phonk Mix', descripcion:'Directo desde la pista. 🚗💨 #phonk #drift',
+            usuario:'Phonk Nation', autorId:'perfil_phonk_nation', kids:false, comentariosActivos:true, efecto:'fx-contraste',
+            trimStart:0, trimEnd:0, likes:452, favoritos:0, comentarios:[], liked:false, faved:false,
+            fecha: Date.now()-100000
+        },
+        {
+            id: uid(), tipo:'youtube', ytId: getYoutubeId('https://youtu.be/c95WGXY42jo'), thumb:'../assets/img/phonk1.jpg',
+            titulo:'Después de medianoche Phonk', descripcion:'Sonidos para la madrugada. #phonknight',
+            usuario:'Night Archive', autorId:'perfil_night_archive', kids:false, comentariosActivos:true, efecto:'fx-none',
+            trimStart:0, trimEnd:0, likes:89, favoritos:0, comentarios:[], liked:false, faved:false,
+            fecha: Date.now()-200000
+        }
+    ];
+}
+
+/* ---------- Render del feed ---------- */
+function listaSegunVista(){
+    if(vistaActual === 'favoritos') return shorts.filter(s => s.faved);
+    if(vistaActual === 'recientes') return [...shorts].sort((a,b)=> (b.fecha||0) - (a.fecha||0));
+    return shorts;
+}
+function actualizarSidebarActivo(){
+    document.getElementById('sideInicio').classList.toggle('active', vistaActual === 'todos');
+    document.getElementById('sideFavoritos').classList.toggle('active', vistaActual === 'favoritos');
+    document.getElementById('sideRecientes').classList.toggle('active', vistaActual === 'recientes');
+}
+function renderShorts(){
+    actualizarSidebarActivo();
+    const feed = document.getElementById('feed');
+    feed.innerHTML = '';
+    const lista = listaSegunVista();
+
+    if(lista.length === 0){
+        let msg = 'Aún no hay shorts.<br>Toca el botón + para crear el primero.';
+        if(vistaActual === 'favoritos') msg = 'Aún no tienes shorts favoritos ⭐<br>Toca ⭐ en un short para guardarlo aquí.';
+        feed.innerHTML = `<div class="empty-feed"><div class="big">🎬</div>
+            <div>${msg}</div>
+            ${vistaActual !== 'todos' ? '<button class="btnvolver" onclick="irAInicio()">Ver todos los shorts</button>' : ''}
+            </div>`;
+        return;
+    }
+    lista.forEach(s => feed.appendChild(crearCardShort(s)));
+    setupObserver();
+}
+function irAInicio(){
+    vistaActual = 'todos';
+    renderShorts();
+    scrollFeedTop(false);
+}
+
+function crearCardShort(s){
+    const card = document.createElement('div');
+    card.className = 'short-card' + (s.tipo === 'audio' ? ' is-audio' : '');
+    card.dataset.id = s.id;
+
+    const mediaWrap = document.createElement('div');
+    mediaWrap.className = 'short-media-wrap';
+
+    let progresoDisponible = true; // si se puede mostrar/actualizar la barra de progreso
+    const esPropio = !!(perfilActualId && s.autorId === perfilActualId);
+
+    if(s.tipo === 'youtube' && s.ytId){
+        const params = new URLSearchParams({
+            autoplay:0, mute: sonidoGlobalActivo ? 0 : 1, loop:1, playlist:s.ytId, controls:0,
+            modestbranding:1, playsinline:1, rel:0, enablejsapi:1
+        });
+        if(s.trimStart) params.set('start', Math.floor(s.trimStart));
+        if(s.trimEnd) params.set('end', Math.floor(s.trimEnd));
+        const iframe = document.createElement('iframe');
+        iframe.id = 'yt-' + s.id;
+        iframe.src = `https://www.youtube.com/embed/${s.ytId}?${params.toString()}`;
+        iframe.allow = "autoplay; encrypted-media; picture-in-picture";
+        iframe.className = s.efecto || 'fx-none';
+        mediaWrap.appendChild(iframe);
+        iframe.addEventListener('load', () => {
+            try{
+                iframe.contentWindow.postMessage(JSON.stringify({event:'listening', id: iframe.id}), '*');
+            }catch(e){}
+        });
+    } else if(s.tipo === 'iframe'){
+        const iframe = document.createElement('iframe');
+        iframe.src = s.src;
+        iframe.className = s.efecto || 'fx-none';
+        mediaWrap.appendChild(iframe);
+        progresoDisponible = false;
+    } else if(s.tipo === 'audio'){
+        if(s.thumb){ mediaWrap.style.backgroundImage = `url('${s.thumb}')`; }
+        const visual = document.createElement('div');
+        visual.className = 'audio-visual';
+        visual.textContent = '🎧';
+        mediaWrap.appendChild(visual);
+        const audio = document.createElement('audio');
+        audio.playsInline = true;
+        audio.muted = !sonidoGlobalActivo;
+        audio.preload = 'metadata';
+        mediaWrap.appendChild(audio);
+        configurarMediaReal(s, audio);
+    } else {
+        const video = document.createElement('video');
+        video.loop = false;
+        video.muted = !sonidoGlobalActivo;
+        video.playsInline = true;
+        video.className = s.efecto || 'fx-none';
+        video.preload = 'metadata';
+        mediaWrap.appendChild(video);
+        configurarMediaReal(s, video);
+    }
+    card.appendChild(mediaWrap);
+
+    card.innerHTML += `
+        <div class="short-topfade"></div>
+        <div class="short-botfade"></div>
+        ${s.kids ? `<div class="kids-badge">👶 Para niños</div>` : ''}
+        <div class="mute-badge" id="mutebadge-${s.id}" onclick="toggleMuteCard(event,'${s.id}')">${sonidoGlobalActivo ? '🔊' : '🔇'}</div>
+        ${esPropio ? `<div class="own-menu-btn" onclick="abrirEditarShort(event,'${s.id}')" title="Editar o eliminar">⋮</div>` : ''}
+        <div class="play-hint" id="hint-${s.id}">▶</div>
+        <div class="heart-burst" id="burst-${s.id}">💖</div>
+        ${progresoDisponible ? `
+        <div class="progress-wrap" id="progwrap-${s.id}" onclick="seekShort(event,'${s.id}')">
+            <div class="progress-fill" id="progress-${s.id}"></div>
+        </div>` : ''}
+
+        <div class="short-info">
+            <div class="short-user">
+                ${avatarHtmlAutor(s.autorId, s.usuario)}
+                <span class="short-username">${escapeHtml(s.usuario || 'Anónimo')}
+                    <span class="subs-count" data-autor="${s.autorId||''}">${s.autorId ? '· ' + contarSuscriptoresDe(s.autorId) + ' suscriptores' : ''}</span>
+                </span>
+                ${(s.autorId && !esPropio) ? `<button class="sub-btn ${estaSuscrito(s.autorId)?'subscrito':''}" data-autor="${s.autorId}" onclick="toggleSuscripcion('${s.autorId}')">${estaSuscrito(s.autorId) ? 'Suscrito ✓' : 'Suscribirse'}</button>` : ''}
+            </div>
+            <div class="short-title">${escapeHtml(s.titulo)}</div>
+            <div class="short-desc">${escapeHtml(s.descripcion||'')}</div>
+            <div class="short-tag">✦ Wshorts${s.tipo==='audio' ? ' · Audio' : ''}</div>
+        </div>
+
+        <div class="short-actions">
+            <button class="action-btn ${s.liked?'liked':''}" id="like-${s.id}" onclick="toggleLike('${s.id}')">
+                <span class="ic">${s.liked?'💖':'💔'}</span>
+                <span class="count" id="likeCount-${s.id}">${s.likes}</span>
+            </button>
+            <button class="action-btn" onclick="abrirComentarios('${s.id}')">
+                <span class="ic">💬</span>
+                <span class="count" id="commentCount-${s.id}">${(s.comentarios||[]).length}</span>
+            </button>
+            <button class="action-btn ${s.faved?'faved':''}" id="fav-${s.id}" onclick="toggleFavorito('${s.id}')">
+                <span class="ic">${s.faved?'⭐':'☆'}</span>
+                <span class="count" id="favCount-${s.id}">${s.favoritos}</span>
+            </button>
+            <button class="action-btn" onclick="abrirCompartir('${s.id}')">
+                <span class="ic">↗</span>
+                <span class="count">Enviar</span>
+            </button>
+        </div>
+    `;
+
+    card.addEventListener('click', (e) => {
+        if(e.target.closest('.short-actions') || e.target.closest('.mute-badge') || e.target.closest('.progress-wrap')) return;
+        togglePlayPause(card);
+    });
+
+    return card;
+}
+
+/* Asigna la fuente real (archivo local desde IndexedDB, URL directa, o archivo estático de demo)
+   a un <video> o <audio>, y conecta la barra de progreso + el loop con recorte. */
+async function configurarMediaReal(s, mediaEl){
+    let url = null;
+    if(s.storageId){
+        try{
+            const blob = await obtenerMediaBlob(s.storageId);
+            if(blob){
+                url = URL.createObjectURL(blob);
+                mediaObjectUrls[s.id] = url;
+            } else {
+                mostrarToast("⚠️ No se encontró el archivo guardado de \"" + s.titulo + "\"");
+            }
+        }catch(e){
+            mostrarToast("⚠️ Error al leer el archivo guardado");
+        }
+    } else {
+        url = s.src;
+    }
+    if(url){ mediaEl.src = url; }
+
+    mediaEl.addEventListener('loadedmetadata', () => {
+        if(s.trimStart) mediaEl.currentTime = s.trimStart;
+    });
+    mediaEl.addEventListener('timeupdate', () => {
+        if(s.trimEnd && mediaEl.currentTime >= s.trimEnd){
+            mediaEl.currentTime = s.trimStart || 0;
+        }
+        actualizarBarraProgreso(s.id, mediaEl.currentTime, mediaEl.duration, s.trimStart||0, s.trimEnd||0);
+    });
+    mediaEl.addEventListener('ended', () => {
+        mediaEl.currentTime = s.trimStart || 0;
+        mediaEl.play().catch(()=>{});
+    });
+}
+
+function actualizarBarraProgreso(id, current, duration, trimStart, trimEnd){
+    const fill = document.getElementById('progress-'+id);
+    if(!fill || !duration || !isFinite(duration)) return;
+    const inicio = trimStart || 0;
+    const fin = trimEnd || duration;
+    const total = Math.max(fin - inicio, 0.01);
+    const pct = Math.min(Math.max(((current - inicio) / total) * 100, 0), 100);
+    fill.style.width = pct + '%';
+}
+
+/* Click/tap en la barra de progreso para saltar a un punto del short */
+function seekShort(event, id){
+    event.stopPropagation();
+    const card = document.querySelector(`.short-card[data-id="${id}"]`);
+    if(!card) return;
+    const wrap = document.getElementById('progwrap-'+id);
+    const rect = wrap.getBoundingClientRect();
+    const fraccion = Math.min(Math.max((event.clientX - rect.left) / rect.width, 0), 1);
+
+    const video = card.querySelector('video');
+    const audio = card.querySelector('audio');
+    const iframe = card.querySelector('iframe[id^="yt-"]');
+    const media = video || audio;
+
+    if(media && media.duration && isFinite(media.duration)){
+        media.currentTime = media.duration * fraccion;
+    } else if(iframe){
+        // Para YouTube usamos el comando seekTo vía postMessage
+        try{
+            iframe.contentWindow.postMessage(JSON.stringify({
+                event:'command', func:'seekTo', args:[9999 * fraccion, true]
+            }), '*');
+        }catch(e){}
+    }
+}
+
+/* Escucha global de mensajes de YouTube (infoDelivery) para actualizar su barra de progreso */
+window.addEventListener('message', (event) => {
+    let data;
+    try{ data = JSON.parse(event.data); }catch(e){ return; }
+    if(!data || data.event !== 'infoDelivery' || !data.info) return;
+    const id = data.id; // iframe id: yt-<shortId>
+    if(!id || !id.startsWith('yt-')) return;
+    const shortId = id.replace('yt-', '');
+    const { currentTime, duration } = data.info;
+    if(typeof currentTime === 'number' && typeof duration === 'number' && duration > 0){
+        actualizarBarraProgreso(shortId, currentTime, duration, 0, 0);
+    }
+});
+
+function escapeHtml(str){
+    const d = document.createElement('div');
+    d.textContent = str || '';
+    return d.innerHTML;
+}
+
+/* ---------- Reproducción automática con IntersectionObserver ---------- */
+function setupObserver(){
+    const cards = document.querySelectorAll('.short-card');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            const media = entry.target.querySelector('video, audio, iframe');
+            if(!media) return;
+            if(entry.isIntersecting && entry.intersectionRatio > 0.7){
+                playMedia(media);
+            } else {
+                pauseMedia(media);
+            }
+        });
+    }, { threshold: [0, 0.7, 1] });
+    cards.forEach(c => observer.observe(c));
+}
+function playMedia(media){
+    if(media.tagName === 'VIDEO' || media.tagName === 'AUDIO'){
+        media.play().catch(()=>{});
+    } else if(media.tagName === 'IFRAME'){
+        try{
+            media.contentWindow.postMessage(JSON.stringify({event:'command',func:'playVideo',args:[]}), '*');
+        }catch(e){}
+    }
+}
+function pauseMedia(media){
+    if(media.tagName === 'VIDEO' || media.tagName === 'AUDIO'){
+        media.pause();
+    } else if(media.tagName === 'IFRAME'){
+        try{
+            media.contentWindow.postMessage(JSON.stringify({event:'command',func:'pauseVideo',args:[]}), '*');
+        }catch(e){}
+    }
+}
+function togglePlayPause(card){
+    const media = card.querySelector('video, audio');
+    const hint = card.querySelector('.play-hint');
+    if(!media){
+        // YouTube: alterna reproducción vía postMessage
+        const iframe = card.querySelector('iframe[id^="yt-"]');
+        if(iframe){
+            try{
+                iframe.contentWindow.postMessage(JSON.stringify({event:'command',func:'playVideo',args:[]}), '*');
+            }catch(e){}
+        }
+        return;
+    }
+    if(media.paused){
+        media.play().catch(()=>{});
+        hint.textContent = '▶️'; hint.classList.add('show');
+    } else {
+        media.pause();
+        hint.textContent = '⏸️'; hint.classList.add('show');
+    }
+    setTimeout(()=> hint.classList.remove('show'), 500);
+}
+
+/* ---------- Sonido: silenciar / activar por short y globalmente ---------- */
+function toggleMuteCard(event, id){
+    event.stopPropagation();
+    const card = document.querySelector(`.short-card[data-id="${id}"]`);
+    const media = card.querySelector('video, audio');
+    const badge = document.getElementById('mutebadge-'+id);
+    if(media){
+        media.muted = !media.muted;
+        badge.textContent = media.muted ? '🔇' : '🔊';
+        mostrarToast(media.muted ? "Video silenciado 🔇" : "Sonido activado 🔊");
+    } else {
+        // YouTube
+        const iframe = card.querySelector('iframe[id^="yt-"]');
+        if(iframe){
+            const activo = badge.textContent.trim() === '🔇';
+            try{
+                iframe.contentWindow.postMessage(JSON.stringify({
+                    event:'command', func: activo ? 'unMute' : 'mute', args:[]
+                }), '*');
+            }catch(e){}
+            badge.textContent = activo ? '🔊' : '🔇';
+            mostrarToast(activo ? "Sonido activado 🔊" : "Video silenciado 🔇");
+        } else {
+            mostrarToast("Este contenido no tiene control de sonido propio.");
+        }
+    }
+}
+document.getElementById('btnMuteAll').addEventListener('click', function(){
+    sonidoGlobalActivo = !sonidoGlobalActivo;
+    guardarPreferenciaSonido();
+    actualizarBotonSonidoGlobal();
+
+    document.querySelectorAll('.short-card video, .short-card audio').forEach(m => {
+        m.muted = !sonidoGlobalActivo;
+    });
+    document.querySelectorAll('.mute-badge').forEach(b => {
+        b.textContent = sonidoGlobalActivo ? '🔊' : '🔇';
+    });
+    document.querySelectorAll('iframe[id^="yt-"]').forEach(iframe => {
+        try{
+            iframe.contentWindow.postMessage(JSON.stringify({
+                event:'command', func: sonidoGlobalActivo ? 'unMute' : 'mute', args:[]
+            }), '*');
+        }catch(e){}
+    });
+    mostrarToast(sonidoGlobalActivo ? "Sonido activado en todos los shorts 📢" : "Todos los shorts silenciados 🔇");
+});
+
+/* ---------- Likes / Favoritos con notificaciones ---------- */
+function toggleLike(id){
+    const s = shorts.find(x => x.id === id);
+    if(!s) return;
+    s.liked = !s.liked;
+    s.likes += s.liked ? 1 : -1;
+    guardarShorts();
+
+    const btn = document.getElementById('like-'+id);
+    if(btn){
+        btn.classList.toggle('liked', s.liked);
+        btn.querySelector('.ic').textContent = s.liked ? '💖' : '💔';
+        document.getElementById('likeCount-'+id).textContent = s.likes;
+    }
+
+    if(s.liked){
+        const burst = document.getElementById('burst-'+id);
+        if(burst){
+            burst.classList.add('show');
+            setTimeout(()=> burst.classList.remove('show'), 500);
+        }
+        mostrarToast("¡Te gusta este short! ❤️");
+    } else {
+        mostrarToast("Has quitado tu like");
+    }
+}
+
+function toggleFavorito(id){
+    const s = shorts.find(x => x.id === id);
+    if(!s) return;
+    s.faved = !s.faved;
+    s.favoritos += s.faved ? 1 : -1;
+    guardarShorts();
+
+    const btn = document.getElementById('fav-'+id);
+    if(btn){
+        btn.classList.toggle('faved', s.faved);
+        btn.querySelector('.ic').textContent = s.faved ? '⭐' : '☆';
+        document.getElementById('favCount-'+id).textContent = s.favoritos;
+    }
+
+    // Si estamos viendo la lista de favoritos y se quita uno, se retira de la vista al instante
+    if(vistaActual === 'favoritos' && !s.faved){
+        renderShorts();
+    }
+
+    mostrarToast(s.faved ? "Guardado en favoritos ⭐" : "Quitado de favoritos");
+}
+
+/* ---------- Comentarios sin recargar ---------- */
+function abrirComentarios(id){
+    shortActivoId = id;
+    const s = shorts.find(x => x.id === id);
+    const cont = document.getElementById('comentariosContenido');
+    if(!s.comentariosActivos){
+        cont.innerHTML = `<div class="comments-disabled">🚫 El creador desactivó los comentarios en este short.</div>`;
+    } else {
+        renderListaComentariosInterna(s);
+    }
+    document.getElementById('modalComentarios').classList.add('show');
+}
+
+function renderListaComentariosInterna(s){
+    const cont = document.getElementById('comentariosContenido');
+    const lista = (s.comentarios||[]);
+    cont.innerHTML = `
+        <div class="comments-list" id="listaComentarios">
+            ${lista.length ? lista.map(c => `
+                <div class="comment-item">
+                    <div class="comment-avatar">${(c.usuario||'TÚ').substring(0,2).toUpperCase()}</div>
+                    <div class="comment-body">
+                        <div class="comment-user">${escapeHtml(c.usuario)}</div>
+                        <div class="comment-text">${escapeHtml(c.texto)}</div>
+                    </div>
+                </div>
+            `).join('') : `<div class="comment-empty">Sé el primero en comentar 💬</div>`}
+        </div>
+        <div class="comment-input-row">
+            <input type="text" id="inputComentario" placeholder="Escribe un comentario..." autocomplete="off">
+            <button onclick="agregarComentario()">Enviar</button>
+        </div>
+    `;
+    const input = document.getElementById('inputComentario');
+    input.addEventListener('keydown', e => { if(e.key === 'Enter') agregarComentario(); });
+}
+
+function cerrarComentarios(){
+    document.getElementById('modalComentarios').classList.remove('show');
+}
+
+function agregarComentario(){
+    const input = document.getElementById('inputComentario');
+    if(!input) return;
+    const texto = input.value.trim();
+    if(!texto) return;
+
+    const s = shorts.find(x => x.id === shortActivoId);
+    if(!s) return;
+
+    s.comentarios = s.comentarios || [];
+    s.comentarios.push({ usuario: 'Tú', texto: texto, fecha: Date.now() });
+    guardarShorts();
+
+    const counterEl = document.getElementById('commentCount-' + shortActivoId);
+    if(counterEl){
+        counterEl.textContent = s.comentarios.length;
+    }
+
+    renderListaComentariosInterna(s);
+    mostrarToast("Comentario publicado 🌐");
+}
+
+/* ---------- Compartir / Descargar ---------- */
+function abrirCompartir(id){
+    shortActivoId = id;
+    document.getElementById('modalCompartir').classList.add('show');
+}
+function cerrarCompartir(){
+    document.getElementById('modalCompartir').classList.remove('show');
+}
+async function compartirEn(canal){
+    const s = shorts.find(x => x.id === shortActivoId);
+    if(!s){ cerrarCompartir(); return; }
+    const url = `${location.origin}${location.pathname}#${s.id}`;
+    const texto = `Mira este short en Wibsitihub: "${s.titulo}"`;
+
+    let target = null;
+    switch(canal){
+        case 'link':
+            if(navigator.clipboard){
+                navigator.clipboard.writeText(url).then(()=> mostrarToast("Enlace copiado ✔️"));
+            } else {
+                mostrarToast("No se pudo copiar el enlace");
+            }
+            break;
+        case 'descargar':
+            await descargarShort(s);
+            break;
+        case 'whatsapp':
+            target = `https://wa.me/?text=${encodeURIComponent(texto + ' ' + url)}`;
+            mostrarToast("Abriendo WhatsApp ↗");
+            break;
+        case 'facebook':
+            target = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+            mostrarToast("Abriendo Facebook ↗");
+            break;
+        case 'twitter':
+            target = `https://twitter.com/intent/tweet?text=${encodeURIComponent(texto)}&url=${encodeURIComponent(url)}`;
+            mostrarToast("Abriendo X / Twitter ↗");
+            break;
+        case 'telegram':
+            target = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(texto)}`;
+            mostrarToast("Abriendo Telegram ↗");
+            break;
+        case 'correo':
+            target = `mailto:?subject=${encodeURIComponent('Mira este Short')}&body=${encodeURIComponent(texto + ' ' + url)}`;
+            mostrarToast("Abriendo aplicación de correo ↗");
+            break;
+        case 'nativo':
+            if(navigator.share){
+                navigator.share({ title: s.titulo, text: texto, url: url }).catch(()=>{});
+            } else {
+                mostrarToast("Compartir nativo no disponible en este navegador");
+            }
+            break;
+    }
+    if(target) window.open(target, '_blank', 'noopener,noreferrer');
+    cerrarCompartir();
+}
+async function descargarShort(s){
+    if(s.tipo === 'youtube'){
+        mostrarToast("No se puede descargar contenido de YouTube desde aquí.");
+        return;
+    }
+    if(s.storageId){
+        try{
+            const blob = await obtenerMediaBlob(s.storageId);
+            if(!blob){ mostrarToast("No se encontró el archivo original."); return; }
+            const a = document.createElement('a');
+            const objUrl = URL.createObjectURL(blob);
+            a.href = objUrl;
+            a.download = s.filename || (s.titulo || 'wshort') + (s.tipo === 'audio' ? '.mp3' : '.mp4');
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(()=> URL.revokeObjectURL(objUrl), 4000);
+            mostrarToast("Descargando short ⬇️");
+        }catch(e){
+            mostrarToast("No se pudo descargar el archivo.");
+        }
+    } else if(s.src){
+        window.open(s.src, '_blank', 'noopener,noreferrer');
+        mostrarToast("Abriendo enlace original para descargar ⬇️");
+    } else {
+        mostrarToast("Este short no tiene un archivo descargable.");
+    }
+}
+
+/* ---------- Editar / eliminar tu propio short ---------- */
+function abrirEditarShort(event, id){
+    if(event) event.stopPropagation();
+    const s = shorts.find(x => x.id === id);
+    if(!s) return;
+    editandoShortId = id;
+    editArchivoBlob = null;
+    editArchivoTipo = null;
+
+    document.getElementById('eTitulo').value = s.titulo || '';
+    document.getElementById('eDescripcion').value = s.descripcion || '';
+    document.getElementById('eArchivoFile').value = '';
+    document.getElementById('eArchivoNombre').textContent = 'Seleccionar nuevo archivo';
+
+    const campoEnlace = document.getElementById('eEnlaceCampo');
+    const campoArchivo = document.getElementById('eArchivoCampo');
+    const inputEnlace = document.getElementById('eEnlace');
+
+    if(s.tipo === 'youtube'){
+        campoEnlace.style.display = 'block';
+        campoArchivo.style.display = 'none';
+        inputEnlace.value = `https://youtu.be/${s.ytId}`;
+    } else if(s.storageId){
+        // Archivo subido: no tiene "enlace" de texto, pero se puede reemplazar el archivo
+        campoEnlace.style.display = 'none';
+        campoArchivo.style.display = 'block';
+    } else {
+        campoEnlace.style.display = 'block';
+        campoArchivo.style.display = 'none';
+        inputEnlace.value = s.src || '';
+    }
+
+    document.getElementById('modalEditarShort').classList.add('show');
+}
+function cerrarEditarShort(){
+    document.getElementById('modalEditarShort').classList.remove('show');
+    editandoShortId = null;
+    editArchivoBlob = null;
+}
+document.getElementById('eArchivoFile').addEventListener('change', function(e){
+    const file = e.target.files[0];
+    if(!file) return;
+    const esAudio = file.type.startsWith('audio') || /\.(mp3|wav|ogg|m4a|aac|flac)$/i.test(file.name);
+    const esVideo = file.type.startsWith('video') || /\.(mp4|webm|mov|mkv|m4v)$/i.test(file.name);
+    if(!esAudio && !esVideo){
+        mostrarToast("⚠️ Formato no soportado");
+        return;
+    }
+    editArchivoBlob = file;
+    editArchivoTipo = esAudio ? 'audio' : 'video';
+    document.getElementById('eArchivoNombre').textContent = file.name;
+    mostrarToast("Nuevo archivo listo para reemplazar ✔️");
+});
+async function guardarEdicionShort(){
+    const s = shorts.find(x => x.id === editandoShortId);
+    if(!s) return;
+
+    const nuevoTitulo = document.getElementById('eTitulo').value.trim();
+    const nuevaDescripcion = document.getElementById('eDescripcion').value.trim();
+    if(!nuevoTitulo){
+        mostrarToast("📛 Ponle un nombre a tu short");
+        return;
+    }
+    s.titulo = nuevoTitulo;
+    s.descripcion = nuevaDescripcion;
+
+    if(s.tipo === 'youtube'){
+        const nuevoEnlace = document.getElementById('eEnlace').value.trim();
+        const nuevoYtId = getYoutubeId(nuevoEnlace);
+        if(nuevoEnlace && nuevoYtId){
+            s.ytId = nuevoYtId;
+        } else if(nuevoEnlace){
+            mostrarToast("⚠️ Ese enlace no parece de YouTube, se mantuvo el anterior");
+        }
+    } else if(s.storageId){
+        if(editArchivoBlob){
+            try{
+                await guardarMediaBlob(s.storageId, editArchivoBlob);
+                s.tipo = editArchivoTipo;
+                s.filename = editArchivoBlob.name;
+                if(mediaObjectUrls[s.id]){ URL.revokeObjectURL(mediaObjectUrls[s.id]); delete mediaObjectUrls[s.id]; }
+                mostrarToast("Archivo reemplazado ✔️");
+            }catch(e){
+                mostrarToast("⚠️ No se pudo reemplazar el archivo");
+            }
+        }
+    } else {
+        const nuevoEnlace = document.getElementById('eEnlace').value.trim();
+        if(nuevoEnlace) s.src = nuevoEnlace;
+    }
+
+    guardarShorts();
+    cerrarEditarShort();
+    renderShorts();
+    mostrarToast("Short actualizado ✔️");
+}
+async function eliminarShortDesdeEditor(){
+    const s = shorts.find(x => x.id === editandoShortId);
+    if(!s) return;
+    if(!confirm(`¿Eliminar "${s.titulo}"? Esta acción no se puede deshacer.`)) return;
+
+    if(s.storageId){ await borrarMediaBlob(s.storageId); }
+    if(mediaObjectUrls[s.id]){ URL.revokeObjectURL(mediaObjectUrls[s.id]); delete mediaObjectUrls[s.id]; }
+
+    shorts = shorts.filter(x => x.id !== s.id);
+    guardarShorts();
+    cerrarEditarShort();
+    renderShorts();
+    mostrarToast("Short eliminado 🗑️");
+}
+
+/* ---------- Modal Crear ---------- */
+function abrirModalCrear(){
+    if(!obtenerPerfilActual()){
+        abrirModalPerfil(true);
+        mostrarToast("👤 Primero crea tu cuenta para poder publicar");
+        return;
+    }
+    resetFormCrear();
+    document.getElementById('modalCrear').classList.add('show');
+    mostrarToast("Panel de creación abierto ✨");
+}
+function cerrarModalCrear(){
+    document.getElementById('modalCrear').classList.remove('show');
+    if(archivoMediaObjectUrl){
+        URL.revokeObjectURL(archivoMediaObjectUrl);
+        archivoMediaObjectUrl = null;
+    }
+}
+function resetFormCrear(){
+    document.getElementById('fTitulo').value = '';
+    document.getElementById('fDescripcion').value = '';
+    document.getElementById('fVideoFile').value = '';
+    document.getElementById('fVideoUrl').value = '';
+    document.getElementById('fThumbFile').value = '';
+    document.getElementById('fEfecto').value = 'fx-none';
+    document.getElementById('fKids').checked = false;
+    document.getElementById('fComentarios').checked = true;
+    document.getElementById('videoFileName').textContent = 'Seleccionar archivo desde el explorador';
+    document.getElementById('thumbFileName').textContent = 'Seleccionar imagen de miniatura';
+    document.getElementById('thumbPreview').style.display = 'none';
+    document.getElementById('videoPreviewBox').style.display = 'none';
+    document.getElementById('videoPreviewEl').style.display = 'none';
+    document.getElementById('audioPreviewEl').style.display = 'none';
+    document.getElementById('trimWrap').style.display = 'none';
+    if(archivoMediaObjectUrl){ URL.revokeObjectURL(archivoMediaObjectUrl); }
+    archivoMediaBlob = null;
+    archivoMediaTipo = null;
+    archivoMediaNombre = '';
+    archivoMediaObjectUrl = null;
+    archivoThumbBase64 = null;
+}
+
+/* Selección de archivo de video o audio (usa un Object URL, no base64, para no saturar memoria) */
+document.getElementById('fVideoFile').addEventListener('change', function(e){
+    const file = e.target.files[0];
+    if(!file) return;
+
+    const esAudio = file.type.startsWith('audio') || /\.(mp3|wav|ogg|m4a|aac|flac)$/i.test(file.name);
+    const esVideo = file.type.startsWith('video') || /\.(mp4|webm|mov|mkv|m4v)$/i.test(file.name);
+
+    if(!esAudio && !esVideo){
+        mostrarToast("⚠️ Formato no soportado. Usa video (mp4, webm...) o audio (mp3, wav...)");
+        return;
+    }
+
+    document.getElementById('fVideoUrl').value = '';
+    document.getElementById('videoFileName').textContent = file.name;
+    mostrarToast(esAudio ? "Audio seleccionado correctamente 🎧" : "Video seleccionado correctamente 📁");
+
+    if(archivoMediaObjectUrl){ URL.revokeObjectURL(archivoMediaObjectUrl); }
+    archivoMediaBlob = file;
+    archivoMediaTipo = esAudio ? 'audio' : 'video';
+    archivoMediaNombre = file.name;
+    archivoMediaObjectUrl = URL.createObjectURL(file);
+
+    const box = document.getElementById('videoPreviewBox');
+    const videoEl = document.getElementById('videoPreviewEl');
+    const audioEl = document.getElementById('audioPreviewEl');
+    box.style.display = 'block';
+
+    if(esAudio){
+        videoEl.style.display = 'none';
+        audioEl.style.display = 'block';
+        audioEl.src = archivoMediaObjectUrl;
+        document.getElementById('trimWrap').style.display = 'none';
+    } else {
+        audioEl.style.display = 'none';
+        videoEl.style.display = 'block';
+        videoEl.src = archivoMediaObjectUrl;
+        videoEl.onloadedmetadata = function(){
+            const dur = videoEl.duration || 0;
+            const trimWrap = document.getElementById('trimWrap');
+            trimWrap.style.display = 'flex';
+            const startInp = document.getElementById('trimStart');
+            const endInp = document.getElementById('trimEnd');
+            startInp.max = dur; endInp.max = dur;
+            startInp.value = 0; endInp.value = dur;
+            actualizarEtiquetasTrim();
+        };
+    }
+});
+
+/* Enlace de video/audio/YouTube/otra página */
+document.getElementById('fVideoUrl').addEventListener('input', function(e){
+    if(e.target.value.trim()){
+        document.getElementById('fVideoFile').value = '';
+        document.getElementById('videoFileName').textContent = 'Seleccionar archivo desde el explorador';
+        if(archivoMediaObjectUrl){ URL.revokeObjectURL(archivoMediaObjectUrl); }
+        archivoMediaBlob = null;
+        archivoMediaTipo = null;
+        archivoMediaObjectUrl = null;
+        document.getElementById('videoPreviewBox').style.display = 'none';
+        document.getElementById('trimWrap').style.display = 'none';
+        mostrarToast("Enlace agregado 🔗");
+    }
+});
+
+/* Selección de miniatura (imagen ligera, sí se guarda como base64) */
+document.getElementById('fThumbFile').addEventListener('change', function(e){
+    const file = e.target.files[0];
+    if(!file) return;
+    document.getElementById('thumbFileName').textContent = file.name;
+    mostrarToast("Miniatura cargada 🖼️");
+    const reader = new FileReader();
+    reader.onload = function(ev){
+        archivoThumbBase64 = ev.target.result;
+        const prev = document.getElementById('thumbPreview');
+        prev.src = archivoThumbBase64;
+        prev.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+});
+
+/* Sliders de recorte */
+['trimStart','trimEnd'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+        actualizarEtiquetasTrim();
+        const videoEl = document.getElementById('videoPreviewEl');
+        const startVal = parseFloat(document.getElementById('trimStart').value);
+        if(videoEl && !isNaN(startVal)) videoEl.currentTime = startVal;
+    });
+});
+function actualizarEtiquetasTrim(){
+    const start = parseFloat(document.getElementById('trimStart').value) || 0;
+    let end = parseFloat(document.getElementById('trimEnd').value) || 0;
+    if(end <= start) end = start + 1;
+    document.getElementById('trimTimes').textContent = `${formatTime(start)} - ${formatTime(end)}`;
+}
+
+/* ---------- Publicar ---------- */
+function publicarShort(){
+    const perfil = obtenerPerfilActual();
+    if(!perfil){
+        abrirModalPerfil(true);
+        mostrarToast("👤 Primero crea tu cuenta para poder publicar");
+        return;
+    }
+    const titulo = document.getElementById('fTitulo').value.trim();
+    const descripcion = document.getElementById('fDescripcion').value.trim();
+    const videoUrl = document.getElementById('fVideoUrl').value.trim();
+    const kids = document.getElementById('fKids').checked;
+    const comentariosActivos = document.getElementById('fComentarios').checked;
+    const efecto = document.getElementById('fEfecto').value;
+
+    if(!titulo){
+        mostrarToast("📛 Ponle un nombre a tu short");
+        return;
+    }
+    if(!archivoMediaBlob && !videoUrl){
+        mostrarToast("➕ Sube un archivo o pega un enlace");
+        return;
+    }
+
+    let nuevoShort;
+    const ytId = videoUrl ? getYoutubeId(videoUrl) : null;
+    const nuevoId = uid();
+    const autorId = perfil.id;
+    const usuario = perfil.nombre;
+
+    if(archivoMediaBlob){
+        const start = archivoMediaTipo === 'video' ? (parseFloat(document.getElementById('trimStart').value) || 0) : 0;
+        const end = archivoMediaTipo === 'video' ? (parseFloat(document.getElementById('trimEnd').value) || 0) : 0;
+        nuevoShort = {
+            id: nuevoId, tipo: archivoMediaTipo, storageId: nuevoId, filename: archivoMediaNombre,
+            thumb: archivoThumbBase64 || '',
+            titulo, descripcion, usuario, autorId,
+            kids, comentariosActivos, efecto,
+            trimStart: start, trimEnd: end > start ? end : 0,
+            likes:0, favoritos:0, comentarios:[], liked:false, faved:false,
+            fecha: Date.now()
+        };
+    } else if(ytId){
+        nuevoShort = {
+            id: nuevoId, tipo:'youtube', ytId,
+            thumb: archivoThumbBase64 || `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`,
+            titulo, descripcion, usuario, autorId,
+            kids, comentariosActivos, efecto,
+            trimStart:0, trimEnd:0,
+            likes:0, favoritos:0, comentarios:[], liked:false, faved:false,
+            fecha: Date.now()
+        };
+    } else if(esEnlaceDeAudioDirecto(videoUrl)){
+        nuevoShort = {
+            id: nuevoId, tipo:'audio', src: videoUrl,
+            thumb: archivoThumbBase64 || '',
+            titulo, descripcion, usuario, autorId,
+            kids, comentariosActivos, efecto,
+            trimStart:0, trimEnd:0,
+            likes:0, favoritos:0, comentarios:[], liked:false, faved:false,
+            fecha: Date.now()
+        };
+    } else if(esEnlaceDeVideoDirecto(videoUrl)){
+        nuevoShort = {
+            id: nuevoId, tipo:'video', src: videoUrl,
+            thumb: archivoThumbBase64 || '',
+            titulo, descripcion, usuario, autorId,
+            kids, comentariosActivos, efecto,
+            trimStart:0, trimEnd:0,
+            likes:0, favoritos:0, comentarios:[], liked:false, faved:false,
+            fecha: Date.now()
+        };
+    } else {
+        // Cualquier otra página: se incrusta como iframe genérico
+        nuevoShort = {
+            id: nuevoId, tipo:'iframe', src: videoUrl,
+            thumb: archivoThumbBase64 || '',
+            titulo, descripcion, usuario, autorId,
+            kids, comentariosActivos, efecto,
+            trimStart:0, trimEnd:0,
+            likes:0, favoritos:0, comentarios:[], liked:false, faved:false,
+            fecha: Date.now()
+        };
+    }
+
+    simularSubida(nuevoShort, archivoMediaBlob);
+}
+
+/* ---------- Animación de subida + guardado real en IndexedDB ---------- */
+function simularSubida(nuevoShort, blobArchivo){
+    subidaCancelada = false;
+    cerrarModalCrear();
+    const overlay = document.getElementById('uploadOverlay');
+    const ring = document.getElementById('uploadRing');
+    const pct = document.getElementById('uploadPct');
+    const check = document.getElementById('uploadCheck');
+    const title = document.getElementById('uploadTitle');
+    const sub = document.getElementById('uploadSub');
+    const cancelBtn = document.getElementById('btnCancelarSubida');
+
+    ring.style.display = 'flex';
+    check.style.display = 'none';
+    cancelBtn.style.display = 'block';
+    title.textContent = 'Subiendo tu Short...';
+    sub.textContent = 'No cierres esta ventana';
+    overlay.classList.add('show');
+    mostrarToast("Iniciando subida del short 🚀");
+
+    let progreso = 0;
+    const interval = setInterval(async () => {
+        if(subidaCancelada){
+            clearInterval(interval);
+            overlay.classList.remove('show');
+            mostrarToast("Subida cancelada ❌");
+            return;
+        }
+        progreso += Math.random() * 12 + 6;
+        if(progreso >= 100) progreso = 100;
+        ring.style.setProperty('--p', progreso.toFixed(0));
+        pct.textContent = progreso.toFixed(0) + '%';
+
+        if(progreso >= 100){
+            clearInterval(interval);
+
+            // Guarda el archivo real en IndexedDB (soporta videos/audios grandes sin llenar localStorage)
+            let guardadoOk = true;
+            if(blobArchivo){
+                try{
+                    await guardarMediaBlob(nuevoShort.storageId, blobArchivo);
+                }catch(e){
+                    guardadoOk = false;
+                }
+            }
+
+            ring.style.display = 'none';
+            check.style.display = 'block';
+            title.textContent = guardadoOk ? '¡Short publicado!' : 'Publicado con advertencia';
+            sub.textContent = guardadoOk ? 'Tu video ya está en el feed' : 'No se pudo guardar el archivo completo';
+            cancelBtn.style.display = 'none';
+
+            shorts.unshift(nuevoShort);
+            const okMeta = guardarShorts();
+            vistaActual = 'todos';
+            renderShorts();
+
+            setTimeout(() => {
+                overlay.classList.remove('show');
+                mostrarToast(guardadoOk && okMeta ? "¡Short publicado con éxito! 🎬" : "Publicado, pero revisa el almacenamiento del navegador");
+                scrollFeedTop(false);
+            }, 900);
+        }
+    }, 220);
+
+    overlay._interval = interval;
+}
+function cancelarSubida(){
+    subidaCancelada = true;
+}
+
+/* ---------- Navegación lateral: Inicio / Favoritos / Recientes ---------- */
+document.getElementById('sideInicio').addEventListener('click', irAInicio);
+document.getElementById('sideFavoritos').addEventListener('click', () => {
+    vistaActual = 'favoritos';
+    renderShorts();
+    scrollFeedTop(false);
+    const total = shorts.filter(s=>s.faved).length;
+    mostrarToast(total ? `Mostrando ${total} favorito(s) ⭐` : "Aún no tienes shorts favoritos ⭐");
+});
+document.getElementById('sideRecientes').addEventListener('click', () => {
+    vistaActual = 'recientes';
+    renderShorts();
+    scrollFeedTop(false);
+    mostrarToast("Mostrando los shorts más recientes ⏰");
+});
+
+/* ---------- Varios ---------- */
+function scrollFeedTop(avisar){
+    document.getElementById('feed').scrollTo({ top:0, behavior:'smooth' });
+    if(avisar !== false) mostrarToast("Desplazado al inicio ⬆️");
+}
+
+/* Cerrar modales al hacer click fuera */
+document.querySelectorAll('.modal-overlay').forEach(ov => {
+    ov.addEventListener('click', (e) => {
+        if(e.target === ov) {
+            ov.classList.remove('show');
+            mostrarToast("Ventana cerrada");
+        }
+    });
+});
+
+/* ---------- Init ---------- */
+cargarPreferenciaSonido();
+cargarPerfiles();
+cargarShorts();
+actualizarUIPerfilTopbar();
+renderShorts();
+if(!obtenerPerfilActual()){
+    abrirModalPerfil(true);
+}
+</script>
+</body>
+</html>

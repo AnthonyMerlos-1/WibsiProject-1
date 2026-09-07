@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="../assets/img/destacados.png" type="image/png">
+<title>PC Gamer 3D Ultimate - Misiones y Cámaras Corregidas</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: #020204;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #fff;
+    user-select: none;
+  }
+  #canvas-container {
+    width: 100vw;
+    height: 100vh;
+  }
+  
+  .ui-container {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10, 12, 18, 0.92);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(0, 240, 255, 0.3);
+    padding: 10px 20px;
+    border-radius: 50px;
+    box-shadow: 0 0 30px rgba(0, 240, 255, 0.25);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    flex-wrap: wrap;
+  }
+  
+  .btn {
+    background: linear-gradient(135deg, #00f0ff, #0077ff);
+    border: none;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn:hover {
+    transform: scale(1.06);
+    filter: brightness(1.2);
+  }
+  .btn-room-light {
+    background: linear-gradient(135deg, #ffaa00, #ff5500);
+    box-shadow: 0 0 12px rgba(255, 170, 0, 0.5);
+  }
+  .btn-room-light.off {
+    background: linear-gradient(135deg, #444, #222);
+    box-shadow: none;
+    color: #aaa;
+  }
+  .btn-wall-light {
+    background: linear-gradient(135deg, #e11d48, #9333ea);
+    box-shadow: 0 0 12px rgba(225, 29, 72, 0.5);
+  }
+  .btn-wall-light.off {
+    background: linear-gradient(135deg, #444, #222);
+    box-shadow: none;
+    color: #aaa;
+  }
+  .btn-view {
+    background: linear-gradient(135deg, #a855f7, #6366f1);
+    box-shadow: 0 0 12px rgba(168, 85, 247, 0.5);
+  }
+  .btn.power-off {
+    background: linear-gradient(135deg, #ff0055, #880022);
+    box-shadow: 0 0 12px rgba(255, 0, 85, 0.6);
+  }
+  .btn-zoom {
+    background: linear-gradient(135deg, #00ff88, #008844);
+    color: #000;
+    box-shadow: 0 0 12px rgba(0, 255, 136, 0.6);
+  }
+  .btn-door {
+    background: linear-gradient(135deg, #ffffff, #d1d5db);
+    color: #111827;
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+  }
+  #main-menu,#instructions{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 35%,rgba(17,40,70,.88),rgba(1,3,8,.98));}
+  #instructions{display:none}.menu-card{width:min(560px,92vw);padding:34px;border-radius:24px;background:rgba(9,15,26,.94);border:1px solid #35c9ff;box-shadow:0 0 55px #008cff55;text-align:center}.menu-card h1{margin:0 0 8px;font-size:clamp(30px,6vw,54px)}.menu-card p{color:#b8c7db;line-height:1.55}.menu-btn{width:100%;margin:7px 0;padding:13px;border:0;border-radius:12px;background:linear-gradient(135deg,#00cfff,#2558ff);color:white;font-weight:800;cursor:pointer}.menu-btn:disabled{filter:grayscale(1);opacity:.45}.keys{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;text-align:left}.key{padding:12px;background:#101b2c;border-radius:10px}.mission-hud{position:fixed;left:16px;top:16px;z-index:12;padding:12px 15px;border-radius:12px;background:#07101ddd;border:1px solid #21caff;color:#dcefff;font-size:13px}.mission-hud b{color:#42e8ff}.toast{position:fixed;left:50%;top:18%;transform:translateX(-50%);z-index:30;padding:12px 20px;border-radius:999px;background:#07101dee;border:1px solid #58f2ff;opacity:0;transition:.25s;pointer-events:none}.toast.show{opacity:1}.hidden{display:none!important}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+<div id="main-menu"><div class="menu-card"><div style="color:#54e5ff;font-weight:800">NIGHT ROOM</div><h1>PC HORROR</h1><p>Explora el cuarto, completa cinco misiones y vigila lo que ocurre alrededor de la casa.</p><button class="menu-btn" id="play-btn">JUGAR SOLO</button><button class="menu-btn" id="instructions-btn">INSTRUCCIONES</button><button class="menu-btn" disabled>JUGAR EN LÍNEA · PRÓXIMAMENTE</button><button class="menu-btn" id="exit-btn" style="background:#293447">SALIR DEL JUEGO</button></div></div>
+<div id="instructions"><div class="menu-card"><h2>Cómo jugar</h2><div class="keys"><div class="key">🖱️ <b>Ratón</b><br>Mirar y usar la PC</div><div class="key">⌨️ <b>WASD</b><br>Moverse al desbloquear</div><div class="key">🪑 <b>E</b><br>Sentarse / levantarse</div><div class="key">🧎 <b>C</b><br>Agacharse</div><div class="key">🚪 <b>P</b><br>Abrir la puerta</div><div class="key">💡 <b>L</b><br>Prender el foco</div></div><button class="menu-btn" id="back-btn">VOLVER AL MENÚ</button></div></div>
+<div class="mission-hud" id="mission-hud"><b>MISIONES</b><div id="mission-progress">0 / 5 completadas</div></div><div class="toast" id="toast"></div>
+
+<div id="canvas-container"></div>
+
+<div class="ui-container">
+  <button id="room-light-btn" class="btn btn-room-light">
+    <span>💡</span> <span id="room-light-text">Luz Techo: ON</span>
+  </button>
+
+  <button id="wall-light-btn" class="btn btn-wall-light">
+    <span>🏮</span> <span id="wall-light-text">Luz Pared: ON</span>
+  </button>
+  
+  <button id="view-left" class="btn btn-view">
+    <span>👈</span> Voltear Izq
+  </button>
+  <button id="view-front" class="btn btn-view">
+    <span>🎯</span> Frente
+  </button>
+  <button id="view-right" class="btn btn-view">
+    <span>👉</span> Voltear Der
+  </button>
+  <button id="view-back" class="btn btn-view">
+    <span>🔄</span> Voltear Atrás
+  </button>
+
+  <button id="door-btn" class="btn btn-door">
+    <span>🚪</span> <span id="door-text">Puerta (P)</span>
+  </button>
+  <button id="trash-btn" class="btn btn-door"><span>🗑️</span> Tirar basura</button>
+
+  <button id="zoom-btn" class="btn btn-zoom">
+    <span>🔍</span> <span id="zoom-text">Entrar a PC</span>
+  </button>
+  
+  <button id="power-btn" class="btn">
+    <span>⏻</span> <span id="power-text">Reiniciar PC</span>
+  </button>
+</div>
+
+<script>
+// ==========================================
+// --- ESTADOS DE MISIONES Y PUERTA ---
+// ==========================================
+const missionState = {
+  loggedWikipedia: false,
+  checkedCameras: false,
+  tookPhoto: false,
+  turnedOffWallLight: false,
+  threwTrash: false
+};
+let playerUnlocked=false, playerStanding=false, crouched=false;
+function missionCount(){return Object.values(missionState).filter(Boolean).length}
+function updateMissionHUD(){const n=missionCount();document.getElementById('mission-progress').textContent=`${n} / 5 completadas`;if(n===5&&!playerUnlocked){playerUnlocked=true;showToast('🏆 Movimiento desbloqueado: WASD, E y C')}}
+function completeMission(k,msg){if(!missionState[k]){missionState[k]=true;updateMissionHUD();showToast('✅ '+msg)}}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove('show'),2200)}
+
+let isDoorOpen = false;
+let targetDoorAngle = 0;
+let currentDoorAngle = 0;
+
+// ==========================================
+// --- CONFIGURACIÓN ESCENA Y CÁMARA ---
+// ==========================================
+const container = document.getElementById('canvas-container');
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x020204, 0.012); 
+
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+const HEAD_POS = new THREE.Vector3(0, 6.5, 16); 
+camera.position.copy(HEAD_POS);
+
+const cameraAngles = {
+  front: { yaw: 0, pitch: -0.1 }, 
+  left: { yaw: Math.PI / 2.2, pitch: 0 },
+  right: { yaw: -Math.PI / 2.2, pitch: 0 },
+  back: { yaw: Math.PI, pitch: 0 },
+  zoom: { yaw: 0, pitch: 0, isZoom: true }
+};
+
+let currentYaw = cameraAngles.front.yaw;
+let currentPitch = cameraAngles.front.pitch;
+let targetYaw = currentYaw;
+let targetPitch = currentPitch;
+let targetFov = 50;
+
+let currentCamPos = HEAD_POS.clone();
+let targetCamPos = HEAD_POS.clone();
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.2;
+container.appendChild(renderer.domElement);
+
+// ==========================================
+// --- CUARTO NEGRO CON ILUMINACIÓN ---
+// ==========================================
+const roomGroup = new THREE.Group();
+const matWall = new THREE.MeshStandardMaterial({ color: 0x08090d, roughness: 0.85 });
+const matFloor = new THREE.MeshStandardMaterial({ color: 0x040406, roughness: 0.5 });
+
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), matFloor);
+floor.rotation.x = -Math.PI / 2;
+floor.position.y = -5.4;
+floor.receiveShadow = true;
+roomGroup.add(floor);
+
+const wallBack = new THREE.Mesh(new THREE.PlaneGeometry(60, 40), matWall);
+wallBack.position.set(0, 14.6, -20);
+roomGroup.add(wallBack);
+
+const wallLeft = new THREE.Mesh(new THREE.PlaneGeometry(60, 40), matWall);
+wallLeft.rotation.y = Math.PI / 2;
+wallLeft.position.set(-30, 14.6, 0);
+roomGroup.add(wallLeft);
+
+const wallFront = new THREE.Mesh(new THREE.PlaneGeometry(60, 40), matWall);
+wallFront.rotation.y = Math.PI;
+wallFront.position.set(0, 14.6, 30);
+roomGroup.add(wallFront);
+
+const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), matWall);
+ceiling.rotation.x = Math.PI / 2;
+ceiling.position.y = 34.6;
+roomGroup.add(ceiling);
+
+// Pared Derecha (con espacio para puerta)
+const wallRightBack = new THREE.Mesh(new THREE.PlaneGeometry(24, 40), matWall);
+wallRightBack.rotation.y = -Math.PI / 2;
+wallRightBack.position.set(30, 14.6, -8);
+roomGroup.add(wallRightBack);
+
+const wallRightFront = new THREE.Mesh(new THREE.PlaneGeometry(14, 40), matWall);
+wallRightFront.rotation.y = -Math.PI / 2;
+wallRightFront.position.set(30, 14.6, 23);
+roomGroup.add(wallRightFront);
+
+const wallRightTop = new THREE.Mesh(new THREE.PlaneGeometry(12, 18), matWall);
+wallRightTop.rotation.y = -Math.PI / 2;
+wallRightTop.position.set(30, 25.6, 10);
+roomGroup.add(wallRightTop);
+
+scene.add(roomGroup);
+
+// Cama, almohada y lámpara de noche
+const bed=new THREE.Group();bed.position.set(-19,-4,10);scene.add(bed);
+const mattress=new THREE.Mesh(new THREE.BoxGeometry(15,2.2,25),new THREE.MeshStandardMaterial({color:0x24324a,roughness:.85}));mattress.castShadow=true;bed.add(mattress);
+const blanket=new THREE.Mesh(new THREE.BoxGeometry(14.4,.45,15),new THREE.MeshStandardMaterial({color:0x174d73,roughness:.9}));blanket.position.set(0,1.3,4);bed.add(blanket);
+const pillow=new THREE.Mesh(new THREE.BoxGeometry(10,1.2,5),new THREE.MeshStandardMaterial({color:0xe5e7eb}));pillow.position.set(0,1.5,-8);bed.add(pillow);
+const nightLamp=new THREE.PointLight(0xffb45c,1.2,18);nightLamp.position.set(-12,3,16);scene.add(nightLamp);
+
+// Exterior ampliado: terreno, carretera, árboles, rocas y faroles
+const terrain=new THREE.Mesh(new THREE.PlaneGeometry(220,180),new THREE.MeshStandardMaterial({color:0x302b22,roughness:1}));terrain.rotation.x=-Math.PI/2;terrain.position.set(85,-5.2,5);scene.add(terrain);
+const road=new THREE.Mesh(new THREE.PlaneGeometry(24,180),new THREE.MeshStandardMaterial({color:0x11151a,roughness:.95}));road.rotation.x=-Math.PI/2;road.rotation.z=Math.PI/2;road.position.set(90,-5,5);scene.add(road);
+for(let x=18;x<165;x+=18){const mark=new THREE.Mesh(new THREE.BoxGeometry(8,.08,.35),new THREE.MeshBasicMaterial({color:0xd9c577}));mark.position.set(x,-4.88,5);scene.add(mark)}
+function addTree(x,z,s=1){const g=new THREE.Group();const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.6,.9,7,8),new THREE.MeshStandardMaterial({color:0x382719}));trunk.position.y=-1.5;g.add(trunk);const crown=new THREE.Mesh(new THREE.ConeGeometry(4*s,10*s,9),new THREE.MeshStandardMaterial({color:0x102918}));crown.position.y=6*s-2;g.add(crown);g.position.set(x,0,z);scene.add(g)}
+[[48,-20],[68,30],[95,-28],[122,28],[150,-15]].forEach(p=>addTree(...p));
+for(let i=0;i<9;i++){const rock=new THREE.Mesh(new THREE.DodecahedronGeometry(1.3+Math.random()*2),new THREE.MeshStandardMaterial({color:0x403c38}));rock.scale.y=.55;rock.position.set(40+Math.random()*120,-3.9,-38+Math.random()*75);scene.add(rock)}
+for(let x=40;x<155;x+=30){const pole=new THREE.Mesh(new THREE.CylinderGeometry(.16,.22,10,8),matWall);pole.position.set(x,0,-4);scene.add(pole);const glow=new THREE.PointLight(0xffd889,1.8,25);glow.position.set(x,5,-4);scene.add(glow)}
+const bin=new THREE.Mesh(new THREE.BoxGeometry(4,6,4),new THREE.MeshStandardMaterial({color:0x183c2d,roughness:.7}));bin.position.set(38,-2,25);scene.add(bin);
+for(let i=0;i<7;i++){const bush=new THREE.Mesh(new THREE.IcosahedronGeometry(2+Math.random(),1),new THREE.MeshStandardMaterial({color:0x15381e}));bush.position.set(33+i*4,-3,19+Math.sin(i)*4);scene.add(bush)}
+
+// --- PUERTA (Con Bisagra Pivotable) ---
+const doorPivot = new THREE.Group();
+doorPivot.position.set(30, -5.4, 4.5); 
+
+const doorGroup = new THREE.Group();
+doorGroup.position.set(0, 0, 5.5);
+doorGroup.rotation.y = -Math.PI / 2;
+
+const matWood = new THREE.MeshStandardMaterial({ color: 0x9c4215, roughness: 0.7, metalness: 0.1 });
+const matDoorGlass = new THREE.MeshStandardMaterial({ 
+  color: 0x051015, transparent: true, opacity: 0.4, roughness: 0.1, metalness: 0.8 
+});
+
+const postLeft = new THREE.Mesh(new THREE.BoxGeometry(1, 22, 1.2), matWood);
+postLeft.position.set(-5.5, 11, 0);
+const postRight = new THREE.Mesh(new THREE.BoxGeometry(1, 22, 1.2), matWood);
+postRight.position.set(5.5, 11, 0);
+const postTop = new THREE.Mesh(new THREE.BoxGeometry(10, 1, 1.2), matWood);
+postTop.position.set(0, 21.5, 0);
+const postMid = new THREE.Mesh(new THREE.BoxGeometry(10, 1.5, 1.2), matWood);
+postMid.position.set(0, 10, 0);
+const postBot = new THREE.Mesh(new THREE.BoxGeometry(10, 1.5, 1.2), matWood);
+postBot.position.set(0, 0.75, 0);
+doorGroup.add(postLeft, postRight, postTop, postMid, postBot);
+
+const panelBase = new THREE.Mesh(new THREE.BoxGeometry(10, 8.5, 0.4), matWood);
+panelBase.position.set(0, 5, 0);
+const panelMolding1 = new THREE.Mesh(new THREE.BoxGeometry(8, 6.5, 0.6), matWood);
+panelMolding1.position.set(0, 5, 0);
+const panelMolding2 = new THREE.Mesh(new THREE.BoxGeometry(6, 4.5, 0.8), matWood);
+panelMolding2.position.set(0, 5, 0);
+doorGroup.add(panelBase, panelMolding1, panelMolding2);
+
+const glassPane = new THREE.Mesh(new THREE.BoxGeometry(10, 10.25, 0.1), matDoorGlass);
+glassPane.position.set(0, 15.875, 0);
+doorGroup.add(glassPane);
+
+const mullionVert = new THREE.Mesh(new THREE.BoxGeometry(0.8, 10.25, 0.8), matWood);
+mullionVert.position.set(0, 15.875, 0);
+const mullionHoriz1 = new THREE.Mesh(new THREE.BoxGeometry(10, 0.8, 0.8), matWood);
+mullionHoriz1.position.set(0, 14.1, 0);
+const mullionHoriz2 = new THREE.Mesh(new THREE.BoxGeometry(10, 0.8, 0.8), matWood);
+mullionHoriz2.position.set(0, 17.6, 0);
+doorGroup.add(mullionVert, mullionHoriz1, mullionHoriz2);
+
+doorPivot.add(doorGroup);
+scene.add(doorPivot);
+
+// ==========================================
+// --- NOCHE Y ESTRELLAS (EXTERIOR) ---
+// ==========================================
+const starsGeometry = new THREE.BufferGeometry();
+const starsCount = 800;
+const starsPositions = new Float32Array(starsCount * 3);
+
+for(let i = 0; i < starsCount; i++) {
+  starsPositions[i * 3] = 35 + Math.random() * 120;
+  starsPositions[i * 3 + 1] = -5 + Math.random() * 80;
+  starsPositions[i * 3 + 2] = -40 + Math.random() * 120;
+}
+starsGeometry.setAttribute('position', new THREE.BufferAttribute(starsPositions, 3));
+const starsMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.25, transparent: true, opacity: 0.8 });
+const starField = new THREE.Points(starsGeometry, starsMaterial);
+scene.add(starField);
+
+const outdoorLight = new THREE.AmbientLight(0x0a1020, 0.1);
+scene.add(outdoorLight);
+
+// ==========================================
+// --- ILUMINACIÓN DEL CUARTO ---
+// ==========================================
+const wallLampGroup = new THREE.Group();
+wallLampGroup.position.set(-29.5, 12, 0);
+
+const lampBase = new THREE.Mesh(new THREE.BoxGeometry(0.4, 4, 1.2), new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.9 }));
+const lampShade = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 3, 16), new THREE.MeshStandardMaterial({ color: 0x222222, metalness: 0.5 }));
+lampShade.position.x = 0.8;
+wallLampGroup.add(lampBase, lampShade);
+scene.add(wallLampGroup);
+
+const wallLight = new THREE.PointLight(0xffaa44, 3.5, 25);
+wallLight.position.set(-27, 12, 0);
+wallLight.castShadow = true;
+scene.add(wallLight);
+
+const ceilingLampMesh = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 2, 0.8, 32), new THREE.MeshStandardMaterial({ color: 0x222222, metalness: 0.8 }));
+ceilingLampMesh.position.set(0, 34, 0);
+scene.add(ceilingLampMesh);
+
+const roomLightMain = new THREE.PointLight(0xffeedd, 2.5, 70);
+roomLightMain.position.set(0, 30, 0);
+roomLightMain.castShadow = true;
+scene.add(roomLightMain);
+
+const roomLightFill = new THREE.AmbientLight(0xffffff, 0.35); 
+scene.add(roomLightFill);
+
+let isRoomLightOn = true;
+let isWallLightOn = true;
+
+// ==========================================
+// --- ILUMINACIÓN AMBIENTE RGB GAMER ---
+// ==========================================
+const rgbLight1 = new THREE.PointLight(0x00f0ff, 4, 15);
+rgbLight1.position.set(-9, 5, -1);
+scene.add(rgbLight1);
+
+const rgbLight2 = new THREE.PointLight(0xff0077, 3.5, 15);
+rgbLight2.position.set(-11, 3, 1);
+scene.add(rgbLight2);
+
+const deskLed = new THREE.PointLight(0x00f0ff, 4.5, 22);
+deskLed.position.set(0, 1, -6);
+scene.add(deskLed);
+
+// ==========================================
+// --- MATERIALES PC GAMER ---
+// ==========================================
+const matMetalDark = new THREE.MeshStandardMaterial({ color: 0x111318, metalness: 0.85, roughness: 0.2 });
+const matBlackPlastic = new THREE.MeshStandardMaterial({ color: 0x181a20, roughness: 0.5 });
+const matPcb = new THREE.MeshStandardMaterial({ color: 0x080e18, roughness: 0.4 });
+const matGpuMetal = new THREE.MeshStandardMaterial({ color: 0x1f222a, metalness: 0.9, roughness: 0.1 });
+const matGlass = new THREE.MeshPhysicalMaterial({
+  color: 0xffffff, transparent: true, opacity: 0.2, roughness: 0.05, transmission: 0.95, thickness: 0.1
+});
+const matRgbDynamic = new THREE.MeshBasicMaterial({ color: 0x00f0ff });
+const matScreen = new THREE.MeshBasicMaterial();
+
+// ==========================================
+// --- ESCRITORIO Y PC ---
+// ==========================================
+const desk = new THREE.Mesh(new THREE.BoxGeometry(42, 0.8, 20), new THREE.MeshStandardMaterial({ color: 0x101216, roughness: 0.6 }));
+desk.position.y = -0.4;
+desk.receiveShadow = true;
+scene.add(desk);
+
+const leg1 = new THREE.Mesh(new THREE.BoxGeometry(1, 10, 18), matMetalDark);
+leg1.position.set(-20, -5, 0);
+const leg2 = leg1.clone();
+leg2.position.x = 20;
+scene.add(leg1, leg2);
+
+const mousepad = new THREE.Mesh(new THREE.BoxGeometry(26, 0.04, 11), new THREE.MeshStandardMaterial({ color: 0x07080a, roughness: 0.9 }));
+mousepad.position.set(1, 0.02, 2.5);
+mousepad.receiveShadow = true;
+scene.add(mousepad);
+
+// GABINETE
+const pcGroup = new THREE.Group();
+pcGroup.position.set(-11, 0, -1);
+scene.add(pcGroup);
+
+const caseMesh = new THREE.Mesh(new THREE.BoxGeometry(5.2, 10, 8.5), matMetalDark);
+caseMesh.position.y = 5;
+caseMesh.castShadow = true;
+pcGroup.add(caseMesh);
+
+const sideGlass = new THREE.Mesh(new THREE.BoxGeometry(0.1, 9.4, 8), matGlass);
+sideGlass.position.set(2.56, 5, 0);
+pcGroup.add(sideGlass);
+
+const motherboard = new THREE.Mesh(new THREE.BoxGeometry(0.2, 8, 7), matPcb);
+motherboard.position.set(-2, 5.2, 0);
+pcGroup.add(motherboard);
+
+for (let i = 0; i < 4; i++) {
+  const ram = new THREE.Mesh(new THREE.BoxGeometry(0.1, 1.4, 0.15), i % 2 === 0 ? matRgbDynamic : matMetalDark);
+  ram.position.set(-1.6, 6.2, -1 + i * 0.3);
+  pcGroup.add(ram);
+}
+
+const gpuGroup = new THREE.Group();
+gpuGroup.position.set(-0.3, 4.2, 0);
+const gpuBody = new THREE.Mesh(new THREE.BoxGeometry(3.2, 1.1, 5.5), matGpuMetal);
+gpuGroup.add(gpuBody);
+for (let i = 0; i < 3; i++) {
+  const gpuFan = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.7, 0.1, 16), matBlackPlastic);
+  gpuFan.rotation.x = Math.PI / 2;
+  gpuFan.position.set(1.55, 0, -1.8 + i * 1.8);
+  gpuGroup.add(gpuFan);
+}
+const gpuLogo = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.3, 2), matRgbDynamic);
+gpuLogo.position.set(-1.58, 0.2, 0);
+gpuGroup.add(gpuLogo);
+pcGroup.add(gpuGroup);
+
+const fanGroup = new THREE.Group();
+const fanGeo = new THREE.TorusGeometry(0.85, 0.1, 16, 32);
+for (let i = 0; i < 3; i++) {
+  const fanRgb = new THREE.Mesh(fanGeo, matRgbDynamic);
+  fanRgb.position.set(0, 2.2 + i * 2.6, 4.1);
+  pcGroup.add(fanRgb);
+  const blades = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.1, 0.05), matBlackPlastic);
+  blades.position.set(0, 2.2 + i * 2.6, 4.1);
+  fanGroup.add(blades);
+}
+pcGroup.add(fanGroup);
+
+const towerPowerBtn = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 0.1, 16), matRgbDynamic);
+towerPowerBtn.rotation.x = Math.PI / 2;
+towerPowerBtn.position.set(1.8, 9.8, 4.22);
+pcGroup.add(towerPowerBtn);
+
+// MONITOR
+const monitorGroup = new THREE.Group();
+monitorGroup.position.set(0, 0, -2);
+scene.add(monitorGroup);
+
+const standBase2 = new THREE.Mesh(new THREE.BoxGeometry(6, 0.2, 4), matMetalDark);
+standBase2.position.y = 0.1;
+const standArm2 = new THREE.Mesh(new THREE.BoxGeometry(1, 5, 0.5), matMetalDark);
+standArm2.position.set(0, 2.5, -1.2);
+monitorGroup.add(standBase2, standArm2);
+
+const screenFrame = new THREE.Mesh(new THREE.BoxGeometry(15.2, 8.8, 0.4), matBlackPlastic);
+screenFrame.position.set(0, 6.5, -0.8);
+monitorGroup.add(screenFrame);
+
+const displayScreen = new THREE.Mesh(new THREE.PlaneGeometry(14.8, 8.4), matScreen);
+displayScreen.position.set(0, 6.5, -0.59);
+monitorGroup.add(displayScreen);
+
+const monitorPowerBtn = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.2, 0.1), matRgbDynamic);
+monitorPowerBtn.position.set(6.8, 2.3, -0.55);
+monitorGroup.add(monitorPowerBtn);
+
+// TECLADO Y MOUSE
+const keyboardGroup = new THREE.Group();
+keyboardGroup.position.set(-1.5, 0.1, 2.5);
+scene.add(keyboardGroup);
+const kbBase = new THREE.Mesh(new THREE.BoxGeometry(9.6, 0.25, 3.4), matMetalDark);
+keyboardGroup.add(kbBase);
+const keyboardKeys=[];for(let r=0;r<3;r++)for(let c=0;c<12;c++){const k=new THREE.Mesh(new THREE.BoxGeometry(.62,.16,.58),new THREE.MeshStandardMaterial({color:0x232833,emissive:0x003344,emissiveIntensity:.6}));k.position.set(-4+c*.72,.22,-.8+r*.72);keyboardGroup.add(k);keyboardKeys.push(k)}
+
+const mouseGroup = new THREE.Group();
+mouseGroup.position.set(6, 0.2, 2.5);
+scene.add(mouseGroup);
+const mouseBody = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.45, 2.2), matBlackPlastic);
+mouseGroup.add(mouseBody);
+const mouseRgbStrip = new THREE.Mesh(new THREE.BoxGeometry(1.32, 0.1, 0.1), matRgbDynamic);
+mouseRgbStrip.position.set(0, 0.1, 1);
+mouseGroup.add(mouseRgbStrip);
+
+// ==========================================
+// --- SISTEMA DE CÁMARAS AJUSTADAS ---
+// ==========================================
+const securityCameras = [
+  { name: 'CAM 1: Cuarto completo', pos: new THREE.Vector3(-26, 25, 26), lookAt: new THREE.Vector3(0, 3, 0), fov: 70 },
+  { name: 'CAM 2: Frente de la casa', pos: new THREE.Vector3(42, 12, 9), lookAt: new THREE.Vector3(105, 0, 4), fov: 72 },
+  { name: 'CAM 3: Patio trasero', pos: new THREE.Vector3(65, 10, 38), lookAt: new THREE.Vector3(36, -1, 23), fov: 66 },
+  { name: 'CAM 4: Cuarto vacío', pos: new THREE.Vector3(22, 16, -16), lookAt: new THREE.Vector3(0, 4, 5), fov: 62 }
+];
+
+const securityCamObj = new THREE.PerspectiveCamera(60, 1, 0.1, 200);
+const camRenderTargets = securityCameras.map(() => new THREE.WebGLRenderTarget(256, 256));
+
+function updateSecurityCameras() {
+  const origAspect = camera.aspect;
+  const currentRenderTarget = renderer.getRenderTarget();
+
+  displayScreen.visible = false; 
+
+  securityCameras.forEach((cam, i) => {
+    securityCamObj.fov = cam.fov || 60;
+    securityCamObj.position.copy(cam.pos);
+    securityCamObj.lookAt(cam.lookAt);
+    securityCamObj.aspect = 1;
+    securityCamObj.updateProjectionMatrix();
+
+    renderer.setRenderTarget(camRenderTargets[i]);
+    renderer.render(scene, securityCamObj);
+  });
+
+  displayScreen.visible = true;
+  renderer.setRenderTarget(currentRenderTarget);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = origAspect;
+  camera.updateProjectionMatrix();
+}
+
+// ==========================================
+// --- CANVAS PANTALLA WINDOWS 11 ---
+// ==========================================
+const canvas = document.createElement('canvas');
+canvas.width = 1024;
+canvas.height = 576;
+const ctx = canvas.getContext('2d');
+
+const screenTexture = new THREE.CanvasTexture(canvas);
+matScreen.map = screenTexture;
+
+let isPowered = true;
+let isBooting = true;
+let bootProgress = 0;
+let isZoomed = false;
+
+let mousePos = { x: 512, y: 288 };
+let isMouseDown = false;
+let dragStart = null;
+let selectionRect = null;
+
+const desktopApps = [
+  { id: 'cams', name: 'Vigilancia', icon: '📹', x: 25, y: 30, width: 90, height: 75, selected: false },
+  { id: 'missions', name: 'Misiones', icon: '🎯', x: 25, y: 120, width: 90, height: 75, selected: false },
+  { id: 'browser', name: 'Chrome Wiki', icon: '🌐', x: 25, y: 210, width: 90, height: 75, selected: false },
+  { id: 'camera', name: 'Mi Cámara', icon: '📷', x: 25, y: 300, width: 90, height: 75, selected: false },
+  { id: 'gallery', name: 'Fotos y Videos', icon: '🖼️', x: 25, y: 390, width: 90, height: 75, selected: false }
+];
+
+let openWindows = [];
+let focusedApp=null;
+let wikiLogged=false,wikiQuery='';
+const webcamVideo=document.createElement('video');webcamVideo.autoplay=true;webcamVideo.muted=true;webcamVideo.playsInline=true;
+let webcamOn=false,frontCamera=true;
+let gallery=[];try{gallery=JSON.parse(localStorage.getItem('nightRoomGallery')||'[]')}catch(e){}
+async function startWebcam(){try{if(webcamVideo.srcObject)webcamVideo.srcObject.getTracks().forEach(t=>t.stop());webcamVideo.srcObject=await navigator.mediaDevices.getUserMedia({video:{facingMode:frontCamera?'user':'environment'},audio:false});webcamOn=true;showToast('📷 Cámara activada')}catch(e){showToast('Permite el acceso a la cámara en el navegador')}}
+function takePhoto(){if(!webcamOn)return startWebcam();const c=document.createElement('canvas');c.width=320;c.height=240;c.getContext('2d').drawImage(webcamVideo,0,0,320,240);gallery.unshift({type:'photo',src:c.toDataURL('image/jpeg',.72),date:new Date().toLocaleString()});gallery=gallery.slice(0,12);localStorage.setItem('nightRoomGallery',JSON.stringify(gallery));completeMission('tookPhoto','Tomaste y guardaste una foto')}
+
+function openApp(appId) {
+  if (openWindows.some(w => w.id === appId)) return;
+
+  if (appId === 'browser') {
+    openWindows.push({ id: 'browser', title: 'Chrome · Wikipedia Nocturna', x: 190, y: 65, w: 610, h: 400, content: 'browser' });
+  } else if (appId === 'missions') {
+    openWindows.push({ id: 'missions', title: 'Gestor de Misiones', x: 320, y: 90, w: 450, h: 350, content: 'missions' });
+  } else if (appId === 'cams') {
+    openWindows.push({ id: 'cams', title: 'Sistema de Vigilancia 4x4', x: 180, y: 50, w: 580, h: 420, content: 'cams' });
+    completeMission('checkedCameras','Revisaste las cuatro cámaras');
+  } else if(appId==='camera'){
+    openWindows.push({id:'camera',title:'Cámara',x:210,y:65,w:560,h:400,content:'camera'});startWebcam();
+  } else if(appId==='gallery'){
+    openWindows.push({id:'gallery',title:'Fotos y videos del juego',x:220,y:70,w:560,h:390,content:'gallery'});
+  }
+}
+
+function drawWindows11Wallpaper() {
+  const grad = ctx.createLinearGradient(0, 0, 1024, 576);
+  grad.addColorStop(0, '#0a192f');
+  grad.addColorStop(0.5, '#020617');
+  grad.addColorStop(1, '#001e3d');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 1024, 576);
+
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  for(let i = 0; i < 5; i++) {
+    ctx.fillStyle = i % 2 === 0 ? 'rgba(0, 180, 255, 0.25)' : 'rgba(80, 70, 255, 0.2)';
+    ctx.beginPath();
+    ctx.ellipse(512 + (i * 30 - 60), 288 + (i * 20 - 40), 180 + i * 20, 260 - i * 15, (i * 25) * Math.PI / 180, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+function renderScreen(time) {
+  if (!isPowered) {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, 1024, 576);
+    screenTexture.needsUpdate = true;
+    return;
+  }
+
+  if (isBooting) {
+    bootProgress += 1.5;
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, 1024, 576);
+    ctx.fillStyle = '#00adef';
+    ctx.fillRect(485, 210, 24, 24); ctx.fillRect(515, 210, 24, 24);
+    ctx.fillRect(485, 240, 24, 24); ctx.fillRect(515, 240, 24, 24);
+    ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.arc(512, 330, 18, time * 8, time * 8 + 4); ctx.stroke();
+    if (bootProgress >= 100) isBooting = false;
+    screenTexture.needsUpdate = true;
+    return;
+  }
+
+  drawWindows11Wallpaper();
+
+  desktopApps.forEach(app => {
+    if (app.selected) {
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.6)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.roundRect(app.x, app.y, app.width, app.height, 8);
+      ctx.fill(); ctx.stroke();
+    }
+    ctx.font = '32px Segoe UI'; ctx.textAlign = 'center';
+    ctx.fillText(app.icon, app.x + app.width / 2, app.y + 38);
+    ctx.fillStyle = '#ffffff'; ctx.font = '12px Segoe UI';
+    ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 4;
+    ctx.fillText(app.name, app.x + app.width / 2, app.y + 60);
+    ctx.shadowBlur = 0;
+  });
+
+  if (selectionRect) {
+    ctx.fillStyle = 'rgba(0, 120, 215, 0.3)'; ctx.strokeStyle = 'rgba(0, 153, 255, 0.8)';
+    ctx.lineWidth = 1;
+    ctx.fillRect(selectionRect.x, selectionRect.y, selectionRect.w, selectionRect.h);
+    ctx.strokeRect(selectionRect.x, selectionRect.y, selectionRect.w, selectionRect.h);
+  }
+
+  openWindows.forEach(win => {
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.95)';
+    ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 15;
+    ctx.beginPath(); ctx.roundRect(win.x, win.y, win.w, win.h, 10); ctx.fill();
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = 'rgba(30, 41, 59, 0.9)';
+    ctx.beginPath(); ctx.roundRect(win.x, win.y, win.w, 32, [10, 10, 0, 0]); ctx.fill();
+
+    ctx.fillStyle = '#ffffff'; ctx.font = '13px Segoe UI'; ctx.textAlign = 'left';
+    ctx.fillText(win.title, win.x + 15, win.y + 21);
+
+    ctx.fillStyle = '#ff4d4d';
+    ctx.beginPath(); ctx.arc(win.x + win.w - 20, win.y + 16, 7, 0, Math.PI * 2); ctx.fill();
+
+    // INTERIOR DE LAS VENTANAS
+    if (win.content === 'browser') {
+      ctx.fillStyle='#f8fafc';ctx.fillRect(win.x+3,win.y+33,win.w-6,win.h-36);ctx.textAlign='left';
+      if(!wikiLogged){ctx.fillStyle='#172033';ctx.font='bold 24px Segoe UI';ctx.fillText('Wikipedia Nocturna',win.x+35,win.y+85);ctx.font='15px Segoe UI';ctx.fillText('Nombre: '+(wikiQuery.split('|')[0]||'haz clic aquí y escribe'),win.x+35,win.y+135);ctx.fillText('Contraseña: '+(wikiQuery.includes('|')?'••••••':'escribe nombre | contraseña'),win.x+35,win.y+175);ctx.fillStyle='#2563eb';ctx.fillRect(win.x+35,win.y+205,180,42);ctx.fillStyle='white';ctx.fillText('ENTRAR',win.x+90,win.y+231)}
+      else{ctx.fillStyle='#e5e7eb';ctx.fillRect(win.x+25,win.y+50,win.w-50,38);ctx.fillStyle='#334155';ctx.font='14px Segoe UI';ctx.fillText(wikiQuery||'Buscar: ¿por qué murió el hermano de...?',win.x+38,win.y+75);ctx.fillStyle='#111827';ctx.font='bold 23px Segoe UI';ctx.fillText('Resultados de Wikipedia',win.x+30,win.y+130);ctx.font='15px Segoe UI';ctx.fillText('Archivo 01: La desaparición nunca fue aclarada.',win.x+30,win.y+175);ctx.fillText('Archivo 02: Último registro: carretera del desierto.',win.x+30,win.y+210);ctx.fillStyle='#9f1239';ctx.fillText('⚠ Algunas páginas parecen haber sido modificadas.',win.x+30,win.y+260)}
+    } else if (win.content === 'notes') {
+      ctx.fillStyle = '#f8fafc'; ctx.font = '14px Segoe UI'; ctx.textAlign = 'left';
+      ctx.fillText(win.text, win.x + 20, win.y + 65);
+    } else if (win.content === 'steam') {
+      ctx.fillStyle = '#0f172a'; ctx.fillRect(win.x + 10, win.y + 40, win.w - 20, win.h - 50);
+      ctx.fillStyle = '#00f0ff'; ctx.font = 'bold 20px Segoe UI';
+      ctx.fillText('TIENDA DE JUEGOS STEAM', win.x + 25, win.y + 75);
+    } else if (win.content === 'calc') {
+      ctx.fillStyle = '#0f172a'; ctx.fillRect(win.x + 15, win.y + 45, win.w - 30, 45);
+      ctx.fillStyle = '#00f0ff'; ctx.font = 'bold 22px Segoe UI'; ctx.textAlign = 'right';
+      ctx.fillText(win.display, win.x + win.w - 25, win.y + 75);
+    } else if (win.content === 'missions') {
+      ctx.fillStyle = '#020617';
+      ctx.fillRect(win.x + 2, win.y + 32, win.w - 4, win.h - 34);
+
+      ctx.fillStyle = '#00f0ff';
+      ctx.font = 'bold 20px Segoe UI';
+      ctx.textAlign = 'left';
+      ctx.fillText('🎯 Tareas del Sistema', win.x + 25, win.y + 70);
+
+      const tasks = [
+        { text: 'Entrar y buscar en Wikipedia', done: missionState.loggedWikipedia },
+        { text: 'Revisar las 4 cámaras', done: missionState.checkedCameras },
+        { text: 'Tomar una foto', done: missionState.tookPhoto },
+        { text: 'Apagar la lámpara de pared', done: missionState.turnedOffWallLight },
+        { text: 'Llevar basura al bote exterior', done: missionState.threwTrash }
+      ];
+
+      tasks.forEach((t, i) => {
+        ctx.fillStyle = t.done ? '#00ff88' : '#cbd5e1';
+        ctx.font = t.done ? 'bold 16px Segoe UI' : '16px Segoe UI';
+        ctx.fillText(t.done ? '✅ ' + t.text : '❌ ' + t.text, win.x + 30, win.y + 120 + (i * 40));
+      });
+
+      const allDone = tasks.every(t => t.done);
+      if (allDone) {
+        ctx.fillStyle = '#ffaa00';
+        ctx.font = 'bold 18px Segoe UI';
+        ctx.textAlign = 'center';
+        ctx.fillText('🏆 ¡Misiones Completadas!', win.x + win.w / 2, win.y + win.h - 40);
+      }
+    } else if (win.content === 'cams') {
+      updateSecurityCameras();
+
+      const gridW = (win.w - 30) / 2;
+      const gridH = (win.h - 55) / 2;
+
+      for (let i = 0; i < 4; i++) {
+        const cx = win.x + 10 + (i % 2) * (gridW + 10);
+        const cy = win.y + 40 + Math.floor(i / 2) * (gridH + 8);
+
+        ctx.strokeStyle = '#00f0ff';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(cx, cy, gridW, gridH);
+
+        const pixels = new Uint8Array(256 * 256 * 4);
+        renderer.readRenderTargetPixels(camRenderTargets[i], 0, 0, 256, 256, pixels);
+        
+        const imgData = ctx.createImageData(256, 256);
+        for (let j = 0; j < pixels.length; j += 4) {
+          imgData.data[j] = pixels[j];
+          imgData.data[j+1] = pixels[j+1];
+          imgData.data[j+2] = pixels[j+2];
+          imgData.data[j+3] = 255;
+        }
+
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = 256; tempCanvas.height = 256;
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.putImageData(imgData, 0, 0);
+
+        ctx.save();
+        ctx.translate(cx, cy + gridH);
+        ctx.scale(1, -1);
+        ctx.drawImage(tempCanvas, 0, 0, gridW, gridH);
+        ctx.restore();
+
+        ctx.fillStyle = 'rgba(0,0,0,0.6)';
+        ctx.fillRect(cx, cy, gridW, 20);
+        ctx.fillStyle = '#00ff88';
+        ctx.font = 'bold 11px Segoe UI';
+        ctx.textAlign = 'left';
+        ctx.fillText('🔴 ' + securityCameras[i].name, cx + 6, cy + 14);
+      }
+    } else if(win.content==='camera'){
+      ctx.fillStyle='#05080d';ctx.fillRect(win.x+10,win.y+42,win.w-20,win.h-95);if(webcamOn&&webcamVideo.readyState>=2){ctx.save();if(frontCamera){ctx.translate(win.x+win.w-10,0);ctx.scale(-1,1);ctx.drawImage(webcamVideo,0,win.y+42,win.w-20,win.h-95)}else ctx.drawImage(webcamVideo,win.x+10,win.y+42,win.w-20,win.h-95);ctx.restore()}else{ctx.fillStyle='white';ctx.textAlign='center';ctx.fillText('Esperando permiso de cámara…',win.x+win.w/2,win.y+190)}ctx.fillStyle='#2563eb';ctx.fillRect(win.x+25,win.y+win.h-45,145,32);ctx.fillStyle='#7c3aed';ctx.fillRect(win.x+190,win.y+win.h-45,145,32);ctx.fillStyle='white';ctx.font='bold 13px Segoe UI';ctx.fillText('📸 TOMAR FOTO',win.x+43,win.y+win.h-24);ctx.fillText('🔄 VOLTEAR',win.x+215,win.y+win.h-24);
+    } else if(win.content==='gallery'){
+      ctx.fillStyle='#0b1220';ctx.fillRect(win.x+3,win.y+33,win.w-6,win.h-36);ctx.fillStyle='white';ctx.font='bold 18px Segoe UI';ctx.textAlign='left';ctx.fillText(`Galería · ${gallery.length} archivos guardados`,win.x+20,win.y+65);gallery.slice(0,6).forEach((g,i)=>{const img=new Image();img.src=g.src;const gx=win.x+20+(i%3)*175,gy=win.y+85+Math.floor(i/3)*130;if(img.complete)ctx.drawImage(img,gx,gy,155,95);ctx.fillStyle='#b8c7db';ctx.font='10px Segoe UI';ctx.fillText(g.date,gx,gy+112)});if(!gallery.length){ctx.fillStyle='#94a3b8';ctx.fillText('Aún no has tomado fotos.',win.x+20,win.y+115)}
+    }
+  });
+
+  // Barra de Tareas
+  ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+  ctx.fillRect(0, 532, 1024, 44);
+  const icons = ['🪟', '🔍', '📁', '🌐', '💬'];
+  const startX = 430;
+  icons.forEach((ic, i) => {
+    ctx.font = '18px Segoe UI'; ctx.textAlign = 'center';
+    ctx.fillText(ic, startX + i * 36 + 16, 560);
+  });
+
+  if (isZoomed) {
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.moveTo(mousePos.x, mousePos.y);
+    ctx.lineTo(mousePos.x + 12, mousePos.y + 16);
+    ctx.lineTo(mousePos.x + 5, mousePos.y + 16);
+    ctx.lineTo(mousePos.x, mousePos.y + 22);
+    ctx.closePath(); ctx.fill();
+  }
+  screenTexture.needsUpdate = true;
+}
+
+// ==========================================
+// --- INTERACCIÓN Y CLICS ---
+// ==========================================
+const raycaster = new THREE.Raycaster();
+const mouseVec = new THREE.Vector2();
+
+function getCanvasCoordinates(e) {
+  mouseVec.x = (e.clientX / window.innerWidth) * 2 - 1;
+  mouseVec.y = -(e.clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouseVec, camera);
+  const intersects = raycaster.intersectObject(displayScreen);
+  if (intersects.length > 0 && intersects[0].uv) {
+    return { x: intersects[0].uv.x * 1024, y: (1 - intersects[0].uv.y) * 576 };
+  }
+  return null;
+}
+
+window.addEventListener('mousemove', (e) => {
+  const coords = getCanvasCoordinates(e);
+  if (coords) {
+    mousePos = coords;
+    if (isMouseDown && dragStart) {
+      selectionRect = {
+        x: Math.min(dragStart.x, mousePos.x),
+        y: Math.min(dragStart.y, mousePos.y),
+        w: Math.abs(mousePos.x - dragStart.x),
+        h: Math.abs(mousePos.y - dragStart.y)
+      };
+      desktopApps.forEach(app => {
+        app.selected = (app.x < selectionRect.x + selectionRect.w && app.x + app.width > selectionRect.x &&
+                        app.y < selectionRect.y + selectionRect.h && app.y + app.height > selectionRect.y);
+      });
+    }
+  }
+});
+
+window.addEventListener('mousedown', (e) => {
+  if (e.target.closest('.ui-container')) return;
+  const coords = getCanvasCoordinates(e);
+  if (coords) {
+    isMouseDown = true; dragStart = { x: coords.x, y: coords.y };
+    openWindows.forEach((win, index) => {
+      if (coords.x >= win.x + win.w - 30 && coords.x <= win.x + win.w - 10 && coords.y >= win.y + 5 && coords.y <= win.y + 25) {
+        openWindows.splice(index, 1);
+      }
+      if(coords.x>=win.x&&coords.x<=win.x+win.w&&coords.y>=win.y&&coords.y<=win.y+win.h)focusedApp=win.content;
+      if(win.content==='browser'&&coords.x>win.x+25&&coords.x<win.x+win.w-25){if(!wikiLogged&&coords.y>win.y+200&&coords.y<win.y+260){wikiLogged=true;completeMission('loggedWikipedia','Entraste y buscaste en Wikipedia');wikiQuery='¿por qué murió el hermano de...?'} }
+      if(win.content==='camera'&&coords.y>win.y+win.h-55){if(coords.x<win.x+180)takePhoto();else if(coords.x<win.x+350){frontCamera=!frontCamera;startWebcam()}}
+    });
+    desktopApps.forEach(app => app.selected = false);
+  }
+});
+
+window.addEventListener('mouseup', () => { isMouseDown = false; dragStart = null; selectionRect = null; });
+
+window.addEventListener('dblclick', (e) => {
+  const coords = getCanvasCoordinates(e);
+  if (coords) {
+    desktopApps.forEach(app => {
+      if (coords.x >= app.x && coords.x <= app.x + app.width && coords.y >= app.y && coords.y <= app.y + app.height) {
+        openApp(app.id);
+      }
+    });
+  }
+});
+
+// ==========================================
+// --- CONTROLES DE LA UI Y PUERTA ---
+// ==========================================
+let lastViewName = 'front'; 
+function setCameraView(viewName) {
+  let finalViewName = viewName;
+  if (viewName !== 'front' && viewName !== 'zoom' && viewName === lastViewName) finalViewName = 'front';
+
+  const view = cameraAngles[finalViewName];
+  targetYaw = view.yaw; targetPitch = view.pitch;
+  
+  if (view.isZoom) {
+    isZoomed = true; targetCamPos.set(0, 6.5, 10.5); targetFov = 48; 
+    document.getElementById('zoom-text').textContent = "Salir de PC";
+  } else {
+    isZoomed = false; targetCamPos.copy(HEAD_POS); targetFov = 50;
+    document.getElementById('zoom-text').textContent = "Entrar a PC";
+  }
+  if (viewName !== 'zoom') lastViewName = finalViewName;
+}
+
+document.getElementById('view-front').addEventListener('click', () => setCameraView('front'));
+document.getElementById('view-left').addEventListener('click', () => setCameraView('left'));
+document.getElementById('view-right').addEventListener('click', () => setCameraView('right'));
+document.getElementById('view-back').addEventListener('click', () => setCameraView('back'));
+
+document.getElementById('zoom-btn').addEventListener('click', () => {
+  if (isZoomed) setCameraView('front'); else setCameraView('zoom');
+});
+
+// ANIMACIÓN DE PUERTA CON CÁMARA
+function toggleDoor() {
+  isDoorOpen = !isDoorOpen;
+  targetDoorAngle = isDoorOpen ? Math.PI / 2.1 : 0;
+  
+  // Mirar hacia la derecha para ver la puerta
+  setCameraView('right');
+
+  // Regresar automáticamente al frente tras ver la animación
+  setTimeout(() => {
+    setCameraView('front');
+  }, 1800);
+}
+
+document.getElementById('door-btn').addEventListener('click', toggleDoor);
+
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'p' || e.key === 'P') {
+    toggleDoor();
+  }
+  const key=keyboardKeys[e.keyCode%keyboardKeys.length];if(key){key.position.y=.1;setTimeout(()=>key.position.y=.22,90)}
+  if(focusedApp==='browser'&&!wikiLogged&&e.key.length===1)wikiQuery=(wikiQuery+e.key).slice(-42);
+  if(e.key==='Backspace'&&focusedApp==='browser')wikiQuery=wikiQuery.slice(0,-1);
+  if((e.key==='l'||e.key==='L')&&!e.repeat)document.getElementById('room-light-btn').click();
+  if(playerUnlocked){const speed=e.shiftKey?1.2:.7;if(e.key.toLowerCase()==='w')targetCamPos.z-=speed;if(e.key.toLowerCase()==='s')targetCamPos.z+=speed;if(e.key.toLowerCase()==='a')targetCamPos.x-=speed;if(e.key.toLowerCase()==='d')targetCamPos.x+=speed;if(e.key.toLowerCase()==='e'){playerStanding=!playerStanding;targetCamPos.y=playerStanding?8:6.5;showToast(playerStanding?'Te levantaste':'Te sentaste en la PC')}if(e.key.toLowerCase()==='c'){crouched=!crouched;targetCamPos.y=crouched?3.8:(playerStanding?8:6.5)}}
+});
+
+document.getElementById('trash-btn').addEventListener('click',()=>{if(!isDoorOpen){showToast('Primero abre la puerta para salir')}else{setCameraView('right');completeMission('threwTrash','Llevaste la basura al bote exterior')}});
+document.getElementById('play-btn').addEventListener('click',()=>document.getElementById('main-menu').classList.add('hidden'));
+document.getElementById('instructions-btn').addEventListener('click',()=>{document.getElementById('main-menu').style.display='none';document.getElementById('instructions').style.display='flex'});
+document.getElementById('back-btn').addEventListener('click',()=>{document.getElementById('instructions').style.display='none';document.getElementById('main-menu').style.display='flex'});
+document.getElementById('exit-btn').addEventListener('click',()=>{if(confirm('¿Quieres salir del juego?')){isPowered=false;document.body.innerHTML='<div style="display:grid;place-items:center;height:100vh;background:#020204;color:white;font:24px Segoe UI">Juego cerrado. Puedes cerrar esta pestaña.</div>'}});
+
+// Luz de Techo
+document.getElementById('room-light-btn').addEventListener('click', (e) => {
+  isRoomLightOn = !isRoomLightOn;
+  const btn = e.currentTarget;
+  if (isRoomLightOn) {
+    roomLightMain.intensity = 2.5; roomLightFill.intensity = 0.35; 
+    btn.classList.remove('off'); document.getElementById('room-light-text').textContent = "Luz Techo: ON";
+  } else {
+    roomLightMain.intensity = 0.02; roomLightFill.intensity = 0.08; 
+    btn.classList.add('off'); document.getElementById('room-light-text').textContent = "Luz Techo: OFF";
+  }
+});
+
+// Luz de Pared
+document.getElementById('wall-light-btn').addEventListener('click', (e) => {
+  isWallLightOn = !isWallLightOn;
+  const btn = e.currentTarget;
+  if (isWallLightOn) {
+    wallLight.intensity = 3.5; btn.classList.remove('off');
+    document.getElementById('wall-light-text').textContent = "Luz Pared: ON";
+  } else {
+    wallLight.intensity = 0; btn.classList.add('off');
+    document.getElementById('wall-light-text').textContent = "Luz Pared: OFF";
+    missionState.turnedOffWallLight = true;
+  }
+});
+
+// Encendido PC
+function togglePower() {
+  isPowered = !isPowered;
+  const pBtn = document.getElementById('power-btn');
+  if (isPowered) {
+    isBooting = true; bootProgress = 0; openWindows = [];
+    pBtn.classList.remove('power-off'); setCameraView('front');
+    document.getElementById('power-text').textContent = "Reiniciar PC";
+  } else {
+    pBtn.classList.add('power-off');
+    document.getElementById('power-text').textContent = "Encender PC";
+  }
+}
+document.getElementById('power-btn').addEventListener('click', togglePower);
+
+// ==========================================
+// --- LOOP DE ANIMACIÓN ---
+// ==========================================
+const clock = new THREE.Clock();
+
+function animate() {
+  requestAnimationFrame(animate);
+  const time = clock.getElapsedTime();
+
+  // Animación de la Cámara
+  currentYaw = THREE.MathUtils.lerp(currentYaw, targetYaw, 0.08);
+  currentPitch = THREE.MathUtils.lerp(currentPitch, targetPitch, 0.08);
+  currentCamPos.lerp(targetCamPos, 0.08);
+  camera.position.copy(currentCamPos);
+  
+  const euler = new THREE.Euler(currentPitch, currentYaw, 0, 'YXZ');
+  camera.quaternion.setFromEuler(euler);
+
+  if (Math.abs(camera.fov - targetFov) > 0.1) {
+    camera.fov = THREE.MathUtils.lerp(camera.fov, targetFov, 0.08);
+    camera.updateProjectionMatrix();
+  }
+
+  // Animación suave de apertura de Puerta
+  currentDoorAngle = THREE.MathUtils.lerp(currentDoorAngle, targetDoorAngle, 0.06);
+  doorPivot.rotation.y = currentDoorAngle;
+
+  starField.rotation.y = time * 0.005;
+
+  if (isPowered) {
+    const hue1 = (time * 0.25) % 1;
+    const hue2 = (time * 0.25 + 0.5) % 1;
+    matRgbDynamic.color.setHSL(hue1, 1, 0.5);
+    rgbLight1.color.setHSL(hue1, 1, 0.5); rgbLight1.intensity = 4.0;
+    rgbLight2.color.setHSL(hue2, 1, 0.5); rgbLight2.intensity = 3.5;
+    deskLed.color.setHSL(hue1, 1, 0.5); deskLed.intensity = 4.5;
+    fanGroup.children.forEach(fan => fan.rotation.z += 0.35);
+  } else {
+    matRgbDynamic.color.setHex(0x111111);
+    rgbLight1.intensity = 0; rgbLight2.intensity = 0; deskLed.intensity = 0;
+  }
+
+  renderScreen(time);
+  renderer.render(scene, camera);
+}
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+animate();
+</script>
+</body>
+</html>

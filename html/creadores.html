@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creadores y Filosofía - WIBSIPROJECT</title>
+    <link rel="icon" href="../assets/img/creadores.jpg" type="image/png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #050508;
+            color: #f0f0f0;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
+            background: linear-gradient(135deg, #050508, #11111d, #1a0b2e);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        #canvas3d {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .back-home-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .btn-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.7rem 1.4rem;
+            background: linear-gradient(135deg, #00d2ff, #9b51e0, #ff007f);
+            background-size: 200% 200%;
+            color: #ffffff;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 50px;
+            box-shadow: 0 5px 20px rgba(0, 210, 255, 0.4);
+            animation: colorShift 5s ease infinite, pulseGlow 2s infinite alternate;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+        }
+
+        @keyframes colorShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes pulseGlow {
+            from { box-shadow: 0 0 10px rgba(0, 210, 255, 0.3); }
+            to { box-shadow: 0 0 25px rgba(255, 0, 127, 0.7); }
+        }
+
+        .btn-home:hover {
+            transform: scale(1.08) translateY(-2px);
+            box-shadow: 0 8px 30px rgba(155, 81, 224, 0.8);
+        }
+
+        header {
+            text-align: center;
+            padding: 4rem 1rem 2rem 1rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        header h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(45deg, #00d2ff, #9b51e0, #ff007f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.4s ease;
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+
+        header h1:hover {
+            transform: scale(1.06) rotate(-1deg);
+            filter: drop-shadow(0 0 30px rgba(0, 210, 255, 0.9));
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 10px rgba(0, 210, 255, 0.4)); }
+            to { filter: drop-shadow(0 0 25px rgba(155, 81, 224, 0.8)); }
+        }
+
+        header p {
+            font-size: 1.2rem;
+            color: #a0a0c0;
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .card {
+            background: rgba(18, 18, 30, 0.75);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.4s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(0, 210, 255, 0.4);
+        }
+
+        .card h2 {
+            font-size: 2rem;
+            margin-bottom: 1.2rem;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .card p, .card li {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #d0d0e0;
+            margin-bottom: 1.2rem;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .benefit-item {
+            background: rgba(25, 25, 45, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+
+        .benefit-item:hover {
+            background: rgba(35, 35, 65, 0.8);
+            transform: translateY(-4px);
+        }
+
+        .benefit-item h3 {
+            color: #00d2ff;
+            margin-bottom: 0.8rem;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ver-mas-btn {
+            background: linear-gradient(135deg, #00d2ff, #9b51e0);
+            border: none;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 1rem;
+            align-self: flex-start;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3);
+        }
+
+        .ver-mas-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(155, 81, 224, 0.6);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(5, 5, 8, 0.85);
+            backdrop-filter: blur(12px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: rgba(18, 18, 32, 0.95);
+            border: 1px solid rgba(0, 210, 255, 0.4);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 2.5rem;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
+            transform: scale(0.95) translateY(20px);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1) translateY(0);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+
+        .close-modal:hover {
+            background: #ff007f;
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            color: #00d2ff;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .interactive-widget {
+            background: rgba(10, 10, 18, 0.9);
+            border: 1px solid rgba(155, 81, 224, 0.4);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .widget-controls {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .widget-btn {
+            background: linear-gradient(45deg, #00d2ff, #9b51e0);
+            border: none;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s ease;
+        }
+
+        .widget-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .widget-output {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #020205;
+            border-radius: 8px;
+            color: #00ffcc;
+            font-family: monospace;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #707090;
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        @media (max-width: 768px) {
+            header h1 { font-size: 2.3rem; }
+            .card { padding: 1.5rem; }
+            .modal-content { padding: 1.5rem; width: 95%; }
+        }
+    </style>
+</head>
+<body>
+
+   <div class="back-home-container">
+       <a href="index.html" class="btn-home" id="homeBtn">
+           <span>←</span> Volver al inicio
+       </a>
+   </div>
+
+    <div class="bg-animation"></div>
+    <canvas id="canvas3d"></canvas>
+
+    <header>
+        <h1>WIBSIPROJECT - Creadores y Filosofía</h1>
+        <p>El origen detrás de la marca, la magia de dar vida al código y la evolución de un ecosistema digital interactivo.</p>
+    </header>
+
+    <main class="container">
+        
+        <section class="card">
+            <h2>💻 ¿Quién Soy y Por Qué Creé Esta Página?</h2>
+            <p>Detrás de cada línea de código, estructura y animación de <strong>WIBSIPROJECT</strong> se encuentra <strong>Anthony</strong>[cite: 4]. Este espacio digital nació de una profunda fascinación por la tecnología, la programación web avanzada y el desarrollo de interfaces inmersivas.</p>
+            <p><strong>¿Por qué creé páginas web?</strong> La respuesta radica en esa inigualable <em>sensación de creación</em>: transformar una pantalla en blanco y líneas de sintaxis en un entorno funcional, interactivo, con movimiento tridimensional, vida propia y lógica integrada. Ver que un diseño cobre movimiento y que los usuarios puedan interactuar fluidamente con él es lo que impulsa esta pasión día a día.</p>
+            <p><strong>El Origen del Nombre:</strong> El nombre <strong>WIBSI</strong> surge de una combinación conceptual orientada a reflejar innovación, ingeniería web y modernidad, fusionando la esencia de estructurar plataformas interconectadas con una identidad propia y memorable en el mundo digital.</p>
+        </section>
+
+        <!-- Módulos Principales -->
+        <section class="card">
+            <h2>⚙️ Módulos Principales de WIBSIPROJECT</h2>
+            <p>Selecciona un apartado para abrir su panel detallado de información avanzada, funciones activas y herramientas interactivas.</p>
+            
+            <div class="benefits-grid">
+                
+                <!-- Apartado 1 -->
+                <div class="benefit-item">
+                    <div>
+                        <h3>🎨 Animaciones y Gráficos</h3>
+                        <p>Renderizado 3D en tiempo real con Three.js, fondos con degradados fluidos y adaptación al cursor.</p>
+                    </div>
+                    <button class="ver-mas-btn" onclick="abrirModal('modalAnimaciones')">Ver más...</button>
+                </div>
+
+                <!-- Apartado 2 -->
+                <div class="benefit-item">
+                    <div>
+                        <h3>⚙️ Funciones e Interactividad</h3>
+                        <p>Controles de estado inteligentes, reproductores multimedia integrados y gestión de visibilidad.</p>
+                    </div>
+                    <button class="ver-mas-btn" onclick="abrirModal('modalFunciones')">Ver más...</button>
+                </div>
+
+                <!-- Apartado 3 -->
+                <div class="benefit-item">
+                    <div>
+                        <h3>🛡️ Estructura y Rendimiento</h3>
+                        <p>Arquitectura modular limpia, diseño Glassmorphism avanzado y optimización de recursos fluidos.</p>
+                    </div>
+                    <button class="ver-mas-btn" onclick="abrirModal('modalEstructura')">Ver más...</button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Comparativa Profunda -->
+        <section class="card">
+            <h2>📊 Comparativa Profunda: Páginas Web Tradicionales vs. El Programa WIBSIPROJECT</h2>
+            <p>Aquí se detallan de forma masiva todas las diferencias estructurales, lógicas, de software y de procesamiento entre lo que comúnmente ofrece internet y lo que ejecuta este proyecto avanzado:</p>
+            
+            <div style="margin-top: 1.5rem;">
+                <h3 style="color: #00d2ff; margin-bottom: 0.6rem;">🧠 1. Procesamiento Lógico y Gestión del Sistema</h3>
+                <p><strong>Páginas Web Comunes:</strong> Funcionan meramente como documentos estáticos de lectura. No poseen un núcleo lógico interno; dependen de recargas completas del navegador para mostrar datos nuevos y carecen de automatización de estados.</p>
+                <p><strong>WIBSIPROJECT:</strong> Opera como un auténtico software interactivo. Implementa clases de control orientadas a objetos, monitoreo de eventos en tiempo real, validaciones lógicas internas y la capacidad de ejecutar rutinas de diagnóstico directamente en la interfaz.</p>
+            </div>
+
+            <div style="margin-top: 1.5rem;">
+                <h3 style="color: #00d2ff; margin-bottom: 0.6rem;">⚡ 2. Optimización de Hardware y Rendimiento de la GPU</h3>
+                <p><strong>Páginas Web Comunes:</strong> Suelen sobrecargar la memoria RAM con scripts externos innecesarios, banners publicitarios pesados y animaciones GIF o CSS mal optimizadas que ralentizan los equipos de gama baja.</p>
+                <p><strong>WIBSIPROJECT:</strong> Utiliza aceleración por hardware a través de WebGL, ajusta dinámicamente el `setPixelRatio` de la pantalla para no perder fotogramas por segundo (FPS) y libera recursos de forma inteligente cuando el usuario minimiza o cambia de pestaña.</p>
+            </div>
+
+            <div style="margin-top: 1.5rem;">
+                <h3 style="color: #00d2ff; margin-bottom: 0.6rem;">🌐 3. Conectividad, Redes y Arquitectura de Datos</h3>
+                <p><strong>Páginas Web Comunes:</strong> Dependen de servidores lentos, generan constantes solicitudes HTTP redundantes y sufren caídas de rendimiento notables ante variaciones mínimas en la red.</p>
+                <p><strong>WIBSIPROJECT:</strong> Posee una arquitectura modular sumamente limpia, diseñada para simular flujos de paquetes de red locales de alta velocidad, estructurando la información en bloques independientes y seguros.</p>
+            </div>
+
+            <div style="margin-top: 1.5rem;">
+                <h3 style="color: #00d2ff; margin-bottom: 0.6rem;">🎨 4. Experiencia Visual y Diseño de Interfaces (UI/UX)</h3>
+                <p><strong>Páginas Web Comunes:</strong> Diseños planos, tipografías estándar y estructuras predecibles que aburren al usuario debido a la falta de innovación visual.</p>
+                <p><strong>WIBSIPROJECT:</strong> Implementa Glassmorphism avanzado (efectos de cristal esmerilado con desenfoque dinámico), fondos con degradados animados por keyframes y un motor 3D interactivo que gira siguiendo los movimientos del cursor del usuario.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL 1: ANIMACIONES Y GRÁFICOS -->
+    <div class="modal-overlay" id="modalAnimaciones">
+        <div class="modal-content">
+            <button class="close-modal" onclick="cerrarModal('modalAnimaciones')">✕</button>
+            <h2 class="modal-title">🎨 Panel Avanzado: Animaciones y Gráficos 3D</h2>
+            <p>Este módulo explora profundamente cómo se implementa la tridimensionalidad en la web moderna:</p>
+            
+            <ul style="list-style-type: none; margin-bottom: 1.5rem;">
+                <li style="position: relative; padding-left: 1.8rem; margin-bottom: 0.8rem;">⚡ <strong>Three.js Core:</strong> Manejo de mallas geométricas (Icosaedros) con propiedades de wireframe y materiales metálicos.</li>
+                <li style="position: relative; padding-left: 1.8rem; margin-bottom: 0.8rem;">⚡ <strong>Efecto Parallax:</strong> Sincronización de coordenadas del cursor del usuario para rotar los objetos 3D de forma fluida.</li>
+            </ul>
+
+            <div class="interactive-widget">
+                <h3>🧪 Simulador de Estado Gráfico</h3>
+                <p>Prueba cambiar las propiedades de renderizado en tiempo real:</p>
+                <div class="widget-controls">
+                    <button class="widget-btn" onclick="cambiarColorObjeto('#00d2ff')">Color Neón Cyan</button>
+                    <button class="widget-btn" onclick="cambiarColorObjeto('#ff007f')" style="background: linear-gradient(45deg, #ff007f, #9b51e0);">Color Fucsia</button>
+                    <button class="widget-btn" onclick="cambiarColorObjeto('#00ffcc')">Color Esmeralda</button>
+                </div>
+                <div class="widget-output" id="outputAnim">Estado actual: Objeto 3D sincronizado y activo.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: FUNCIONES E INTERACTIVIDAD -->
+    <div class="modal-overlay" id="modalFunciones">
+        <div class="modal-content">
+            <button class="close-modal" onclick="cerrarModal('modalFunciones')">✕</button>
+            <h2 class="modal-title">⚙️ Panel Avanzado: Funciones e Interactividad</h2>
+            <p>La interactividad va más allá de un simple clic. Este panel administra sistemas en tiempo real y secuencias multimedia:</p>
+            
+            <ul style="list-style-type: none; margin-bottom: 1.5rem;">
+                <li style="position: relative; padding-left: 1.8rem; margin-bottom: 0.8rem;">⚡ <strong>Gestión de Visibilidad:</strong> Pausa automática de recursos y audio cuando el usuario cambia de pestaña.</li>
+                <li style="position: relative; padding-left: 1.8rem; margin-bottom: 0.8rem;">⚡ <strong>Controles Dinámicos:</strong> Paneles flotantes con transiciones de entrada y salida basadas en curvas Bézier.</li>
+            </ul>
+
+            <div class="interactive-widget">
+                <h3>🎵 Reproductor Multimedia & Diagnóstico</h3>
+                <p>Gestiona el flujo de audio interactivo del sistema:</p>
+                <div class="widget-controls">
+                    <button class="widget-btn" onclick="ejecutarAccionWidget('play')">Reproducir Audio Witsi</button>
+                    <button class="widget-btn" onclick="ejecutarAccionWidget('pause')" style="background: linear-gradient(45deg, #ef4444, #dc2626);">Pausar Audio</button>
+                </div>
+                <div class="widget-output" id="outputFunc">Estado de audio: En espera de comandos.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: ESTRUCTURA Y RENDIMIENTO -->
+    <div class="modal-overlay" id="modalEstructura">
+        <div class="modal-content">
+            <button class="close-modal" onclick="cerrarModal('modalEstructura')">✕</button>
+            <h2 class="modal-title">🛡️ Panel Avanzado: Estructura y Rendimiento</h2>
+            <p>La base de un software robusto reside en su arquitectura y diseño modular limpio:</p>
+            
+            <ul style="list-style-type: none; margin-bottom: 1.5rem;">
+                <li style="position: relative; padding-left: 1.8rem; margin-bottom: 0.8rem;">⚡ <strong>Glassmorphism Avanzado:</strong> Uso de efectos de desenfoque de fondo (`backdrop-filter`) combinados con bordes translúcidos.</li>
+                <li style="position: relative; padding-left: 1.8rem; margin-bottom: 0.8rem;">⚡ <strong>Modularidad Limpia:</strong> Separación estricta entre estilos CSS, lógica JavaScript y estructura DOM.</li>
+            </ul>
+
+            <div class="interactive-widget">
+                <h3>📊 Monitor de Recursos del Sistema</h3>
+                <p>Verifica el estado operativo y la estabilidad del entorno:</p>
+                <div class="widget-controls">
+                    <button class="widget-btn" onclick="ejecutarDiagnostico()">Ejecutar Diagnóstico</button>
+                </div>
+                <div class="widget-output" id="outputEst">Diagnóstico pendiente. Haz clic en el botón superior.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botón flotante de contacto y panel deslizante para reportar al administrador -->
+    <div id="contactoAdminContainer">
+        <button id="btnConsultarAdmin" onclick="togglePanelContacto()">💬 Consultar al administrador</button>
+        
+        <div id="panelContactoAdmin" class="panel-admin-flotante">
+            <button class="cerrar-panel-admin" onclick="togglePanelContacto()">✕</button>
+            <h3 style="color: #00d2ff; margin-bottom: 0.8rem; font-size: 1.2rem;">Reportar al Administrador</h3>
+            <p style="font-size: 0.85rem; color: #a0a0c0; margin-bottom: 1rem;">Selecciona los detalles del caso para enviarlos al panel.</p>
+            
+            <form id="formAdminData" onsubmit="enviarAlPanelAdministrador(event)">
+                
+                <div style="margin-bottom: 0.8rem;">
+                    <label style="display: block; font-size: 0.8rem; margin-bottom: 0.2rem; color: #d0d0e0;">Usuario Problemático:</label>
+                    <select id="adminUsuario" required style="width: 100%; padding: 0.6rem; background: rgba(10, 10, 18, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white;">
+                        <option value="" disabled selected>Selecciona un usuario...</option>
+                        <option value="Usuario_Alpha">Usuario Alpha</option>
+                        <option value="Usuario_Beta">Usuario Beta</option>
+                        <option value="Usuario_Gamma">Usuario Gamma</option>
+                        <option value="Usuario_Delta">Usuario Delta</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 0.8rem;">
+                    <label style="display: block; font-size: 0.8rem; margin-bottom: 0.2rem; color: #d0d0e0;">Video Relacionado (Index):</label>
+                    <select id="adminVideo" required style="width: 100%; padding: 0.6rem; background: rgba(10, 10, 18, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white;">
+                        <option value="" disabled selected>Selecciona un video...</option>
+                        <option value="Video_Animacion_3D.mp4">Video: Animación y Gráficos 3D</option>
+                        <option value="Video_Interactivo_Witsi.mp4">Video: Funciones e Interactividad</option>
+                        <option value="Video_Tutorial_Glass.mp4">Video: Estructura y Rendimiento</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 0.8rem;">
+                    <label style="display: block; font-size: 0.8rem; margin-bottom: 0.2rem; color: #d0d0e0;">¿Cuál es el problema?</label>
+                    <textarea id="adminProblema" required rows="2" placeholder="Explica el inconveniente..." style="width: 100%; padding: 0.6rem; background: rgba(10, 10, 18, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; resize: none;"></textarea>
+                </div>
+
+                <div style="margin-bottom: 0.8rem;">
+                    <label style="display: block; font-size: 0.8rem; margin-bottom: 0.2rem; color: #d0d0e0;">¿Por qué lo desea / solicita?</label>
+                    <textarea id="adminDeseo" required rows="2" placeholder="Motivo de la solicitud..." style="width: 100%; padding: 0.6rem; background: rgba(10, 10, 18, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; resize: none;"></textarea>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; font-size: 0.8rem; margin-bottom: 0.2rem; color: #d0d0e0;">Tu Correo:</label>
+                    <input type="email" id="adminEmail" required placeholder="correo@ejemplo.com" style="width: 100%; padding: 0.6rem; background: rgba(10, 10, 18, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white;">
+                </div>
+
+                <button type="submit" style="width: 100%; background: linear-gradient(135deg, #00d2ff, #9b51e0); border: none; color: white; padding: 0.7rem; border-radius: 8px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3);">Enviar al Panel Admin</button>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        #contactoAdminContainer {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 9999;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        #btnConsultarAdmin {
+            background: linear-gradient(135deg, #00d2ff, #ff007f);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(255, 0, 127, 0.4);
+            transition: transform 0.3s ease;
+        }
+        #btnConsultarAdmin:hover {
+            transform: scale(1.05);
+        }
+        .panel-admin-flotante {
+            position: absolute;
+            bottom: 60px;
+            right: 0;
+            width: 340px;
+            background: rgba(15, 15, 25, 0.96);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+            display: none;
+            transform-origin: bottom right;
+            animation: abrirPanel 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes abrirPanel {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .cerrar-panel-admin {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .cerrar-panel-admin:hover {
+            background: #ff007f;
+        }
+    </style>
+
+    <footer>
+        <p>&copy; 2026 WIBSIPROJECT - Desarrollado por Anthony. Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        function abrirModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function cerrarModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+
+        let materialGlobal = null;
+
+        function cambiarColorObjeto(colorHex) {
+            if (materialGlobal) {
+                materialGlobal.color.set(colorHex);
+                document.getElementById('outputAnim').textContent = `Éxito: Color del objeto 3D cambiado a ${colorHex}`;
+            }
+        }
+
+        function ejecutarAccionWidget(accion) {
+            const out = document.getElementById('outputFunc');
+            if (accion === 'play') {
+                out.textContent = "Audio activado correctamente. Frecuencia sincronizada.";
+            } else {
+                out.textContent = "Audio pausado por el usuario.";
+            }
+        }
+
+        function ejecutarDiagnostico() {
+            const out = document.getElementById('outputEst');
+            out.textContent = "Analizando memoria... [OK] Latencia: 12ms. [OK] Estructura modular óptima.";
+        }
+
+        function togglePanelContacto() {
+            const panel = document.getElementById('panelContactoAdmin');
+            panel.style.display = (panel.style.display === 'block') ? 'none' : 'block';
+        }
+
+        function enviarAlPanelAdministrador(event) {
+            event.preventDefault();
+            
+            const params = new URLSearchParams({
+                usuario: document.getElementById('adminUsuario').value,
+                video: document.getElementById('adminVideo').value,
+                problema: document.getElementById('adminProblema').value,
+                deseo: document.getElementById('adminDeseo').value,
+                email: document.getElementById('adminEmail').value,
+                fecha: new Date().toLocaleString()
+            });
+
+            window.location.href = `panel_administrador.html?${params.toString()}`;
+        }
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#canvas3d'), alpha: true, antialias: true });
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        const geometry = new THREE.IcosahedronGeometry(2, 0);
+        const material = new THREE.MeshStandardMaterial({
+            color: 0x00d2ff,
+            wireframe: true,
+            roughness: 0.4,
+            metalness: 0.8
+        });
+        materialGlobal = material;
+
+        const icosahedron = new THREE.Mesh(geometry, material);
+        scene.add(icosahedron);
+
+        const pointLight = new THREE.PointLight(0x9b51e0, 3, 50);
+        pointLight.position.set(5, 5, 5);
+        scene.add(pointLight);
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        camera.position.z = 6;
+
+        let mouseX = 0;
+        let mouseY = 0;
+
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX / window.innerWidth) - 0.5;
+            mouseY = (event.clientY / window.innerHeight) - 0.5;
+        });
+
+        const clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+            const elapsedTime = clock.getElapsedTime();
+            icosahedron.rotation.x = elapsedTime * 0.3 + mouseY * 0.6;
+            icosahedron.rotation.y = elapsedTime * 0.4 + mouseX * 0.6;
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>

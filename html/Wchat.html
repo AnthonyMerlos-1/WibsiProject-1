@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../assets/img/chast.png" type="image/png">
+    <title>Wchat - Buzón e IDs</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #0b0f19;
+            color: #f3f4f6;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .wchat-container {
+            width: 100%; max-width: 1250px; height: 100vh;
+            background: rgba(18, 22, 35, 0.85);
+            backdrop-filter: blur(16px);
+            display: flex;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 40px rgba(0, 176, 155, 0.05);
+            position: relative; overflow: hidden;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @media (min-width: 768px) {
+            .wchat-container {
+                height: 92vh; border-radius: 20px;
+                border: 1px solid rgba(255, 255, 255, 0.08);
+            }
+        }
+
+        /* Sidebar */
+        .wchat-sidebar {
+            width: 360px; background: rgba(15, 18, 29, 0.95);
+            border-right: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex; flex-direction: column; flex-shrink: 0; z-index: 2;
+        }
+
+        .wchat-sidebar-header {
+            padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .wchat-logo { display: flex; align-items: center; gap: 12px; }
+        .wchat-logo-icon {
+            width: 38px; height: 38px;
+            background: linear-gradient(135deg, #00b09b, #96c93d);
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            font-weight: 800; color: #fff; font-size: 16px;
+            box-shadow: 0 4px 15px rgba(0, 176, 155, 0.3);
+        }
+        .wchat-logo-text { font-size: 18px; font-weight: 800; color: #fff; }
+        .wchat-logo-text span { color: #00b09b; }
+
+        .wchat-header-actions { display: flex; gap: 6px; }
+        
+        .wchat-action-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #d1d5db; padding: 7px 10px; border-radius: 10px;
+            cursor: pointer; font-size: 11.5px; font-weight: 600;
+            display: flex; align-items: center; gap: 5px;
+            transition: all 0.2s ease; position: relative;
+        }
+        .wchat-action-btn:hover {
+            background: rgba(0, 176, 155, 0.15); border-color: #00b09b; color: #fff;
+        }
+
+        /* Insignia de notificaciones en buzón */
+        .badge-count {
+            background: #ef4444; color: #fff; font-size: 9px;
+            padding: 2px 5px; border-radius: 10px; font-weight: bold;
+        }
+
+        /* Tarjeta de Identificación de Usuario Activo Superior */
+        .user-id-badge-bar {
+            background: rgba(0, 176, 155, 0.07);
+            border-bottom: 1px solid rgba(0, 176, 155, 0.15);
+            padding: 10px 18px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .user-id-info span { font-size: 11px; color: #9ca3af; display: block; }
+        .user-id-info strong { font-size: 12.5px; color: #00b09b; font-family: monospace; letter-spacing: 0.5px; }
+        .copy-id-btn {
+            background: rgba(0, 176, 155, 0.2); border: none; color: #fff;
+            padding: 4px 8px; border-radius: 6px; font-size: 10px; cursor: pointer;
+        }
+        .copy-id-btn:hover { background: #00b09b; }
+
+        .wchat-search-box { padding: 12px 18px; }
+        .wchat-search-input {
+            width: 100%; background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08); padding: 10px 14px;
+            border-radius: 12px; color: #fff; font-size: 13px; outline: none;
+        }
+        .wchat-search-input:focus { border-color: #00b09b; }
+
+        .wchat-chats-list { flex: 1; overflow-y: auto; padding: 0 8px; }
+
+        .wchat-chat-item {
+            display: flex; align-items: center; gap: 14px; padding: 12px 14px;
+            cursor: pointer; border-radius: 12px; margin-bottom: 4px;
+            transition: all 0.2s ease;
+        }
+        .wchat-chat-item:hover { background: rgba(255, 255, 255, 0.04); }
+        .wchat-chat-item.active {
+            background: linear-gradient(90deg, rgba(0, 176, 155, 0.15), rgba(0, 176, 155, 0.03));
+            border-left: 3.5px solid #00b09b;
+        }
+
+        .wchat-avatar {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: linear-gradient(135deg, #4f46e5, #06b6d4);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: #fff; font-size: 14px; flex-shrink: 0; position: relative;
+        }
+        .wchat-status-dot {
+            width: 10px; height: 10px; background: #10b981;
+            border: 2px solid #12151f; border-radius: 50%;
+            position: absolute; bottom: 1px; right: 1px;
+        }
+
+        .wchat-chat-info { flex: 1; min-width: 0; }
+        .wchat-chat-name-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; }
+        .wchat-chat-name { font-size: 14px; font-weight: 600; color: #fff; }
+        .wchat-chat-time { font-size: 11px; color: #6b7280; }
+        .wchat-chat-preview { font-size: 12.5px; color: #9ca3af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Panel Principal */
+        .wchat-main { flex: 1; display: flex; flex-direction: column; background: rgba(13, 16, 25, 0.7); }
+        .wchat-main-header {
+            padding: 16px 24px; background: rgba(18, 22, 35, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .wchat-active-user { display: flex; align-items: center; gap: 14px; }
+        .wchat-active-details h3 { font-size: 15px; color: #fff; margin: 0; font-weight: 600; }
+        .wchat-active-details p { font-size: 12px; color: #00b09b; margin: 0; }
+
+        .wchat-messages-scroll {
+            flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        .wchat-msg {
+            max-width: 65%; padding: 12px 16px; border-radius: 14px; font-size: 14px; line-height: 1.5;
+            position: relative; word-break: break-word; animation: bubblePop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes bubblePop {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .wchat-msg.incoming { background: rgba(26, 30, 45, 0.95); color: #f3f4f6; align-self: flex-start; border-bottom-left-radius: 4px; }
+        .wchat-msg.outgoing { background: linear-gradient(135deg, #00b09b, #00897b); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .wchat-msg-time { font-size: 10px; margin-top: 4px; text-align: right; opacity: 0.7; }
+
+        /* Mensajes de imagen */
+        .wchat-msg.msg-image { padding: 6px; background: rgba(26, 30, 45, 0.95); }
+        .wchat-msg.msg-image.outgoing { background: rgba(0, 137, 123, 0.5); }
+        .wchat-msg-image-content { max-width: 260px; max-height: 320px; border-radius: 10px; display: block; cursor: pointer; }
+
+        /* Mensajes de audio */
+        .wchat-msg.msg-audio { display: flex; flex-direction: column; gap: 4px; min-width: 220px; }
+        .wchat-msg-audio-content { width: 220px; height: 34px; }
+        .wchat-msg-audio-content::-webkit-media-controls-panel { background-color: transparent; }
+
+        /* Stickers: sin fondo de burbuja, tamaño grande */
+        .wchat-msg.msg-sticker { background: transparent !important; padding: 0; font-size: 62px; line-height: 1; box-shadow: none; }
+        .wchat-msg.msg-sticker .wchat-msg-time { text-align: inherit; opacity: 0.6; font-size: 9px; }
+        .wchat-msg.msg-sticker.outgoing { align-items: flex-end; display: flex; flex-direction: column; }
+        .wchat-msg.msg-sticker.incoming { align-items: flex-start; display: flex; flex-direction: column; }
+
+        .wchat-input-bar {
+            padding: 16px 24px; background: rgba(18, 22, 35, 0.9);
+            border-top: 1px solid rgba(255, 255, 255, 0.06); display: flex; align-items: center; gap: 10px;
+            position: relative;
+        }
+        .wchat-text-input {
+            flex: 1; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 12px 18px; border-radius: 12px; color: #fff; font-size: 14px; outline: none;
+        }
+        .wchat-text-input:focus { border-color: #00b09b; }
+        .wchat-send-btn {
+            background: linear-gradient(135deg, #00b09b, #00897b); color: #fff; border: none;
+            padding: 12px 22px; border-radius: 12px; font-weight: 600; cursor: pointer;
+        }
+        .wchat-send-btn:hover { transform: translateY(-1px); }
+
+        .wchat-tool-btn {
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #d1d5db; width: 42px; height: 42px; border-radius: 12px; font-size: 17px;
+            cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .wchat-tool-btn:hover { background: rgba(0, 176, 155, 0.15); border-color: #00b09b; }
+        .wchat-tool-btn.recording {
+            background: #ef4444; border-color: #ef4444; color: #fff;
+            animation: pulseRec 1s infinite;
+        }
+        @keyframes pulseRec {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+            50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+        }
+        .recording-indicator {
+            position: absolute; top: -34px; left: 24px; background: #ef4444; color: #fff;
+            font-size: 11px; padding: 4px 10px; border-radius: 8px; display: flex; align-items: center; gap: 6px;
+        }
+
+        /* Panel de stickers */
+        .sticker-panel {
+            position: absolute; bottom: 68px; right: 24px; background: #161b2c;
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 14px; padding: 12px;
+            display: none; grid-template-columns: repeat(5, 1fr); gap: 6px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 50; width: 240px;
+        }
+        .sticker-panel.active { display: grid; }
+        .sticker-option {
+            font-size: 26px; text-align: center; padding: 6px; border-radius: 8px; cursor: pointer;
+            transition: background 0.15s ease;
+        }
+        .sticker-option:hover { background: rgba(255, 255, 255, 0.08); }
+
+        /* Indicador de "escribiendo..." */
+        .typing-indicator-bar {
+            padding: 0 24px; height: 0; overflow: hidden; display: flex; align-items: center; gap: 8px;
+            color: #9ca3af; font-size: 12.5px; transition: height 0.2s ease;
+        }
+        .typing-indicator-bar.active { height: 30px; }
+        .typing-dots { display: flex; gap: 3px; }
+        .typing-dots span {
+            width: 6px; height: 6px; border-radius: 50%; background: #00b09b;
+            animation: typingBounce 1.2s infinite ease-in-out;
+        }
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typingBounce {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+            30% { transform: translateY(-5px); opacity: 1; }
+        }
+
+        /* Modales Generales */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px);
+            display: flex; justify-content: center; align-items: center; z-index: 100;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-card {
+            background: #161b2c; border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%; max-width: 420px; padding: 24px; border-radius: 18px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5); transform: scale(0.9); transition: transform 0.3s;
+        }
+        .modal-overlay.active .modal-card { transform: scale(1); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .modal-header h3 { font-size: 18px; color: #fff; }
+        .modal-close { background: none; border: none; color: #9ca3af; font-size: 18px; cursor: pointer; }
+        .modal-body p { font-size: 13px; color: #9ca3af; margin-bottom: 14px; }
+        .modal-input {
+            width: 100%; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 11px 14px; border-radius: 10px; color: #fff; font-size: 14px; outline: none; margin-bottom: 16px;
+        }
+        .modal-input:focus { border-color: #00b09b; }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 10px; }
+        .modal-btn-cancel { background: transparent; border: 1px solid rgba(255, 255, 255, 0.1); color: #d1d5db; padding: 9px 16px; border-radius: 10px; cursor: pointer; }
+        .modal-btn-confirm { background: #00b09b; border: none; color: #fff; padding: 9px 18px; border-radius: 10px; cursor: pointer; font-weight: 600; }
+
+        /* Estilos Buzón de Invitaciones */
+        .invite-item {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+            padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
+        }
+        .invite-info h4 { font-size: 13.5px; color: #fff; }
+        .invite-info span { font-size: 11px; color: #00b09b; font-family: monospace; }
+        .invite-actions { display: flex; gap: 6px; }
+        .btn-accept { background: #10b981; border: none; color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+        .btn-reject { background: #ef4444; border: none; color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+
+        .wchat-back-home {
+            position: fixed; top: 16px; right: 24px; background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; padding: 7px 14px; border-radius: 10px;
+            font-size: 12px; text-decoration: none; z-index: 1000; backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="index.html" class="wchat-back-home">🏠 Inicio</a>
+
+    <div class="wchat-container">
+        <!-- Sidebar -->
+        <div class="wchat-sidebar">
+            <div class="wchat-sidebar-header">
+                <div class="wchat-logo">
+                    <div class="wchat-logo-icon">W</div>
+                    <div class="wchat-logo-text">W<span>chat</span></div>
+                </div>
+                <div class="wchat-header-actions">
+                    <button class="wchat-action-btn" onclick="abrirModalId()" title="Enviar Solicitud">➕ ID</button>
+                    <button class="wchat-action-btn" onclick="abrirBuzon()" title="Buzón">
+                        📥 Buzón <span class="badge-count" id="badgeCount">1</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tarjeta con el ID propio del usuario conectado (proviene de la sesión de cuenta.html) -->
+            <div class="user-id-badge-bar">
+                <div class="user-id-info">
+                    <span>Conectado como <strong id="myUserNameDisplay" style="color:#fff;">Usuario</strong> · Tu ID:</span>
+                    <strong id="myUserIdDisplay">--</strong>
+                </div>
+                <button class="copy-id-btn" onclick="copiarMiId()">Copiar</button>
+            </div>
+
+            <div class="wchat-search-box">
+                <input type="text" class="wchat-search-input" placeholder="Buscar en tus chats...">
+            </div>
+
+            <div class="wchat-chats-list" id="chatsList">
+                <div class="wchat-chat-item active" data-chat-id="soporte" onclick="seleccionarChat('soporte', 'Soporte Wchat', this)">
+                    <div class="wchat-avatar">
+                        SW
+                        <div class="wchat-status-dot"></div>
+                    </div>
+                    <div class="wchat-chat-info">
+                        <div class="wchat-chat-name-row">
+                            <span class="wchat-chat-name">Soporte Wchat</span>
+                            <span class="wchat-chat-time">12:00 PM</span>
+                        </div>
+                        <div class="wchat-chat-preview">¡Hola! Ya puedes usar tu ID en cualquier sección.</div>
+                    </div>
+                </div>
+                <!-- Los amigos reales (agregados por ID) se insertan aquí dinámicamente y se guardan en localStorage -->
+            </div>
+        </div>
+
+        <!-- Área Principal de Chat -->
+        <div class="wchat-main">
+            <div class="wchat-main-header">
+                <div class="wchat-active-user">
+                    <div class="wchat-avatar" id="activeChatAvatar">SW</div>
+                    <div class="wchat-active-details">
+                        <h3 id="activeChatName">Soporte Wchat</h3>
+                        <p>● En línea</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="wchat-messages-scroll" id="messagesContainer">
+                <div class="wchat-msg incoming">
+                    ¡Tu ID personal te acompaña a donde vayas dentro del sistema! Las solicitudes de amistad o chats externos llegan directamente a tu buzón. ✨
+                    <div class="wchat-msg-time">12:00 PM</div>
+                </div>
+            </div>
+
+            <div class="typing-indicator-bar" id="typingIndicatorBar">
+                <div class="typing-dots"><span></span><span></span><span></span></div>
+                <span id="typingIndicatorText">escribiendo...</span>
+            </div>
+
+            <div class="wchat-input-bar">
+                <input type="file" id="imageInput" accept="image/*" style="display:none" onchange="manejarImagenSeleccionada(event)">
+
+                <button class="wchat-tool-btn" onclick="document.getElementById('imageInput').click()" title="Enviar imagen">🖼️</button>
+                <button class="wchat-tool-btn" id="stickerToggleBtn" onclick="alternarPanelStickers()" title="Enviar sticker">😀</button>
+                <button class="wchat-tool-btn" id="micBtn" onclick="alternarGrabacionAudio()" title="Enviar audio">🎤</button>
+
+                <div class="sticker-panel" id="stickerPanel"></div>
+
+                <input type="text" class="wchat-text-input" id="messageInput" placeholder="Escribe un mensaje..." onkeydown="if(event.key === 'Enter') enviarMensaje()" oninput="notificarEscribiendo()">
+                <button class="wchat-send-btn" onclick="enviarMensaje()">Enviar ➔</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Agregar por ID -->
+    <div class="modal-overlay" id="friendModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Enviar Solicitud por ID</h3>
+                <button class="modal-close" onclick="cerrarModalId()">✕</button>
+            </div>
+            <div class="modal-body">
+                <p>Escribe el Wchat ID de la persona con la que deseas conectar para enviarle una invitación a su buzón.</p>
+                <input type="text" class="modal-input" id="targetIdInput" placeholder="Ej: WCHAT-USER-7712">
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn-cancel" onclick="cerrarModalId()">Cancelar</button>
+                <button class="modal-btn-confirm" onclick="enviarSolicitudId()">Enviar Invitación</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Buzón de Invitaciones -->
+    <div class="modal-overlay" id="mailboxModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Buzón de Invitaciones</h3>
+                <button class="modal-close" onclick="cerrarBuzon()">✕</button>
+            </div>
+            <div class="modal-body" id="mailboxContent">
+                <!-- Las solicitudes de amistad reales se renderizan aquí desde localStorage -->
+                <p id="mailboxEmptyMsg" style="text-align:center; color:#6b7280; padding: 10px 0;">No tienes solicitudes pendientes.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn-confirm" onclick="cerrarBuzon()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* =====================================================================
+           WCHAT — integrado con las cuentas creadas/logueadas en cuenta.html
+           Claves usadas en localStorage:
+             - wibsitihub_sesion_activa      -> (de cuenta.html) sesión activa
+             - wibsitihub_usuarios_registrados -> (de cuenta.html) todos los usuarios
+             - wchat_solicitudes_amistad     -> array de solicitudes pendientes
+             - wchat_amigos                  -> { [miId]: [ {id, name}, ... ] }
+             - wchat_mensajes                -> { [parKey]: [ {fromId, texto, hora}, ... ] }
+           Como localStorage es compartido por el navegador, dos cuentas distintas
+           logueadas en dos pestañas distintas pueden "enviarse" solicitudes y
+           mensajes entre sí, y el evento 'storage' avisa a la otra pestaña en vivo.
+        ===================================================================== */
+
+        const SESSION_KEY   = 'wibsitihub_sesion_activa';
+        const USERS_KEY     = 'wibsitihub_usuarios_registrados';
+        const REQUESTS_KEY  = 'wchat_solicitudes_amistad';
+        const FRIENDS_KEY   = 'wchat_amigos';
+        const MESSAGES_KEY  = 'wchat_mensajes';
+
+        let miUsuario = null;
+        let miId = null;
+        let chatActivoId = 'soporte';
+
+        // ---------- Utilidades de almacenamiento ----------
+        function leerJSON(clave, porDefecto) {
+            try {
+                const val = JSON.parse(localStorage.getItem(clave));
+                return val === null || val === undefined ? porDefecto : val;
+            } catch (e) {
+                return porDefecto;
+            }
+        }
+        function guardarJSON(clave, valor) {
+            localStorage.setItem(clave, JSON.stringify(valor));
+        }
+        function obtenerUsuarios() { return leerJSON(USERS_KEY, []); }
+        function obtenerSolicitudes() { return leerJSON(REQUESTS_KEY, []); }
+        function guardarSolicitudes(lista) { guardarJSON(REQUESTS_KEY, lista); }
+        function obtenerAmigosMapa() { return leerJSON(FRIENDS_KEY, {}); }
+        function guardarAmigosMapa(mapa) { guardarJSON(FRIENDS_KEY, mapa); }
+        function obtenerMensajesMapa() { return leerJSON(MESSAGES_KEY, {}); }
+        function guardarMensajesMapa(mapa) { guardarJSON(MESSAGES_KEY, mapa); }
+        function parKey(idA, idB) { return [idA, idB].sort().join('___'); }
+        function iniciales(nombre) {
+            return (nombre || '?').trim().split(/\s+/).map(p => p[0]).join('').substring(0, 2).toUpperCase();
+        }
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+
+        // ---------- Sesión: los datos vienen de cuenta.html ----------
+        function obtenerSesionActivaWchat() {
+            // Prioridad 1: sesión de esta pestaña (usuario normal, aislada por pestaña) — igual que en cuenta.html
+            const sesionPestana = sessionStorage.getItem(SESSION_KEY);
+            if (sesionPestana) {
+                try { return JSON.parse(sesionPestana); } catch (e) { /* ignorar */ }
+            }
+            // Prioridad 2: sesión de administrador (se guarda en localStorage, sin cambios)
+            const sesionAdmin = localStorage.getItem(SESSION_KEY);
+            if (sesionAdmin) {
+                try {
+                    const usr = JSON.parse(sesionAdmin);
+                    if (usr && usr.isAdmin) return usr;
+                } catch (e) { /* ignorar */ }
+            }
+            return null;
+        }
+
+        function cargarSesion() {
+            const sesion = obtenerSesionActivaWchat();
+            if (!sesion || !sesion.id) {
+                alert('Debes iniciar sesión en tu cuenta para usar Wchat. Serás redirigido a cuenta.html.');
+                window.location.href = 'cuenta.html';
+                return false;
+            }
+            miUsuario = sesion;
+            miId = sesion.id;
+            document.getElementById('myUserIdDisplay').textContent = miId;
+            document.getElementById('myUserNameDisplay').textContent = sesion.name || 'Usuario';
+            return true;
+        }
+
+        function copiarMiId() {
+            navigator.clipboard.writeText(miId);
+            alert('¡Tu Wchat ID ' + miId + ' ha sido copiado al portapapeles!');
+        }
+
+        // ---------- Buzón / Solicitudes de amistad ----------
+        function abrirBuzon() {
+            renderizarBuzon();
+            document.getElementById('mailboxModal').classList.add('active');
+        }
+        function cerrarBuzon() {
+            document.getElementById('mailboxModal').classList.remove('active');
+        }
+
+        function abrirModalId() {
+            document.getElementById('friendModal').classList.add('active');
+            document.getElementById('targetIdInput').focus();
+        }
+        function cerrarModalId() {
+            document.getElementById('friendModal').classList.remove('active');
+            document.getElementById('targetIdInput').value = '';
+        }
+
+        function enviarSolicitudId() {
+            const idDestino = document.getElementById('targetIdInput').value.trim();
+            if (!idDestino) return;
+
+            if (idDestino === miId) {
+                alert('No puedes enviarte una solicitud a ti mismo.');
+                return;
+            }
+
+            const usuarios = obtenerUsuarios();
+            const usuarioDestino = usuarios.find(u => u.id === idDestino);
+            if (!usuarioDestino) {
+                alert('No existe ningún usuario registrado con ese ID. Verifica que la persona ya tenga una cuenta en cuenta.html.');
+                return;
+            }
+
+            const amigosMapa = obtenerAmigosMapa();
+            const misAmigos = amigosMapa[miId] || [];
+            if (misAmigos.some(a => a.id === idDestino)) {
+                alert('Ya tienes agregado a este usuario como amigo.');
+                cerrarModalId();
+                return;
+            }
+
+            const solicitudes = obtenerSolicitudes();
+            const yaExiste = solicitudes.some(s => s.fromId === miId && s.toId === idDestino);
+            if (yaExiste) {
+                alert('Ya le enviaste una solicitud a este usuario, espera su respuesta.');
+                cerrarModalId();
+                return;
+            }
+
+            solicitudes.push({
+                reqId: 'REQ-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+                fromId: miId,
+                fromName: miUsuario.name,
+                toId: idDestino,
+                fecha: Date.now()
+            });
+            guardarSolicitudes(solicitudes);
+
+            mostrarNotificacionLocal(`¡Invitación enviada con éxito al ID: ${idDestino}!`);
+            cerrarModalId();
+            actualizarBadge();
+        }
+
+        function renderizarBuzon() {
+            const solicitudes = obtenerSolicitudes().filter(s => s.toId === miId);
+            const contenedor = document.getElementById('mailboxContent');
+
+            if (solicitudes.length === 0) {
+                contenedor.innerHTML = `<p id="mailboxEmptyMsg" style="text-align:center; color:#6b7280; padding: 10px 0;">No tienes solicitudes pendientes.</p>`;
+                return;
+            }
+
+            contenedor.innerHTML = solicitudes.map(s => `
+                <div class="invite-item" id="invite-${s.reqId}">
+                    <div class="invite-info">
+                        <h4>${escapeHtml(s.fromName)}</h4>
+                        <span>ID: ${escapeHtml(s.fromId)}</span>
+                    </div>
+                    <div class="invite-actions">
+                        <button class="btn-accept" onclick="aceptarInvitacion('${s.reqId}')">Aceptar</button>
+                        <button class="btn-reject" onclick="rechazarInvitacion('${s.reqId}')">Rechazar</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function aceptarInvitacion(reqId) {
+            const solicitudes = obtenerSolicitudes();
+            const solicitud = solicitudes.find(s => s.reqId === reqId);
+            if (!solicitud) return;
+
+            // Agregar amistad en ambos sentidos para que ambas cuentas se vean en su lista
+            const amigosMapa = obtenerAmigosMapa();
+            amigosMapa[solicitud.toId] = amigosMapa[solicitud.toId] || [];
+            amigosMapa[solicitud.fromId] = amigosMapa[solicitud.fromId] || [];
+
+            if (!amigosMapa[solicitud.toId].some(a => a.id === solicitud.fromId)) {
+                amigosMapa[solicitud.toId].push({ id: solicitud.fromId, name: solicitud.fromName });
+            }
+            const usuarios = obtenerUsuarios();
+            const usuarioReceptor = usuarios.find(u => u.id === solicitud.toId);
+            const nombreReceptor = usuarioReceptor ? usuarioReceptor.name : 'Usuario';
+            if (!amigosMapa[solicitud.fromId].some(a => a.id === solicitud.toId)) {
+                amigosMapa[solicitud.fromId].push({ id: solicitud.toId, name: nombreReceptor });
+            }
+            guardarAmigosMapa(amigosMapa);
+
+            // Quitar la solicitud ya procesada
+            guardarSolicitudes(solicitudes.filter(s => s.reqId !== reqId));
+
+            renderizarBuzon();
+            actualizarBadge();
+            renderizarListaChats();
+            cerrarBuzon();
+            mostrarNotificacionLocal(`Ahora eres amigo de ${solicitud.fromName}.`);
+        }
+
+        function rechazarInvitacion(reqId) {
+            const solicitudes = obtenerSolicitudes().filter(s => s.reqId !== reqId);
+            guardarSolicitudes(solicitudes);
+            renderizarBuzon();
+            actualizarBadge();
+        }
+
+        function actualizarBadge() {
+            const pendientes = obtenerSolicitudes().filter(s => s.toId === miId).length;
+            const badge = document.getElementById('badgeCount');
+            badge.textContent = pendientes;
+            badge.style.display = pendientes === 0 ? 'none' : 'inline-block';
+        }
+
+        // ---------- Lista de chats / amigos (persistente) ----------
+        function textoPrevioMensaje(m) {
+            if (!m) return 'Conectados mediante Wchat ID.';
+            const tipo = m.tipo || 'text';
+            if (tipo === 'image') return '📷 Imagen';
+            if (tipo === 'audio') return '🎤 Mensaje de voz';
+            if (tipo === 'sticker') return `${m.contenido} Sticker`;
+            return m.texto !== undefined ? m.texto : m.contenido;
+        }
+
+        function renderizarListaChats() {
+            const listaChats = document.getElementById('chatsList');
+            // Conservar el chat de soporte, quitar el resto para volver a pintarlo
+            listaChats.querySelectorAll('.wchat-chat-item[data-chat-id]:not([data-chat-id="soporte"])').forEach(el => el.remove());
+
+            const amigosMapa = obtenerAmigosMapa();
+            const misAmigos = amigosMapa[miId] || [];
+            const mensajesMapa = obtenerMensajesMapa();
+
+            misAmigos.forEach(amigo => {
+                const clave = parKey(miId, amigo.id);
+                const historial = mensajesMapa[clave] || [];
+                const ultimo = historial[historial.length - 1];
+                const previa = textoPrevioMensaje(ultimo);
+                const hora = ultimo ? ultimo.hora : '';
+
+                const item = document.createElement('div');
+                item.className = 'wchat-chat-item';
+                item.setAttribute('data-chat-id', amigo.id);
+                item.setAttribute('onclick', `seleccionarChat('${amigo.id}', ${JSON.stringify(amigo.name)}, this)`);
+                item.innerHTML = `
+                    <div class="wchat-avatar" style="background: linear-gradient(135deg, #10b981, #3b82f6);">
+                        ${iniciales(amigo.name)}
+                        <div class="wchat-status-dot"></div>
+                    </div>
+                    <div class="wchat-chat-info">
+                        <div class="wchat-chat-name-row">
+                            <span class="wchat-chat-name">${escapeHtml(amigo.name)}</span>
+                            <span class="wchat-chat-time">${escapeHtml(hora)}</span>
+                        </div>
+                        <div class="wchat-chat-preview">${escapeHtml(previa)}</div>
+                    </div>
+                `;
+                listaChats.appendChild(item);
+            });
+
+            // Si el chat activo sigue existiendo, refrescar su vista de mensajes
+            if (chatActivoId !== 'soporte') {
+                const sigueSiendoAmigo = misAmigos.some(a => a.id === chatActivoId);
+                if (!sigueSiendoAmigo) {
+                    // El amigo ya no está (poco común); volver a soporte
+                    const soporteEl = listaChats.querySelector('[data-chat-id="soporte"]');
+                    if (soporteEl) seleccionarChat('soporte', 'Soporte Wchat', soporteEl);
+                }
+            }
+        }
+
+        function seleccionarChat(chatId, nombre, elemento) {
+            document.querySelectorAll('.wchat-chat-item').forEach(item => item.classList.remove('active'));
+            if (elemento) elemento.classList.add('active');
+
+            // Si se estaba grabando un audio en el chat anterior, se detiene al cambiar de chat
+            if (grabando) detenerGrabacion();
+            document.getElementById('stickerPanel').classList.remove('active');
+            document.getElementById('typingIndicatorBar').classList.remove('active');
+
+            chatActivoId = chatId;
+            document.getElementById('activeChatName').textContent = nombre;
+            document.getElementById('activeChatAvatar').textContent = iniciales(nombre);
+
+            renderizarMensajes();
+        }
+
+        function renderizarBurbujaMensaje(m) {
+            const esMio = m.fromId === miId;
+            const tipo = m.tipo || 'text';
+            let contenidoHtml;
+            let claseTipo = '';
+
+            if (tipo === 'image') {
+                claseTipo = 'msg-image';
+                contenidoHtml = `<img src="${m.contenido}" class="wchat-msg-image-content" onclick="window.open(this.src, '_blank')">`;
+            } else if (tipo === 'audio') {
+                claseTipo = 'msg-audio';
+                contenidoHtml = `<audio controls class="wchat-msg-audio-content" src="${m.contenido}"></audio>`;
+            } else if (tipo === 'sticker') {
+                claseTipo = 'msg-sticker';
+                contenidoHtml = m.contenido;
+            } else {
+                contenidoHtml = escapeHtml(m.texto !== undefined ? m.texto : m.contenido);
+            }
+
+            return `
+                <div class="wchat-msg ${esMio ? 'outgoing' : 'incoming'} ${claseTipo}">
+                    ${contenidoHtml}
+                    <div class="wchat-msg-time">${escapeHtml(m.hora)}</div>
+                </div>
+            `;
+        }
+
+        function renderizarMensajes() {
+            const container = document.getElementById('messagesContainer');
+
+            if (chatActivoId === 'soporte') {
+                container.innerHTML = `
+                    <div class="wchat-msg incoming">
+                        ¡Tu ID personal te acompaña a donde vayas dentro del sistema! Las solicitudes de amistad llegan directamente a tu buzón. ✨
+                        <div class="wchat-msg-time">12:00 PM</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const clave = parKey(miId, chatActivoId);
+            const mensajesMapa = obtenerMensajesMapa();
+            const historial = mensajesMapa[clave] || [];
+
+            if (historial.length === 0) {
+                container.innerHTML = `<div class="wchat-msg incoming">Ya son amigos en Wchat. ¡Escribe el primer mensaje! 👋</div>`;
+                return;
+            }
+
+            container.innerHTML = historial.map(renderizarBurbujaMensaje).join('');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // ---------- Envío unificado de mensajes (texto / imagen / audio / sticker) ----------
+        function agregarMensajeAlChat(tipo, contenido) {
+            const ahora = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            if (chatActivoId === 'soporte') {
+                // Chat de soporte: solo se ve localmente, no se guarda como conversación real
+                const container = document.getElementById('messagesContainer');
+                const msgDiv = document.createElement('div');
+                let inner;
+                let claseTipo = '';
+                if (tipo === 'image') { claseTipo = 'msg-image'; inner = `<img src="${contenido}" class="wchat-msg-image-content" onclick="window.open(this.src, '_blank')">`; }
+                else if (tipo === 'audio') { claseTipo = 'msg-audio'; inner = `<audio controls class="wchat-msg-audio-content" src="${contenido}"></audio>`; }
+                else if (tipo === 'sticker') { claseTipo = 'msg-sticker'; inner = contenido; }
+                else { inner = escapeHtml(contenido); }
+                msgDiv.className = `wchat-msg outgoing ${claseTipo}`;
+                msgDiv.innerHTML = `${inner}<div class="wchat-msg-time">${ahora}</div>`;
+                container.appendChild(msgDiv);
+                container.scrollTop = container.scrollHeight;
+                return;
+            }
+
+            const clave = parKey(miId, chatActivoId);
+            const mensajesMapa = obtenerMensajesMapa();
+            mensajesMapa[clave] = mensajesMapa[clave] || [];
+            mensajesMapa[clave].push({ fromId: miId, tipo: tipo, contenido: contenido, hora: ahora });
+
+            try {
+                guardarMensajesMapa(mensajesMapa);
+            } catch (e) {
+                mensajesMapa[clave].pop();
+                alert('No se pudo enviar: el archivo es demasiado grande para el almacenamiento del navegador. Prueba con uno más pequeño o más corto.');
+                return;
+            }
+
+            // Al enviar, se limpia el propio aviso de "escribiendo..."
+            const mapaTyping = leerJSON(TYPING_KEY, {});
+            delete mapaTyping[clave];
+            guardarJSON(TYPING_KEY, mapaTyping);
+
+            renderizarMensajes();
+            renderizarListaChats();
+            const item = document.querySelector(`.wchat-chat-item[data-chat-id="${chatActivoId}"]`);
+            if (item) item.classList.add('active');
+        }
+
+        function enviarMensaje() {
+            const input = document.getElementById('messageInput');
+            const texto = input.value.trim();
+            if (!texto) return;
+            agregarMensajeAlChat('text', texto);
+            input.value = '';
+        }
+
+        // ---------- Imágenes ----------
+        function manejarImagenSeleccionada(event) {
+            const archivo = event.target.files[0];
+            event.target.value = '';
+            if (!archivo) return;
+            if (!archivo.type.startsWith('image/')) {
+                alert('Selecciona un archivo de imagen válido.');
+                return;
+            }
+            if (chatActivoId === 'soporte') {
+                mostrarNotificacionLocal('Selecciona un chat con un amigo real para enviar imágenes que se guarden.');
+            }
+
+            const lector = new FileReader();
+            lector.onload = function(e) {
+                comprimirImagen(e.target.result, function(dataUrlComprimido) {
+                    agregarMensajeAlChat('image', dataUrlComprimido);
+                });
+            };
+            lector.readAsDataURL(archivo);
+        }
+
+        function comprimirImagen(dataUrl, callback) {
+            const img = new Image();
+            img.onload = function() {
+                const MAX_LADO = 720;
+                let w = img.width, h = img.height;
+                if (w > MAX_LADO || h > MAX_LADO) {
+                    if (w > h) { h = Math.round(h * (MAX_LADO / w)); w = MAX_LADO; }
+                    else { w = Math.round(w * (MAX_LADO / h)); h = MAX_LADO; }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = w;
+                canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                callback(canvas.toDataURL('image/jpeg', 0.72));
+            };
+            img.src = dataUrl;
+        }
+
+        // ---------- Stickers ----------
+        const LISTA_STICKERS = ['😀','😂','😍','😎','🥳','👍','🔥','❤️','🎉','😢','😮','🙌','💯','🤔','👏','🙏','😴','🥰','😅','🤩'];
+
+        function poblarPanelStickers() {
+            const panel = document.getElementById('stickerPanel');
+            panel.innerHTML = LISTA_STICKERS.map(s => `<div class="sticker-option" onclick="enviarSticker('${s}')">${s}</div>`).join('');
+        }
+
+        function alternarPanelStickers() {
+            document.getElementById('stickerPanel').classList.toggle('active');
+        }
+
+        function enviarSticker(emoji) {
+            agregarMensajeAlChat('sticker', emoji);
+            document.getElementById('stickerPanel').classList.remove('active');
+        }
+
+        document.addEventListener('click', function(e) {
+            const panel = document.getElementById('stickerPanel');
+            const boton = document.getElementById('stickerToggleBtn');
+            if (panel && panel.classList.contains('active') && !panel.contains(e.target) && e.target !== boton) {
+                panel.classList.remove('active');
+            }
+        });
+
+        // ---------- Audios ----------
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let grabando = false;
+        let recordingStartTime = 0;
+        let recordingTimerInterval = null;
+
+        function alternarGrabacionAudio() {
+            if (chatActivoId === 'soporte') {
+                alert('Selecciona un chat con un amigo real para enviar audios.');
+                return;
+            }
+            if (!grabando) iniciarGrabacion();
+            else detenerGrabacion();
+        }
+
+        function iniciarGrabacion() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === 'undefined') {
+                alert('Tu navegador no soporta la grabación de audio.');
+                return;
+            }
+            navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
+                audioChunks = [];
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.addEventListener('dataavailable', function(e) { audioChunks.push(e.data); });
+                mediaRecorder.addEventListener('stop', function() {
+                    stream.getTracks().forEach(t => t.stop());
+                    const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+                    const lector = new FileReader();
+                    lector.onload = function(e) {
+                        agregarMensajeAlChat('audio', e.target.result);
+                    };
+                    lector.readAsDataURL(blob);
+                });
+                mediaRecorder.start();
+                grabando = true;
+                recordingStartTime = Date.now();
+                document.getElementById('micBtn').classList.add('recording');
+                document.getElementById('micBtn').textContent = '⏹️';
+                mostrarIndicadorGrabando();
+            }).catch(function() {
+                alert('No se pudo acceder al micrófono. Revisa los permisos del navegador para este sitio.');
+            });
+        }
+
+        function detenerGrabacion() {
+            if (mediaRecorder && grabando) {
+                mediaRecorder.stop();
+            }
+            grabando = false;
+            document.getElementById('micBtn').classList.remove('recording');
+            document.getElementById('micBtn').textContent = '🎤';
+            ocultarIndicadorGrabando();
+        }
+
+        function mostrarIndicadorGrabando() {
+            ocultarIndicadorGrabando();
+            const ind = document.createElement('div');
+            ind.className = 'recording-indicator';
+            ind.id = 'recordingIndicator';
+            ind.innerHTML = '🔴 Grabando... <span id="recordingTimer">0:00</span>';
+            document.querySelector('.wchat-input-bar').appendChild(ind);
+            recordingTimerInterval = setInterval(function() {
+                const seg = Math.floor((Date.now() - recordingStartTime) / 1000);
+                const m = Math.floor(seg / 60), s = seg % 60;
+                const el = document.getElementById('recordingTimer');
+                if (el) el.textContent = `${m}:${s.toString().padStart(2, '0')}`;
+            }, 500);
+        }
+
+        function ocultarIndicadorGrabando() {
+            clearInterval(recordingTimerInterval);
+            const el = document.getElementById('recordingIndicator');
+            if (el) el.remove();
+        }
+
+        // ---------- Indicador de "escribiendo..." ----------
+        const TYPING_KEY = 'wchat_escribiendo';
+        let ultimoTypingEnviado = 0;
+        let typingHideTimeout = null;
+
+        function notificarEscribiendo() {
+            if (chatActivoId === 'soporte') return;
+            const ahora = Date.now();
+            if (ahora - ultimoTypingEnviado < 700) return;
+            ultimoTypingEnviado = ahora;
+
+            const clave = parKey(miId, chatActivoId);
+            const mapaTyping = leerJSON(TYPING_KEY, {});
+            mapaTyping[clave] = { fromId: miId, ts: ahora };
+            guardarJSON(TYPING_KEY, mapaTyping);
+        }
+
+        function mostrarIndicadorEscribiendo(nombre) {
+            const bar = document.getElementById('typingIndicatorBar');
+            document.getElementById('typingIndicatorText').textContent = `${nombre} está escribiendo...`;
+            bar.classList.add('active');
+            clearTimeout(typingHideTimeout);
+            typingHideTimeout = setTimeout(function() {
+                bar.classList.remove('active');
+            }, 2500);
+        }
+
+        function manejarEventoTyping() {
+            if (chatActivoId === 'soporte') return;
+            const clave = parKey(miId, chatActivoId);
+            const mapaTyping = leerJSON(TYPING_KEY, {});
+            const registro = mapaTyping[clave];
+            if (registro && registro.fromId === chatActivoId && (Date.now() - registro.ts) < 3000) {
+                const amigosMapa = obtenerAmigosMapa();
+                const amigo = (amigosMapa[miId] || []).find(a => a.id === chatActivoId);
+                mostrarIndicadorEscribiendo(amigo ? amigo.name : 'Tu amigo');
+            }
+        }
+
+        function mostrarNotificacionLocal(mensaje) {
+            const existente = document.querySelector('.wchat-toast-local');
+            if (existente) existente.remove();
+
+            const toast = document.createElement('div');
+            toast.className = 'wchat-toast-local';
+            toast.style.cssText = 'position:fixed; bottom:20px; right:20px; background:#161b2c; border:1px solid rgba(255,255,255,0.15); color:#fff; padding:12px 18px; border-radius:10px; box-shadow:0 10px 30px rgba(0,0,0,0.5); z-index:1000; font-size:13px; max-width:320px;';
+            toast.textContent = mensaje;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.transition = 'opacity 0.4s ease';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 400);
+            }, 3000);
+        }
+
+        // ---------- Sincronización en vivo entre pestañas (misma cuenta o cuentas distintas) ----------
+        window.addEventListener('storage', function(evento) {
+            if (evento.key === REQUESTS_KEY) {
+                actualizarBadge();
+                if (document.getElementById('mailboxModal').classList.contains('active')) {
+                    renderizarBuzon();
+                }
+                const pendientesAhora = obtenerSolicitudes().filter(s => s.toId === miId);
+                if (pendientesAhora.length > 0) {
+                    mostrarNotificacionLocal('📥 ¡Tienes una nueva solicitud de amistad en tu buzón!');
+                }
+            }
+            if (evento.key === FRIENDS_KEY) {
+                renderizarListaChats();
+            }
+            if (evento.key === MESSAGES_KEY) {
+                renderizarListaChats();
+                if (chatActivoId !== 'soporte') renderizarMensajes();
+            }
+            if (evento.key === TYPING_KEY) {
+                manejarEventoTyping();
+            }
+        });
+
+        // ---------- Inicialización ----------
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!cargarSesion()) return;
+            actualizarBadge();
+            poblarPanelStickers();
+            renderizarListaChats();
+            renderizarMensajes();
+        });
+    </script>
+</body>
+</html>

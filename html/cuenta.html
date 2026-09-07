@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Cuenta - WIBSIPROJECT</title>
+    <link rel="icon" type="image/png" href="../assets/img/cuenta.png">
+    <!-- SDK de Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- SDK de Google reCAPTCHA -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0b0b10;
+            color: #f3f4f6;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            position: relative;
+            perspective: 1500px;
+        }
+
+        .animated-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            background: radial-gradient(circle at 50% 50%, #121218 0%, #07070a 100%);
+        }
+
+        .floating-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.45;
+            animation: moveBlob 15s infinite alternate ease-in-out;
+        }
+
+        .blob-1 { width: 450px; height: 450px; background: #6366f1; top: -10%; left: -10%; animation-duration: 18s; }
+        .blob-2 { width: 400px; height: 400px; background: #a855f7; bottom: -15%; right: -10%; animation-duration: 22s; animation-delay: -5s; }
+
+        @keyframes moveBlob {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(60px, 40px) scale(1.1); }
+            100% { transform: translate(-40px, 80px) scale(0.95); }
+        }
+
+        .book-container {
+            position: relative;
+            width: 100%;
+            max-width: 440px;
+            background: rgba(18, 18, 24, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+            z-index: 10;
+            overflow: hidden;
+            box-sizing: border-box;
+            transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes bubbleEntrance {
+            0% { transform: scale(0.4) translateY(60px) rotateX(15deg); opacity: 0; }
+            70% { transform: scale(1.02) translateY(-10px) rotateX(-5deg); opacity: 1; }
+            100% { transform: scale(1) translateY(0) rotateX(0); opacity: 1; }
+        }
+
+        .bubble-effect {
+            animation: bubbleEntrance 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            transform-origin: bottom center;
+        }
+
+        .book-pages-wrapper {
+            display: flex;
+            width: 200%;
+            transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+
+        .book-page {
+            width: 50%;
+            padding: 35px;
+            box-sizing: border-box;
+            flex-shrink: 0;
+        }
+
+        .hub-logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .hub-logo-ring {
+            position: relative;
+            width: 85px;
+            height: 85px;
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.2) 0%, rgba(147, 51, 234, 0.2) 50%, rgba(219, 39, 119, 0.2) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(147, 51, 234, 0.3);
+            margin-bottom: 12px;
+            animation: pulseLogo 3s infinite ease-in-out;
+            overflow: hidden;
+            border: 2px solid rgba(139, 92, 246, 0.4);
+        }
+
+        @keyframes pulseLogo {
+            0%, 100% { transform: scale(1); box-shadow: 0 10px 30px rgba(147, 51, 234, 0.3); }
+            50% { transform: scale(1.05); box-shadow: 0 15px 35px rgba(219, 39, 119, 0.5); }
+        }
+
+        .hub-logo-graphic {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000000;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+        .hub-logo-graphic img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .hub-logo-title {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: #ffffff;
+        }
+
+        .hub-logo-title span { color: #818cf8; }
+        .hub-logo-subtitle { font-size: 12px; color: #9ca3af; margin-top: 2px; }
+
+        .page-navigation {
+            display: flex;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .page-nav-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #9ca3af;
+            padding: 10px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            border-radius: 9px;
+            transition: all 0.3s ease;
+        }
+
+        .page-nav-btn.active {
+            background: #6366f1;
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 18px 0;
+            color: #6b7280;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .auth-divider::before, .auth-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .auth-divider:not(:empty)::before { margin-right: .75em; }
+        .auth-divider:not(:empty)::after { margin-left: .75em; }
+
+        .google-btn-wrapper {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+
+        .form-group { margin-bottom: 16px; }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            color: #9ca3af;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+        }
+
+        .recaptcha-wrapper {
+            display: flex;
+            justify-content: center;
+            margin: 12px 0;
+            transform: scale(0.9);
+            transform-origin: 0 0;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 8px;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .auth-btn:hover { opacity: 0.95; transform: translateY(-1px); }
+        .auth-btn:active { transform: scale(0.98); }
+
+        .auth-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        .forgot-pass-link {
+            display: block;
+            text-align: right;
+            margin-top: -8px;
+            margin-bottom: 14px;
+            font-size: 12px;
+            color: #818cf8;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .forgot-pass-link:hover { text-decoration: underline; }
+
+        .profile-view { text-align: center; }
+
+        .profile-avatar-wrapper {
+            position: relative;
+            width: 85px;
+            height: 85px;
+            margin: 0 auto 15px auto;
+            cursor: pointer;
+        }
+
+        .profile-avatar-large {
+            width: 85px;
+            height: 85px;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+            background-size: cover;
+            background-position: center;
+            overflow: hidden;
+        }
+
+        .profile-avatar-wrapper::after {
+            content: '📷';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: #121218;
+            border: 1px solid rgba(255,255,255,0.2);
+            font-size: 11px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-name { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+        .profile-email { font-size: 12px; color: #9ca3af; margin-bottom: 8px; }
+        
+        .profile-id-badge {
+            font-size: 11px;
+            color: #818cf8;
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px dashed rgba(99, 102, 241, 0.4);
+            padding: 4px 10px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-bottom: 15px;
+            font-family: monospace;
+            letter-spacing: 0.5px;
+        }
+
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-item span { display: block; }
+        .stat-value { font-size: 14px; font-weight: bold; color: #f3f4f6; }
+        .stat-label { font-size: 10px; color: #9ca3af; margin-top: 2px; }
+
+        .admin-badge {
+            background: rgba(99, 102, 241, 0.2);
+            color: #818cf8;
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .back-home-link {
+            display: inline-block;
+            margin-top: 15px;
+            color: #9ca3af;
+            text-decoration: none;
+            font-size: 12px;
+            transition: color 0.2s;
+        }
+        .back-home-link:hover { color: #6366f1; }
+
+        .hidden { display: none !important; }
+
+        .auth-warning-banner {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            font-weight: 600;
+            font-size: 13px;
+            animation: dropDownAlert 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        @keyframes dropDownAlert {
+            0% { transform: translate(-50%, -40px); opacity: 0; }
+            100% { transform: translate(-50%, 0); opacity: 1; }
+        }
+
+        .account-toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #121218;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            padding: 12px 18px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            animation: slideInToast 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 13px;
+        }
+
+        @keyframes slideInToast {
+            from { transform: translateY(80px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* ============ MODAL RECUPERAR CONTRASEÑA ============ */
+        .modal-overlay-recuperar {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 16px;
+        }
+        .modal-overlay-recuperar.show { display: flex; }
+        .modal-box-recuperar {
+            width: 100%;
+            max-width: 380px;
+            background: rgba(18, 18, 24, 0.97);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+            position: relative;
+            animation: bubbleEntrance 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        .modal-close-recuperar {
+            position: absolute;
+            top: 14px;
+            right: 16px;
+            cursor: pointer;
+            color: #9ca3af;
+            font-size: 18px;
+            line-height: 1;
+            background: none;
+            border: none;
+        }
+        .modal-close-recuperar:hover { color: #fff; }
+        .modal-icon-recuperar {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            background: rgba(99,102,241,0.16);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 14px;
+            font-size: 22px;
+        }
+        .modal-box-recuperar h3 {
+            margin: 0 0 6px 0;
+            font-size: 17px;
+            color: #fff;
+        }
+        .modal-box-recuperar p.sub {
+            margin: 0 0 16px 0;
+            font-size: 12.5px;
+            color: #9ca3af;
+            line-height: 1.5;
+        }
+        .recuperar-error-msg {
+            display: none;
+            color: #f87171;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 6px 0 0;
+            align-items: center;
+            gap: 6px;
+        }
+        .recuperar-exito-box {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .recuperar-exito-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: rgba(16, 185, 129, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            font-size: 24px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="animated-background">
+        <div class="floating-blob blob-1"></div>
+        <div class="floating-blob blob-2"></div>
+    </div>
+
+    <!-- Contenedor principal estilo libro con animación burbuja -->
+    <div class="book-container bubble-effect" id="bookContainer">
+        
+        <!-- PÁGINAS DE AUTENTICACIÓN -->
+        <div id="authSection">
+            <div class="book-pages-wrapper" id="pagesWrapper">
+                
+                <!-- PÁGINA 1: INICIAR SESIÓN -->
+                <div class="book-page">
+                    <div class="hub-logo-container" onclick="window.location.reload()" style="cursor: pointer;" title="Recargar página">
+                        <div class="hub-logo-ring">
+                            <div class="hub-logo-graphic">
+                                <img src="../assets/img/logwiti.png" alt="Logo Wibsitihub">
+                            </div>
+                        </div>
+                        <div class="hub-logo-title">WIBSI<span>PROJECT</span></div>
+                        <div class="hub-logo-subtitle">Acceso de Cuentas</div>
+                    </div>
+
+                    <div class="page-navigation">
+                        <button class="page-nav-btn active">Iniciar Sesión</button>
+                        <button class="page-nav-btn" onclick="pasarPagina('register')">Registrarse →</button>
+                    </div>
+
+                    <div class="google-btn-wrapper">
+                        <div id="g_id_onload"
+                            data-client_id="913264385243-5niaqo5la6q46o1t65qs7jaufr753euh.apps.googleusercontent.com"
+                            data-callback="handleGoogleSignIn"
+                            data-auto_prompt="false">
+                        </div>
+                        <div class="g_id_signin"
+                            data-type="standard"
+                            data-shape="pill"
+                            data-theme="filled_black"
+                            data-text="signin_with"
+                            data-size="large"
+                            data-logo_alignment="left">
+                        </div>
+                    </div>
+
+                    <div class="auth-divider">o correo electrónico</div>
+
+                    <form id="loginForm" onsubmit="ejecutarLogin(event)">
+                        <div class="form-group">
+                            <label>Correo electrónico</label>
+                            <input type="email" id="loginEmail" placeholder="tu@gmail.com" required autocomplete="email">
+                        </div>
+                        <div class="form-group">
+                            <label>Contraseña</label>
+                            <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+                        </div>
+
+                        <a href="#" class="forgot-pass-link" onclick="abrirModalRecuperacion(event)">¿Olvidaste tu contraseña?</a>
+
+                        <!-- reCAPTCHA dinámico visible y funcional exclusivo para el Administrador -->
+                        <div id="recaptchaContainer" class="form-group hidden">
+                            <label style="margin-bottom: 6px; color: #818cf8; font-weight: 600;">Verificación de seguridad (Semáforos / Pasos)</label>
+                            <div class="recaptcha-wrapper">
+                                <div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="auth-btn">Iniciar Sesión ✦</button>
+                    </form>
+
+                    <div style="text-align: center;">
+                        <a href="index.html" class="back-home-link">← Volver al inicio</a>
+                    </div>
+                </div>
+
+                <!-- PÁGINA 2: REGISTRARSE -->
+                <div class="book-page">
+                    <div class="hub-logo-container" onclick="window.location.reload()" style="cursor: pointer;" title="Recargar página">
+                        <div class="hub-logo-ring">
+                            <div class="hub-logo-graphic">
+                                <img src="../assets/img/logwiti.png" alt="Logo WIBSIPROJECT">
+                            </div>
+                        </div>
+                        <div class="hub-logo-title">WIBSI<span>PROJECT</span></div>
+                        <div class="hub-logo-subtitle">Registro de Nuevo Miembro</div>
+                    </div>
+
+                    <div class="page-navigation">
+                        <button class="page-nav-btn" onclick="pasarPagina('login')">← Iniciar Sesión</button>
+                        <button class="page-nav-btn active">Registrarse</button>
+                    </div>
+
+                    <form id="registerForm" onsubmit="ejecutarRegistro(event)" style="margin-top: 15px;">
+                        <div class="form-group">
+                            <label>Nombre de Usuario</label>
+                            <input type="text" id="regName" placeholder="Tu Nombre" required autocomplete="name">
+                        </div>
+                        <div class="form-group">
+                            <label>Correo electrónico</label>
+                            <input type="email" id="regEmail" placeholder="tu@gmail.com" required autocomplete="email">
+                        </div>
+                        <div class="form-group">
+                            <label>Contraseña</label>
+                            <input type="password" id="regPassword" placeholder="••••••••" required autocomplete="new-password">
+                        </div>
+                        <button type="submit" class="auth-btn">Crear Cuenta ✦</button>
+                    </form>
+
+                    <div style="text-align: center;">
+                        <a href="index.html" class="back-home-link">← Volver al inicio</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- VISTA DE PERFIL -->
+        <div id="profileSection" class="profile-view hidden" style="padding: 35px;">
+            <div class="hub-logo-container" style="margin-bottom: 20px;">
+                <div class="hub-logo-ring" style="width: 50px; height: 50px;">
+                    <div class="hub-logo-graphic">
+                        <img src="../assets/img/logwiti.png" alt="Logo WIBSIPROJECT">
+                    </div>
+                </div>
+            </div>
+
+            <input type="file" id="fileInputAvatar" accept="image/*" style="display: none;" onchange="cambiarFotoPerfil(event)">
+            
+            <div class="profile-avatar-wrapper" onclick="document.getElementById('fileInputAvatar').click()" title="Haz clic para cambiar tu foto de perfil">
+                <div class="profile-avatar-large" id="profileInitials">AM</div>
+            </div>
+
+            <div class="profile-name" id="profileDisplayName">Usuario</div>
+            <div class="profile-email" id="profileDisplayEmail">tu@gmail.com</div>
+            
+            <div>
+                <span class="profile-id-badge" id="profileDisplayId">ID: --</span>
+            </div>
+
+            <div id="adminBadgeContainer" class="hidden">
+                <span class="admin-badge">⚡ ACCESO ADMINISTRADOR</span>
+            </div>
+
+            <div class="profile-stats">
+                <div class="stat-item" id="statRangoBox">
+                    <span class="stat-value" id="statRango">Usuario</span>
+                    <span class="stat-label">Rango</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="statEstado">Activo</span>
+                    <span class="stat-label">Estado</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="statTiempoActivo">0s</span>
+                    <span class="stat-label">Tiempo Activo</span>
+                </div>
+            </div>
+
+            <button class="auth-btn" style="background: linear-gradient(135deg, #00b09b, #00897b); box-shadow: 0 4px 15px rgba(0,176,155,0.4);" onclick="window.location.href='Wchat.html'">
+                💬 Ir a Wchat
+            </button>
+
+            <button class="auth-btn" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); margin-top: 10px;" onclick="cerrarSesion()">
+                Cerrar Sesión ✕
+            </button>
+
+            <div style="text-align: center;">
+                <a href="index.html" class="back-home-link">← Volver al inicio de WIBSIPROJECT</a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ============ MODAL RECUPERAR CONTRASEÑA ============ -->
+    <div class="modal-overlay-recuperar" id="modalRecuperar">
+        <div class="modal-box-recuperar">
+            <button type="button" class="modal-close-recuperar" onclick="cerrarModalRecuperacion()">✕</button>
+
+            <div id="recuperarFormWrap">
+                <div class="modal-icon-recuperar">🔑</div>
+                <h3>Recuperar contraseña</h3>
+                <p class="sub">Ingresa el correo con el que te registraste y te enviaremos un enlace para restablecer tu contraseña.</p>
+
+                <div class="form-group">
+                    <label>Correo electrónico</label>
+                    <input type="email" class="" id="recuperarEmailInput" placeholder="tu@gmail.com" style="width:100%; padding:12px 14px; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:#fff; font-size:14px; box-sizing:border-box;" onkeypress="if(event.key==='Enter')enviarRecuperacionPassword()">
+                </div>
+
+                <p class="recuperar-error-msg" id="recuperarErrorMsg">
+                    <span>⚠️</span> <span id="recuperarErrorTexto"></span>
+                </p>
+
+                <button type="button" class="auth-btn" id="btnEnviarRecuperacion" style="margin-top:14px;" onclick="enviarRecuperacionPassword()">
+                    Enviar enlace de recuperación
+                </button>
+            </div>
+
+            <div class="recuperar-exito-box" id="recuperarExitoBox">
+                <div class="recuperar-exito-icon">✅</div>
+                <h3>Revisa tu correo</h3>
+                <p class="sub">Te enviamos un enlace a <b id="recuperarEmailMostrado" style="color:#fff;"></b> para restablecer tu contraseña. Revisa también la carpeta de spam.</p>
+                <button type="button" class="auth-btn" style="background: rgba(255,255,255,0.08); box-shadow:none;" onclick="cerrarModalRecuperacion()">Entendido</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ FIREBASE (solo para recuperar contraseña) ============ -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+        import {
+            getAuth,
+            sendPasswordResetEmail,
+            createUserWithEmailAndPassword,
+            fetchSignInMethodsForEmail
+        } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAg8n3AcKE-0QDQYcswUBYZwI702TzPZIU",
+            authDomain: "anthonypg.firebaseapp.com",
+            projectId: "anthonypg",
+            storageBucket: "anthonypg.firebasestorage.app",
+            messagingSenderId: "620424695699",
+            appId: "1:620424695699:web:429c9ace801a5bc75a6266",
+            measurementId: "G-YVFYEWDQ98"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Crea (si no existe ya) una cuenta "espejo" en Firebase Auth para que
+        // el correo de recuperación de contraseña tenga a quién mandarle el link.
+        // Esto NO cambia el login/registro visible de WIBSIPROJECT: solo permite
+        // que "¿Olvidaste tu contraseña?" funcione de verdad.
+        window.fbEspejoRegistro = async function (email, password) {
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+            } catch (err) {
+                // Si el correo ya tiene una cuenta espejo, lo ignoramos en silencio.
+                if (err.code !== 'auth/email-already-in-use') {
+                    console.warn('No se pudo crear la cuenta espejo de recuperación:', err.code);
+                }
+            }
+        };
+
+        window.fbEnviarRecuperacion = function (email) {
+            return sendPasswordResetEmail(auth, email);
+        };
+
+        // ============ UI DEL MODAL DE RECUPERAR CONTRASEÑA ============
+        window.abrirModalRecuperacion = function (event) {
+            if (event) event.preventDefault();
+            document.getElementById('recuperarFormWrap').style.display = 'block';
+            document.getElementById('recuperarExitoBox').style.display = 'none';
+            document.getElementById('recuperarErrorMsg').style.display = 'none';
+            const input = document.getElementById('recuperarEmailInput');
+            input.value = document.getElementById('loginEmail').value || '';
+            document.getElementById('modalRecuperar').classList.add('show');
+            setTimeout(() => input.focus(), 100);
+        };
+
+        window.cerrarModalRecuperacion = function () {
+            document.getElementById('modalRecuperar').classList.remove('show');
+        };
+
+        window.enviarRecuperacionPassword = function () {
+            const input = document.getElementById('recuperarEmailInput');
+            const email = input.value.trim();
+            const btn = document.getElementById('btnEnviarRecuperacion');
+            const errorBox = document.getElementById('recuperarErrorMsg');
+            const errorTexto = document.getElementById('recuperarErrorTexto');
+
+            errorBox.style.display = 'none';
+
+            if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+                errorTexto.textContent = 'Ingresa un correo electrónico válido.';
+                errorBox.style.display = 'flex';
+                input.focus();
+                return;
+            }
+
+            btn.disabled = true;
+            const textoOriginal = btn.textContent;
+            btn.textContent = 'Enviando...';
+
+            window.fbEnviarRecuperacion(email)
+                .then(() => {
+                    document.getElementById('recuperarEmailMostrado').textContent = email;
+                    document.getElementById('recuperarFormWrap').style.display = 'none';
+                    document.getElementById('recuperarExitoBox').style.display = 'flex';
+                })
+                .catch((error) => {
+                    let msg = 'No se pudo enviar el correo. Inténtalo de nuevo.';
+                    if (error.code === 'auth/invalid-email') msg = 'Ese correo no tiene un formato válido.';
+                    else if (error.code === 'auth/user-not-found') msg = 'No existe ninguna cuenta con ese correo. Regístrate primero.';
+                    else if (error.code === 'auth/too-many-requests') msg = 'Demasiados intentos. Espera unos minutos.';
+                    errorTexto.textContent = msg;
+                    errorBox.style.display = 'flex';
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.textContent = textoOriginal;
+                });
+        };
+    </script>
+
+    <script>
+        // Credenciales actualizadas del administrador
+        const CORREO_ADMIN = "admin_administrador@gmail.com";
+        const PASSWORD_ADMIN = "admin2436";
+        const SESSION_KEY = 'wibsitihub_sesion_activa';
+        let timerActivoInterval = null;
+        let inactivityTimeout = null;
+
+        /* ==========================================================================
+           Manejo de la sesión activa:
+           - Usuarios normales: se guardan en sessionStorage, que es exclusivo de
+             cada pestaña. Así, si abres dos pestañas con dos cuentas distintas (o
+             recargas una), cada una conserva SU propia sesión sin mezclarse.
+           - Administrador: se mantiene igual que antes, en localStorage, para no
+             tocar el comportamiento del panel de administrador.
+        ========================================================================== */
+        function guardarSesionActiva(usuario) {
+            if (usuario && usuario.isAdmin) {
+                sessionStorage.removeItem(SESSION_KEY);
+                localStorage.setItem(SESSION_KEY, JSON.stringify(usuario));
+            } else {
+                localStorage.removeItem(SESSION_KEY);
+                sessionStorage.setItem(SESSION_KEY, JSON.stringify(usuario));
+            }
+        }
+
+        function obtenerSesionActiva() {
+            // Prioridad 1: sesión de esta pestaña (usuario normal, aislada por pestaña)
+            const sesionPestana = sessionStorage.getItem(SESSION_KEY);
+            if (sesionPestana) {
+                try { return JSON.parse(sesionPestana); } catch (e) { /* ignorar */ }
+            }
+            // Prioridad 2: sesión de administrador (comportamiento sin cambios)
+            const sesionAdmin = localStorage.getItem(SESSION_KEY);
+            if (sesionAdmin) {
+                try {
+                    const usr = JSON.parse(sesionAdmin);
+                    if (usr && (usr.isAdmin || (usr.email && usr.email.toLowerCase() === CORREO_ADMIN.toLowerCase()))) {
+                        return usr;
+                    }
+                } catch (e) { /* ignorar */ }
+            }
+            return null;
+        }
+
+        function eliminarSesionActiva() {
+            sessionStorage.removeItem(SESSION_KEY);
+            localStorage.removeItem(SESSION_KEY);
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+            
+            document.getElementById('loginEmail').addEventListener('input', function(e) {
+                const emailIngresado = e.target.value.trim().toLowerCase();
+                const recaptchaDiv = document.getElementById('recaptchaContainer');
+                
+                if (emailIngresado === CORREO_ADMIN.toLowerCase()) {
+                    recaptchaDiv.classList.remove('hidden');
+                } else {
+                    recaptchaDiv.classList.add('hidden');
+                }
+            });
+
+            verificarEstadoSesion();
+            configurarEventosInactividad();
+        });
+
+        function pasarPagina(destino) {
+            const wrapper = document.getElementById('pagesWrapper');
+            if (destino === 'register') {
+                wrapper.style.transform = 'translateX(-50%)';
+            } else {
+                wrapper.style.transform = 'translateX(0)';
+            }
+        }
+
+        function generarIdUnico() {
+            return 'WIB-' + Math.random().toString(36).substring(2, 8).toUpperCase() + '-' + Date.now().toString().slice(-4);
+        }
+
+        function handleGoogleSignIn(response) {
+            const responsePayload = parseJwt(response.credential);
+            const emailUser = responsePayload.email.toLowerCase();
+            const esAdmin = emailUser === CORREO_ADMIN.toLowerCase();
+            
+            let listaUsuarios = JSON.parse(localStorage.getItem('wibsitihub_usuarios_registrados')) || [];
+            let usuarioExistente = listaUsuarios.find(u => u.email.toLowerCase() === emailUser);
+
+            const usuarioGoogle = {
+                id: usuarioExistente ? usuarioExistente.id : generarIdUnico(),
+                name: responsePayload.name,
+                email: responsePayload.email,
+                isAdmin: esAdmin,
+                avatar: usuarioExistente?.avatar || responsePayload.picture || null,
+                loginTime: Date.now(),
+                totalActiveSeconds: usuarioExistente ? (usuarioExistente.totalActiveSeconds || 0) : 0
+            };
+
+            guardarYRegistrarUsuario(usuarioGoogle);
+            mostrarToast(`¡Bienvenido, ${responsePayload.name}! Sesión iniciada correctamente.`);
+
+            setTimeout(() => {
+                if (esAdmin) {
+                    window.location.href = 'panel_administrador.html';
+                } else {
+                    verificarEstadoSesion();
+                }
+            }, 800);
+        }
+
+        function parseJwt(token) {
+            var base64Url = token.split('.')[1];
+            var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(jsonPayload);
+        }
+
+        function ejecutarLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const emailLower = email.toLowerCase();
+            const esAdmin = emailLower === CORREO_ADMIN.toLowerCase();
+
+            if (esAdmin) {
+                if (password !== PASSWORD_ADMIN) {
+                    mostrarAdvertenciaSesion("¡Contraseña de administrador incorrecta!");
+                    return;
+                }
+
+                const recaptchaResponse = grecaptcha.getResponse();
+                if (!recaptchaResponse || recaptchaResponse.length === 0) {
+                    mostrarAdvertenciaSesion("¡Por favor completa el reCAPTCHA (semáforos/pasos de peatones)!");
+                    return;
+                }
+            }
+            
+            let listaUsuarios = JSON.parse(localStorage.getItem('wibsitihub_usuarios_registrados')) || [];
+            let usuarioExistente = listaUsuarios.find(u => u.email.toLowerCase() === emailLower);
+
+            if (!usuarioExistente && !esAdmin) {
+                mostrarAdvertenciaSesion("No existe una cuenta con este correo. Regístrate en la siguiente pestaña.");
+                pasarPagina('register');
+                document.getElementById('regEmail').value = email;
+                return;
+            }
+
+            const usuarioSesion = {
+                id: usuarioExistente ? usuarioExistente.id : generarIdUnico(),
+                name: usuarioExistente ? usuarioExistente.name : (esAdmin ? "Administrador" : email.split('@')[0].toUpperCase()),
+                email: email,
+                isAdmin: esAdmin,
+                avatar: usuarioExistente ? usuarioExistente.avatar : null,
+                loginTime: Date.now(),
+                totalActiveSeconds: usuarioExistente ? (usuarioExistente.totalActiveSeconds || 0) : 0
+            };
+            
+            guardarYRegistrarUsuario(usuarioSesion);
+            mostrarToast("¡Inicio de sesión exitoso!");
+            
+            setTimeout(() => { 
+                if (esAdmin) {
+                    window.location.href = 'panel_administrador.html';
+                } else {
+                    verificarEstadoSesion(); 
+                }
+            }, 800);
+        }
+
+        function ejecutarRegistro(event) {
+            event.preventDefault();
+            const nombre = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const emailLower = email.toLowerCase();
+            const esAdmin = emailLower === CORREO_ADMIN.toLowerCase();
+
+            let listaUsuarios = JSON.parse(localStorage.getItem('wibsitihub_usuarios_registrados')) || [];
+            let correoDuplicado = listaUsuarios.some(u => u.email.toLowerCase() === emailLower);
+
+            if (correoDuplicado) {
+                mostrarAdvertenciaSesion("Este correo ya está registrado. Inicia sesión en su lugar.");
+                pasarPagina('login');
+                document.getElementById('loginEmail').value = email;
+                return;
+            }
+
+            const nuevoUsuario = {
+                id: generarIdUnico(),
+                name: nombre,
+                email: email,
+                isAdmin: esAdmin,
+                avatar: null,
+                loginTime: Date.now(),
+                totalActiveSeconds: 0
+            };
+
+            guardarYRegistrarUsuario(nuevoUsuario);
+            mostrarToast("¡Cuenta creada y sesión iniciada con éxito!");
+
+            // Crea en segundo plano una cuenta "espejo" en Firebase Auth con este
+            // mismo correo y contraseña, únicamente para que "¿Olvidaste tu
+            // contraseña?" pueda enviar el correo de recuperación real.
+            if (password && window.fbEspejoRegistro) {
+                window.fbEspejoRegistro(email, password);
+            }
+            
+            document.getElementById('registerForm').reset();
+            
+            setTimeout(() => {
+                if (esAdmin) {
+                    window.location.href = 'panel_administrador.html';
+                } else {
+                    verificarEstadoSesion();
+                }
+            }, 800);
+        }
+
+        function guardarYRegistrarUsuario(usuario) {
+            guardarSesionActiva(usuario);
+
+            let listaUsuarios = JSON.parse(localStorage.getItem('wibsitihub_usuarios_registrados')) || [];
+            const existeIndex = listaUsuarios.findIndex(u => u.email.toLowerCase() === usuario.email.toLowerCase() || u.id === usuario.id);
+            
+            if (existeIndex !== -1) {
+                if(!usuario.avatar && listaUsuarios[existeIndex].avatar) {
+                    usuario.avatar = listaUsuarios[existeIndex].avatar;
+                }
+                usuario.totalActiveSeconds = listaUsuarios[existeIndex].totalActiveSeconds || usuario.totalActiveSeconds || 0;
+                listaUsuarios[existeIndex] = usuario;
+            } else {
+                listaUsuarios.push(usuario);
+            }
+            localStorage.setItem('wibsitihub_usuarios_registrados', JSON.stringify(listaUsuarios));
+        }
+
+        function cambiarFotoPerfil(event) {
+            const archivo = event.target.files[0];
+            if (!archivo) return;
+
+            const lector = new FileReader();
+            lector.onload = function(e) {
+                const base64Image = e.target.result;
+
+                const avatarDiv = document.getElementById('profileInitials');
+                if(avatarDiv) {
+                    avatarDiv.style.backgroundImage = `url(${base64Image})`;
+                    avatarDiv.textContent = '';
+                }
+
+                let sesion = obtenerSesionActiva();
+                if (sesion) {
+                    sesion.avatar = base64Image;
+                    guardarYRegistrarUsuario(sesion);
+                }
+
+                mostrarToast("¡Foto de perfil actualizada con éxito!");
+            };
+            lector.readAsDataURL(archivo);
+        }
+
+        function verificarEstadoSesion() {
+            const usuario = obtenerSesionActiva();
+            if (usuario) {
+                
+                if (!usuario.id) {
+                    usuario.id = generarIdUnico();
+                    guardarYRegistrarUsuario(usuario);
+                }
+
+                const esAdminReal = usuario.email.toLowerCase() === CORREO_ADMIN.toLowerCase() || usuario.isAdmin;
+
+                // Redirigir al panel de administrador si se encuentra sesión activa y es admin
+                if (esAdminReal && window.location.pathname.includes('cuenta')) {
+                    window.location.href = 'panel_administrador.html';
+                    return;
+                }
+
+                document.getElementById('authSection').classList.add('hidden');
+                document.getElementById('profileSection').classList.remove('hidden');
+
+                document.getElementById('profileDisplayName').textContent = usuario.name;
+                document.getElementById('profileDisplayEmail').textContent = usuario.email;
+                document.getElementById('profileDisplayId').textContent = 'ID: ' + usuario.id;
+
+                const avatarDiv = document.getElementById('profileInitials');
+                if (usuario.avatar) {
+                    avatarDiv.style.backgroundImage = `url(${usuario.avatar})`;
+                    avatarDiv.textContent = '';
+                } else {
+                    avatarDiv.style.backgroundImage = 'none';
+                    const initials = usuario.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                    avatarDiv.textContent = initials || 'W';
+                }
+                
+                if (esAdminReal) {
+                    document.getElementById('adminBadgeContainer').classList.remove('hidden');
+                    document.getElementById('statRango').textContent = 'VIP';
+                } else {
+                    document.getElementById('adminBadgeContainer').classList.add('hidden');
+                    document.getElementById('statRango').textContent = 'Usuario';
+                }
+
+                iniciarContadorActivo(usuario);
+            } else {
+                document.getElementById('authSection').classList.remove('hidden');
+                document.getElementById('profileSection').classList.add('hidden');
+            }
+        }
+
+        function iniciarContadorActivo(usuario) {
+            if (timerActivoInterval) clearInterval(timerActivoInterval);
+
+            if (!usuario.totalActiveSeconds) usuario.totalActiveSeconds = 0;
+
+            timerActivoInterval = setInterval(() => {
+                usuario.totalActiveSeconds++;
+                const lblTiempo = document.getElementById('statTiempoActivo');
+                if (lblTiempo) lblTiempo.textContent = formatearTiempo(usuario.totalActiveSeconds);
+                guardarYRegistrarUsuario(usuario);
+            }, 1000);
+        }
+
+        function formatearTiempo(segundos) {
+            if (segundos < 60) {
+                return segundos + "s";
+            } else if (segundos < 3600) {
+                const mins = Math.floor(segundos / 60);
+                const secs = segundos % 60;
+                return mins + "m " + secs + "s";
+            } else {
+                const horas = Math.floor(segundos / 3600);
+                const mins = Math.floor((segundos % 3600) / 60);
+                return horas + "h " + mins + "m";
+            }
+        }
+
+        function configurarEventosInactividad() {
+            const marcarActivo = () => {
+                const lblEstado = document.getElementById('statEstado');
+                if (lblEstado) lblEstado.textContent = 'Activo';
+                
+                if (inactivityTimeout) clearTimeout(inactivityTimeout);
+                
+                inactivityTimeout = setTimeout(() => {
+                    const lblEstadoInactivo = document.getElementById('statEstado');
+                    if (lblEstadoInactivo) lblEstadoInactivo.textContent = 'Inactivo';
+                }, 30000);
+            };
+
+            window.addEventListener('mousemove', marcarActivo);
+            window.addEventListener('keypress', marcarActivo);
+            window.addEventListener('click', marcarActivo);
+            window.addEventListener('scroll', marcarActivo);
+            marcarActivo();
+        }
+
+        function mostrarAdvertenciaSesion(mensaje) {
+            const alertaExistente = document.querySelector('.auth-warning-banner');
+            if (alertaExistente) alertaExistente.remove();
+
+            const banner = document.createElement('div');
+            banner.className = 'auth-warning-banner';
+            banner.innerHTML = `<span style="font-size: 16px;">⚠️</span><span>${mensaje}</span>`;
+            document.body.appendChild(banner);
+
+            setTimeout(() => {
+                banner.style.transition = 'opacity 0.4s ease';
+                banner.style.opacity = '0';
+                setTimeout(() => banner.remove(), 400);
+            }, 4000);
+        }
+
+        function cerrarSesion() {
+            if (timerActivoInterval) clearInterval(timerActivoInterval);
+            if (inactivityTimeout) clearTimeout(inactivityTimeout);
+            
+            eliminarSesionActiva();
+            
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('recaptchaContainer').classList.add('hidden');
+            if(window.grecaptcha) grecaptcha.reset();
+
+            document.getElementById('authSection').classList.remove('hidden');
+            document.getElementById('profileSection').classList.add('hidden');
+            
+            document.getElementById('loginForm').reset();
+            document.getElementById('registerForm').reset();
+            pasarPagina('login');
+            
+            mostrarAdvertenciaSesion("¡Sesión cerrada correctamente!");
+        }
+
+        function mostrarToast(mensaje) {
+            const existingToast = document.querySelector('.account-toast');
+            if (existingToast) existingToast.remove();
+
+            const toast = document.createElement('div');
+            toast.className = 'account-toast';
+            toast.innerHTML = `<span>✓</span><p style="margin:0;">${mensaje}</p>`;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
+        }
+    </script>
+</body>
+
+</html>

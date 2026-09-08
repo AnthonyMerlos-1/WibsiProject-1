@@ -1,628 +1,5192 @@
 <!DOCTYPE html>
+
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WIBSIPROJECT - Tendencias Globales</title>
-    <link rel="icon" type="image/png" href="../assets/img/tendencias.png">
-    <link rel="stylesheet" href="../css/style.css">
-    <style>
-        :root {
-            --trend-primary: #8b5cf6;
-            --trend-glow: rgba(139, 92, 246, 0.25);
-            --card-bg: rgba(20, 20, 28, 0.7);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        .video-card {
-            background: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 14px;
-            overflow: hidden;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-        }
+<title>WIBSIPROJECT — Tendencias</title>
 
-        .video-card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(139, 92, 246, 0.4);
-            box-shadow: 0 12px 28px rgba(139, 92, 246, 0.15);
-        }
+<link rel="icon" type="image/png" href="../assets/img/tendencias.png">
 
-        .edit-video-btn {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: rgba(15, 15, 20, 0.85);
-            border: 1px solid rgba(139, 92, 246, 0.4);
-            color: #d1d5db;
-            padding: 6px 12px;
-            font-size: 12px;
-            font-weight: 600;
-            border-radius: 8px;
-            cursor: pointer;
-            z-index: 10;
-            backdrop-filter: blur(4px);
-            transition: all 0.25s ease;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
+<style>
 
-        .edit-video-btn:hover {
-            background: var(--trend-primary);
-            color: #fff;
-            border-color: var(--trend-primary);
-            transform: scale(1.05);
-            box-shadow: 0 0 12px rgba(139, 92, 246, 0.5);
-        }
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
 
-        @keyframes pulseGlow {
-            0% { transform: scale(1); box-shadow: 0 0 0 rgba(139, 92, 246, 0); border-color: rgba(139, 92, 246, 0.2); }
-            50% { transform: scale(1.02); box-shadow: 0 0 25px rgba(139, 92, 246, 0.6); border-color: #8b5cf6; background: rgba(139, 92, 246, 0.15); }
-            100% { transform: scale(1); box-shadow: 0 0 0 rgba(139, 92, 246, 0); border-color: rgba(139, 92, 246, 0.2); }
-        }
+:root{
+    --bg:#050509;
+    --panel:#0d0d15;
+    --panel2:#12121c;
+    --line:rgba(255,255,255,.08);
 
-        .video-card.editing-animation {
-            animation: pulseGlow 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
+    --purple:#8b5cf6;
+    --blue:#3b82f6;
+    --cyan:#22d3ee;
+    --pink:#ec4899;
 
-        .ymusic-floating-bar {
-            position: fixed;
-            bottom: 0; left: 0; width: 100%; height: 64px;
-            background: rgba(18, 18, 24, 0.95);
-            backdrop-filter: blur(12px);
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 16px; z-index: 1000;
-            box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.5);
-            transform: translateY(100%);
-            animation: slideUpBar 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-        .ymusic-floating-bar.closing { animation: slideDownBar 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-        @keyframes slideUpBar { to { transform: translateY(0); } }
-        @keyframes slideDownBar { from { transform: translateY(0); } to { transform: translateY(100%); } }
+    --text:#f8fafc;
+    --muted:#7d8799;
+}
 
-        .ymusic-progress-bar {
-            position: absolute; top: 0; left: 0; width: 100%; height: 3px;
-            background: rgba(255, 255, 255, 0.1); cursor: pointer; transition: height 0.2s ease;
-        }
-        .ymusic-progress-bar:hover { height: 6px; }
-        .ymusic-progress-filled { height: 100%; background: var(--trend-primary); width: 0%; transition: width 0.1s linear; }
+body{
+    min-height:100vh;
+    font-family:Arial,Helvetica,sans-serif;
+    color:var(--text);
 
-        .ymusic-left-controls { display: flex; align-items: center; gap: 12px; }
-        .ymusic-time { font-size: 12px; color: #9ca3af; min-width: 75px; user-select: none; }
-        
-        .ymusic-center-info {
-            display: flex; align-items: center; gap: 12px; cursor: pointer;
-            max-width: 40%; overflow: hidden; padding: 4px 8px; border-radius: 8px; transition: background 0.2s;
-        }
-        .ymusic-center-info:hover { background: rgba(255, 255, 255, 0.05); }
-        #barThumb { width: 44px; height: 44px; border-radius: 6px; object-fit: cover; }
-        .ymusic-text-group { display: flex; flex-direction: column; overflow: hidden; }
-        .ymusic-bar-title { font-size: 14px; font-weight: 600; color: #f3f4f6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .ymusic-bar-channel { font-size: 12px; color: #9ca3af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    background:
+        radial-gradient(
+            circle at 20% 0%,
+            rgba(139,92,246,.18),
+            transparent 28%
+        ),
+        radial-gradient(
+            circle at 90% 20%,
+            rgba(34,211,238,.10),
+            transparent 25%
+        ),
+        var(--bg);
 
-        .ymusic-right-controls { display: flex; align-items: center; gap: 8px; }
-        .ymusic-icon-btn {
-            background: transparent; border: none; color: #d1d5db; cursor: pointer;
-            width: 36px; height: 36px; border-radius: 50%; display: flex;
-            align-items: center; justify-content: center; transition: all 0.2s ease; font-size: 14px;
-        }
-        .ymusic-icon-btn:hover { background: rgba(255, 255, 255, 0.1); color: #fff; transform: scale(1.05); }
-        .ymusic-icon-btn.play-main { background: var(--trend-primary); color: #fff; width: 40px; height: 40px; }
+    overflow-x:hidden;
+}
 
-        @media (max-width: 768px) {
-            .ymusic-right-controls .hide-mobile { display: none; }
-            .ymusic-time, .ymusic-left-controls button:not(.play-main) { display: none; }
-            .ymusic-center-info { max-width: 60%; }
-        }
-    </style>
+button{
+    font-family:inherit;
+}
+
+/* =====================================================
+   BARRA SUPERIOR
+===================================================== */
+
+.topbar{
+    height:70px;
+
+    position:sticky;
+    top:0;
+    z-index:1000;
+
+    display:flex;
+    align-items:center;
+    gap:20px;
+
+    padding:0 24px;
+
+    background:rgba(5,5,9,.88);
+    backdrop-filter:blur(20px);
+
+    border-bottom:1px solid var(--line);
+
+    overflow:hidden;
+}
+
+/* Línea animada */
+
+.topbar::before{
+    content:"";
+
+    position:absolute;
+    top:0;
+    left:-30%;
+
+    width:30%;
+    height:2px;
+
+    background:linear-gradient(
+        90deg,
+        transparent,
+        var(--purple),
+        var(--cyan),
+        var(--pink),
+        transparent
+    );
+
+    animation:topbarMove 5s linear infinite;
+}
+
+@keyframes topbarMove{
+    0%{
+        left:-30%;
+    }
+
+    100%{
+        left:100%;
+    }
+}
+
+/* brillo */
+
+.topbar::after{
+    content:"";
+
+    position:absolute;
+    width:220px;
+    height:220px;
+
+    left:20%;
+    top:-170px;
+
+    background:rgba(139,92,246,.08);
+
+    filter:blur(60px);
+
+    border-radius:50%;
+
+    animation:topGlow 7s ease-in-out infinite;
+}
+
+@keyframes topGlow{
+
+    0%,100%{
+        transform:translateX(-100px);
+    }
+
+    50%{
+        transform:translateX(350px);
+    }
+
+}
+
+/* =====================================================
+   LOGO
+===================================================== */
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-width:210px;
+
+    position:relative;
+    z-index:2;
+}
+
+.logo-box{
+    width:42px;
+    height:42px;
+
+    display:grid;
+    place-items:center;
+
+    border-radius:13px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--purple),
+            var(--blue)
+        );
+
+    font-weight:900;
+
+    box-shadow:
+        0 0 25px rgba(139,92,246,.35);
+
+    animation:logoFloat 3s ease-in-out infinite;
+}
+
+@keyframes logoFloat{
+
+    0%,100%{
+        transform:translateY(0);
+    }
+
+    50%{
+        transform:translateY(-3px) rotate(2deg);
+    }
+
+}
+
+.logo strong{
+    font-size:16px;
+}
+
+.logo small{
+    display:block;
+    margin-top:3px;
+
+    color:var(--muted);
+
+    font-size:8px;
+    letter-spacing:2px;
+}
+
+/* =====================================================
+   BUSCADOR
+===================================================== */
+
+.search{
+    flex:1;
+    max-width:650px;
+
+    height:42px;
+
+    display:flex;
+    align-items:center;
+
+    padding:0 14px;
+
+    border:1px solid var(--line);
+    border-radius:12px;
+
+    background:rgba(255,255,255,.035);
+
+    transition:.3s;
+
+    position:relative;
+    z-index:2;
+}
+
+.search:focus-within{
+    border-color:rgba(139,92,246,.65);
+
+    box-shadow:
+        0 0 0 3px rgba(139,92,246,.08),
+        0 0 25px rgba(139,92,246,.12);
+}
+
+.search span{
+    color:#687386;
+    font-size:20px;
+    margin-right:9px;
+}
+
+.search input{
+    width:100%;
+
+    border:0;
+    outline:0;
+
+    background:transparent;
+    color:white;
+}
+
+/* =====================================================
+   ACCIONES
+===================================================== */
+
+.actions{
+    margin-left:auto;
+
+    display:flex;
+    gap:8px;
+
+    position:relative;
+    z-index:2;
+}
+
+.action{
+    height:40px;
+
+    padding:0 14px;
+
+    border:1px solid var(--line);
+    border-radius:10px;
+
+    background:#0d0d15;
+    color:white;
+
+    cursor:pointer;
+
+    transition:.25s;
+}
+
+.action:hover{
+    border-color:rgba(139,92,246,.5);
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 8px 25px rgba(0,0,0,.25);
+}
+
+.profile{
+    width:40px;
+    height:40px;
+
+    border:0;
+    border-radius:50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--purple),
+            var(--pink)
+        );
+
+    color:white;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:.25s;
+}
+
+.profile:hover{
+    transform:scale(1.08) rotate(5deg);
+}
+
+/* =====================================================
+   LAYOUT
+===================================================== */
+
+.layout{
+    display:flex;
+    min-height:calc(100vh - 70px);
+}
+
+/* =====================================================
+   SIDEBAR
+===================================================== */
+
+.sidebar{
+    width:230px;
+
+    position:sticky;
+    top:70px;
+
+    height:calc(100vh - 70px);
+
+    padding:24px 13px;
+
+    border-right:1px solid var(--line);
+
+    background:rgba(7,7,11,.65);
+}
+
+.label{
+    padding:0 12px;
+    margin:0 0 9px;
+
+    color:#626c7d;
+
+    font-size:9px;
+    font-weight:bold;
+
+    letter-spacing:2px;
+}
+
+.side{
+    width:100%;
+    height:44px;
+
+    display:flex;
+    align-items:center;
+
+    gap:11px;
+
+    padding:0 12px;
+
+    border:0;
+    border-radius:11px;
+
+    background:transparent;
+
+    color:#929caf;
+
+    cursor:pointer;
+
+    text-align:left;
+
+    transition:.2s;
+}
+
+.side:hover{
+    color:white;
+
+    background:rgba(139,92,246,.10);
+
+    transform:translateX(3px);
+}
+
+.side.active{
+    color:white;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(139,92,246,.22),
+            rgba(59,130,246,.08)
+        );
+}
+
+.side span{
+    width:23px;
+    text-align:center;
+    font-size:17px;
+}
+
+/* =====================================================
+   MAIN
+===================================================== */
+
+.main{
+    flex:1;
+
+    padding:30px 36px 120px;
+
+    min-width:0;
+}
+
+/* =====================================================
+   HERO
+===================================================== */
+
+.hero{
+    position:relative;
+    overflow:hidden;
+
+    min-height:290px;
+
+    padding:42px;
+
+    border:1px solid var(--line);
+    border-radius:28px;
+
+    background:
+        linear-gradient(
+            120deg,
+            rgba(139,92,246,.20),
+            rgba(59,130,246,.08),
+            rgba(236,72,153,.08)
+        );
+}
+
+.hero::before{
+    content:"";
+
+    position:absolute;
+
+    width:350px;
+    height:350px;
+
+    right:-100px;
+    top:-150px;
+
+    border-radius:50%;
+
+    border:1px solid rgba(139,92,246,.2);
+
+    animation:heroRotate 12s linear infinite;
+}
+
+@keyframes heroRotate{
+    from{
+        transform:rotate(0deg);
+    }
+
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+.hero-image{
+    position:absolute;
+
+    right:0;
+    top:0;
+
+    width:46%;
+    height:100%;
+
+    object-fit:cover;
+
+    opacity:.45;
+
+    mask-image:
+        linear-gradient(
+            90deg,
+            transparent,
+            black
+        );
+}
+
+.hero-content{
+    position:relative;
+    z-index:2;
+
+    max-width:650px;
+}
+
+.badge{
+    display:inline-block;
+
+    padding:7px 12px;
+
+    border-radius:30px;
+
+    background:rgba(139,92,246,.15);
+
+    border:1px solid rgba(139,92,246,.25);
+
+    color:#d8ccff;
+
+    font-size:9px;
+
+    font-weight:bold;
+
+    letter-spacing:1.5px;
+}
+
+.hero h1{
+    margin-top:17px;
+
+    font-size:clamp(40px,6vw,67px);
+
+    line-height:.95;
+
+    letter-spacing:-3px;
+}
+
+.hero h1 span{
+    background:
+        linear-gradient(
+            90deg,
+            #c4b5fd,
+            #60a5fa,
+            #67e8f9
+        );
+
+    -webkit-background-clip:text;
+
+    color:transparent;
+}
+
+.hero p{
+    margin-top:17px;
+
+    max-width:590px;
+
+    color:#9aa4b6;
+
+    line-height:1.6;
+
+    font-size:13px;
+}
+
+.hero-buttons{
+    display:flex;
+
+    gap:10px;
+
+    margin-top:25px;
+}
+
+.hero-button{
+    padding:11px 17px;
+
+    border:0;
+
+    border-radius:10px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--purple),
+            var(--blue)
+        );
+
+    color:white;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:.25s;
+}
+
+.hero-button:hover{
+    transform:translateY(-3px);
+
+    box-shadow:
+        0 12px 30px rgba(139,92,246,.25);
+}
+
+.hero-button.secondary{
+    background:rgba(255,255,255,.07);
+
+    border:1px solid var(--line);
+}
+
+/* =====================================================
+   PLAYLISTS
+===================================================== */
+
+.playlists-section{
+    margin-top:35px;
+}
+
+.playlist-header{
+    display:flex;
+
+    align-items:end;
+
+    justify-content:space-between;
+
+    margin-bottom:18px;
+}
+
+.playlist-header small{
+    color:#657083;
+
+    font-size:9px;
+
+    letter-spacing:2px;
+}
+
+.playlist-header h2{
+    margin-top:5px;
+
+    font-size:25px;
+}
+
+.playlist-grid{
+    display:grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            minmax(150px,1fr)
+        );
+
+    gap:15px;
+}
+
+.playlist-card{
+    position:relative;
+
+    overflow:hidden;
+
+    min-height:145px;
+
+    padding:18px;
+
+    border:1px solid var(--line);
+
+    border-radius:18px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.055),
+            rgba(255,255,255,.015)
+        );
+
+    cursor:pointer;
+
+    transition:.3s;
+}
+
+.playlist-card:hover{
+    transform:translateY(-5px);
+
+    border-color:
+        rgba(139,92,246,.45);
+
+    box-shadow:
+        0 18px 40px rgba(0,0,0,.35);
+}
+
+.playlist-card::before{
+    content:"";
+
+    position:absolute;
+
+    width:110px;
+    height:110px;
+
+    right:-35px;
+    bottom:-35px;
+
+    border-radius:50%;
+
+    background:
+        rgba(139,92,246,.14);
+
+    filter:blur(8px);
+}
+
+.playlist-icon{
+    width:43px;
+    height:43px;
+
+    display:grid;
+    place-items:center;
+
+    border-radius:13px;
+
+    background:
+        rgba(139,92,246,.14);
+
+    font-size:22px;
+
+    margin-bottom:15px;
+}
+
+.playlist-card h3{
+    font-size:15px;
+
+    position:relative;
+}
+
+.playlist-card p{
+    margin-top:7px;
+
+    color:#697386;
+
+    font-size:10px;
+
+    position:relative;
+}
+
+.playlist-count{
+    position:absolute;
+
+    right:14px;
+    top:14px;
+
+    padding:5px 8px;
+
+    border-radius:20px;
+
+    background:rgba(0,0,0,.35);
+
+    color:#aeb7c8;
+
+    font-size:9px;
+}
+
+/* =====================================================
+   PLAYLIST VIEW
+===================================================== */
+
+.playlist-view{
+    display:none;
+
+    margin-top:28px;
+
+    padding:22px;
+
+    border:1px solid var(--line);
+
+    border-radius:20px;
+
+    background:rgba(255,255,255,.025);
+}
+
+.playlist-view.active{
+    display:block;
+}
+
+.playlist-view-top{
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    margin-bottom:20px;
+}
+
+.playlist-view-top h2{
+    font-size:21px;
+}
+
+.close-playlist{
+    border:1px solid var(--line);
+
+    background:rgba(255,255,255,.04);
+
+    color:white;
+
+    padding:8px 12px;
+
+    border-radius:9px;
+
+    cursor:pointer;
+}
+
+/* =====================================================
+   FILTERS
+===================================================== */
+
+.filters{
+    display:flex;
+
+    gap:9px;
+
+    margin:30px 0 25px;
+
+    overflow-x:auto;
+}
+
+.filter{
+    white-space:nowrap;
+
+    padding:10px 16px;
+
+    border-radius:30px;
+
+    border:1px solid var(--line);
+
+    background:#0d0d15;
+
+    color:#8993a4;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.filter.active,
+.filter:hover{
+    color:white;
+
+    border-color:
+        rgba(139,92,246,.5);
+
+    background:
+        rgba(139,92,246,.14);
+}
+
+/* =====================================================
+   SECTION TITLE
+===================================================== */
+
+.section-title{
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:end;
+
+    margin:35px 0 18px;
+}
+
+.section-title small{
+    color:#657083;
+
+    font-size:9px;
+
+    letter-spacing:2px;
+}
+
+.section-title h2{
+    margin-top:5px;
+
+    font-size:25px;
+}
+
+/* =====================================================
+   VIDEO GRID
+===================================================== */
+
+.grid{
+    display:grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fill,
+            minmax(250px,1fr)
+        );
+
+    gap:20px;
+}
+
+.card{
+    position:relative;
+
+    overflow:hidden;
+
+    border:1px solid var(--line);
+
+    border-radius:18px;
+
+    background:var(--panel);
+
+    transition:.3s;
+}
+
+.card:hover{
+    transform:translateY(-6px);
+
+    border-color:
+        rgba(139,92,246,.4);
+
+    box-shadow:
+        0 20px 45px rgba(0,0,0,.4);
+}
+
+.thumb{
+    position:relative;
+
+    aspect-ratio:16/9;
+
+    overflow:hidden;
+}
+
+.thumb img{
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+
+    transition:.4s;
+}
+
+.card:hover .thumb img{
+    transform:scale(1.06);
+}
+
+.overlay{
+    position:absolute;
+
+    inset:0;
+
+    background:
+        linear-gradient(
+            to bottom,
+            transparent 40%,
+            rgba(0,0,0,.82)
+        );
+}
+
+/* =====================================================
+   PLAY
+===================================================== */
+
+.play{
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    width:52px;
+    height:52px;
+
+    transform:
+        translate(-50%,-50%)
+        scale(.8);
+
+    border:0;
+
+    border-radius:50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--purple),
+            var(--blue)
+        );
+
+    color:white;
+
+    font-size:18px;
+
+    opacity:0;
+
+    cursor:pointer;
+
+    transition:.25s;
+}
+
+.card:hover .play{
+    opacity:1;
+
+    transform:
+        translate(-50%,-50%)
+        scale(1);
+}
+
+/* =====================================================
+   BOTÓN PLAYLIST
+===================================================== */
+
+.playlist-add{
+    position:absolute;
+
+    right:10px;
+    top:57px;
+
+    z-index:5;
+
+    width:38px;
+    height:38px;
+
+    border:1px solid
+        rgba(255,255,255,.12);
+
+    border-radius:50%;
+
+    background:
+        rgba(0,0,0,.68);
+
+    backdrop-filter:blur(8px);
+
+    color:white;
+
+    cursor:pointer;
+
+    font-size:17px;
+
+    transition:.2s;
+}
+
+.playlist-add:hover{
+    transform:scale(1.1);
+
+    background:
+        rgba(139,92,246,.28);
+
+    border-color:
+        rgba(139,92,246,.55);
+}
+
+.playlist-add.saved{
+    color:#67e8f9;
+
+    background:
+        rgba(34,211,238,.12);
+
+    border-color:
+        rgba(34,211,238,.35);
+}
+
+/* =====================================================
+   CORAZÓN
+===================================================== */
+
+.heart{
+    position:absolute;
+
+    right:10px;
+    top:10px;
+
+    z-index:5;
+
+    width:38px;
+    height:38px;
+
+    border:1px solid
+        rgba(255,255,255,.12);
+
+    border-radius:50%;
+
+    background:
+        rgba(0,0,0,.65);
+
+    backdrop-filter:blur(8px);
+
+    color:white;
+
+    cursor:pointer;
+
+    font-size:18px;
+
+    transition:.2s;
+}
+
+.heart:hover{
+    transform:scale(1.1);
+
+    background:
+        rgba(236,72,153,.2);
+}
+
+.heart.active{
+    color:#ff4fa3;
+
+    background:
+        rgba(236,72,153,.16);
+}
+
+/* =====================================================
+   PLAYLIST BADGE
+===================================================== */
+
+.playlist-badge{
+    position:absolute;
+
+    left:10px;
+    top:10px;
+
+    z-index:4;
+
+    padding:6px 9px;
+
+    border-radius:7px;
+
+    background:
+        rgba(0,0,0,.7);
+
+    backdrop-filter:blur(8px);
+
+    color:#d9e0ec;
+
+    font-size:9px;
+
+    font-weight:bold;
+}
+
+/* =====================================================
+   QUALITY
+===================================================== */
+
+.quality{
+    position:absolute;
+
+    left:10px;
+    bottom:10px;
+
+    padding:5px 8px;
+
+    border-radius:6px;
+
+    background:
+        rgba(0,0,0,.75);
+
+    font-size:9px;
+
+    font-weight:bold;
+}
+
+/* =====================================================
+   INFO
+===================================================== */
+
+.info{
+    padding:14px;
+}
+
+.title{
+    min-height:38px;
+
+    font-size:14px;
+
+    line-height:1.35;
+
+    font-weight:bold;
+}
+
+.creator{
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    margin-top:12px;
+
+    color:#a6afbf;
+
+    font-size:11px;
+}
+
+.avatar{
+    width:26px;
+    height:26px;
+
+    display:grid;
+    place-items:center;
+
+    border-radius:50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--purple),
+            var(--blue)
+        );
+
+    color:white;
+
+    font-weight:bold;
+}
+
+.meta{
+    margin-top:9px;
+
+    color:#606b7d;
+
+    font-size:10px;
+}
+
+/* =====================================================
+   EMPTY
+===================================================== */
+
+.empty{
+    display:none;
+
+    text-align:center;
+
+    padding:80px;
+
+    color:#697386;
+}
+
+/* =====================================================
+   TOAST
+===================================================== */
+
+.toast{
+    position:fixed;
+
+    right:25px;
+    bottom:100px;
+
+    z-index:9000;
+
+    max-width:330px;
+
+    padding:14px 18px;
+
+    border:1px solid
+        rgba(139,92,246,.35);
+
+    border-radius:13px;
+
+    background:
+        rgba(14,14,23,.95);
+
+    backdrop-filter:blur(15px);
+
+    box-shadow:
+        0 15px 45px rgba(0,0,0,.45);
+
+    color:white;
+
+    font-size:12px;
+
+    transform:
+        translateY(30px);
+
+    opacity:0;
+
+    pointer-events:none;
+
+    transition:.3s;
+}
+
+.toast.show{
+    transform:translateY(0);
+
+    opacity:1;
+}
+
+/* =====================================================
+   MODAL PLAYLIST
+===================================================== */
+
+.modal{
+    position:fixed;
+
+    inset:0;
+
+    z-index:8000;
+
+    display:none;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:20px;
+
+    background:
+        rgba(0,0,0,.75);
+
+    backdrop-filter:blur(10px);
+}
+
+.modal.active{
+    display:flex;
+}
+
+.modal-box{
+    width:min(450px,100%);
+
+    padding:25px;
+
+    border:1px solid
+        rgba(139,92,246,.3);
+
+    border-radius:22px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #11111b,
+            #08080d
+        );
+
+    box-shadow:
+        0 30px 100px rgba(0,0,0,.7);
+
+    animation:modalIn .25s ease;
+}
+
+@keyframes modalIn{
+
+    from{
+        opacity:0;
+        transform:translateY(20px) scale(.96);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0) scale(1);
+    }
+
+}
+
+.modal-box h2{
+    font-size:21px;
+}
+
+.modal-box > p{
+    margin-top:8px;
+
+    color:#7d8799;
+
+    font-size:11px;
+}
+
+.detected{
+    margin-top:17px;
+
+    padding:13px;
+
+    border-radius:13px;
+
+    background:
+        rgba(139,92,246,.1);
+
+    border:1px solid
+        rgba(139,92,246,.2);
+
+    font-size:12px;
+}
+
+.playlist-options{
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:10px;
+
+    margin-top:15px;
+}
+
+.playlist-option{
+    padding:15px;
+
+    border:1px solid var(--line);
+
+    border-radius:13px;
+
+    background:rgba(255,255,255,.035);
+
+    color:white;
+
+    cursor:pointer;
+
+    text-align:left;
+
+    transition:.2s;
+}
+
+.playlist-option:hover{
+    border-color:
+        rgba(139,92,246,.5);
+
+    background:
+        rgba(139,92,246,.1);
+
+    transform:translateY(-2px);
+}
+
+.playlist-option.selected{
+    border-color:
+        var(--cyan);
+
+    background:
+        rgba(34,211,238,.08);
+}
+
+.playlist-option strong{
+    display:block;
+
+    font-size:12px;
+}
+
+.playlist-option small{
+    display:block;
+
+    margin-top:5px;
+
+    color:#687386;
+
+    font-size:9px;
+}
+
+.modal-actions{
+    display:flex;
+
+    justify-content:flex-end;
+
+    gap:8px;
+
+    margin-top:18px;
+}
+
+.modal-btn{
+    padding:10px 15px;
+
+    border-radius:10px;
+
+    border:1px solid var(--line);
+
+    background:rgba(255,255,255,.05);
+
+    color:white;
+
+    cursor:pointer;
+}
+
+.modal-btn.primary{
+    border:0;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--purple),
+            var(--blue)
+        );
+}
+
+/* =====================================================
+   MUSIC BAR
+===================================================== */
+
+#musicBar{
+    position:fixed;
+
+    left:0;
+    right:0;
+    bottom:0;
+
+    height:76px;
+
+    z-index:5000;
+
+    display:none;
+
+    align-items:center;
+
+    padding:0 18px;
+
+    background:
+        rgba(9,9,15,.96);
+
+    backdrop-filter:blur(20px);
+
+    border-top:
+        1px solid rgba(139,92,246,.3);
+}
+
+#musicBar.active{
+    display:flex;
+}
+
+.progress{
+    position:absolute;
+
+    top:0;
+    left:0;
+
+    width:100%;
+    height:3px;
+
+    background:
+        rgba(255,255,255,.08);
+
+    cursor:pointer;
+}
+
+.progress-fill{
+    height:100%;
+
+    width:0;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--purple),
+            var(--cyan),
+            var(--pink)
+        );
+}
+
+.music-left{
+    display:flex;
+
+    align-items:center;
+
+    gap:7px;
+
+    min-width:250px;
+}
+
+.music-btn{
+    width:37px;
+    height:37px;
+
+    border:0;
+
+    border-radius:50%;
+
+    background:transparent;
+
+    color:#cbd5e1;
+
+    cursor:pointer;
+}
+
+.music-btn:hover{
+    background:
+        rgba(255,255,255,.08);
+}
+
+.play-main{
+    width:43px;
+    height:43px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--purple),
+            var(--blue)
+        );
+
+    color:white;
+}
+
+.music-info{
+    flex:1;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:12px;
+}
+
+#barThumb{
+    width:48px;
+    height:48px;
+
+    border-radius:9px;
+
+    object-fit:cover;
+}
+
+.music-text{
+    max-width:350px;
+}
+
+#barTitle{
+    font-size:13px;
+
+    font-weight:bold;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+}
+
+#barCreator{
+    margin-top:4px;
+
+    color:#657083;
+
+    font-size:10px;
+}
+
+.music-right{
+    min-width:250px;
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    gap:5px;
+}
+
+.bar-action{
+    height:37px;
+
+    padding:0 11px;
+
+    border:1px solid transparent;
+
+    border-radius:9px;
+
+    background:transparent;
+
+    color:#cbd5e1;
+
+    cursor:pointer;
+}
+
+.bar-action:hover{
+    background:
+        rgba(255,255,255,.07);
+}
+
+.favorite.active{
+    color:#ff4fa3;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media(max-width:1000px){
+
+    .playlist-grid{
+        grid-template-columns:
+            repeat(2,1fr);
+    }
+
+}
+
+@media(max-width:900px){
+
+    .sidebar{
+        display:none;
+    }
+
+    .main{
+        padding:
+            20px 15px 110px;
+    }
+
+    .logo{
+        min-width:auto;
+    }
+
+    .logo-text{
+        display:none;
+    }
+
+    .topbar{
+        padding:0 13px;
+    }
+
+    .music-left,
+    .music-right{
+        min-width:auto;
+    }
+
+}
+
+@media(max-width:700px){
+
+    .playlist-grid{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .actions .action:first-child{
+        display:none;
+    }
+
+}
+
+@media(max-width:600px){
+
+    .search{
+        display:none;
+    }
+
+    .hero{
+        padding:27px;
+    }
+
+    .hero-image{
+        width:100%;
+        opacity:.18;
+    }
+
+    .grid{
+        grid-template-columns:
+            repeat(2,1fr);
+
+        gap:10px;
+    }
+
+    .info{
+        padding:9px;
+    }
+
+    .title{
+        font-size:11px;
+    }
+
+    .creator{
+        font-size:9px;
+    }
+
+    .music-info{
+        justify-content:flex-start;
+    }
+
+    .music-text{
+        max-width:150px;
+    }
+
+    .playlist-grid{
+        grid-template-columns:1fr;
+    }
+
+}
+
+@media(max-width:430px){
+
+    .grid{
+        grid-template-columns:1fr;
+    }
+
+    .music-right .bar-action span{
+        display:none;
+    }
+
+    .playlist-options{
+        grid-template-columns:1fr;
+    }
+
+}
+
+</style>
+
 </head>
 
 <body>
 
-    <div class="ambient ambient-one"></div>
-    <div class="ambient ambient-two"></div>
+<!-- =====================================================
+     BARRA SUPERIOR
+===================================================== -->
 
-    <header class="topbar">
-        <div class="brand">
-            <div class="brand-symbol">W</div>
-            <div>
-                <div class="brand-name">WIBSIPROJECT<span>.</span></div>
-                <div class="brand-sub">VIDEO NETWORK</div>
-            </div>
-        </div>
+<header class="topbar">
 
-        <div class="search-box">
-            <span>⌕</span>
-            <input type="text" id="searchInput" placeholder="Buscar tendencias..." autocomplete="off">
-            <kbd>ENTER</kbd>
-        </div>
+```
+<div class="logo">
 
-        <div class="top-actions">
-            <button class="top-button" id="randomButton">✦ <span>Sorpréndeme</span></button>
-            <button class="top-button" id="btnSecureTop" onclick="checkPassword()" title="Sección protegida para videos privados">🔒 <span>Privados</span></button>
-            <button class="icon-button" title="Lista de favoritos guardados">♡</button>
-            <button class="profile-button" id="profileBtnTop" title="Perfil de usuario" onclick="window.location.href='cuenta.html'"><span id="topUserInitials">AM</span></button>
-        </div>
-    </header>
-
-   <div class="app">
-        <aside class="sidebar">
-            <div class="sidebar-section">
-                <div class="section-label">EXPLORAR</div>
-                <button class="side-link" onclick="window.location.href='../index.html'" title="Ir a la página principal de inicio"><span>🏠</span> Inicio</button>
-                <button class="side-link active" onclick="window.location.href='html/explorar_mas.html'" title="Ver sección detallada de explorar más contenido"><span>🎁</span> Tendencias</button>
-                <button class="side-link" onclick="window.location.href='Wshorts.html'" title="Ver Shorts"><span>⚡</span> Shorts</button>
-                <button class="side-link" title="Explorar los videos más destacados de la plataforma" onclick="window.location.href='destacados.html'"><span>🖨️</span> Destacados</button>
-                <button class="side-link" title="Reproducir un video aleatorio de forma automática"><span>🔄</span> Aleatorio</button>
-            </div>
-
-            <div class="sidebar-section">
-                <div class="section-label">TU ESPACIO</div>
-                <button class="side-link" title="Ver tus videos marcados como favoritos" onclick="window.location.href='html/favoritos.html'"><span>💝</span> Favoritos</button>
-
-                   <button class="side-link" onclick="window.location.href='html/historial.html'">
-                    <span>💻️</span> Historial
-                </button>
-
-
-                <button class="side-link" title="Acceder a tus elementos guardados"><span>💾</span> Guardados</button>
-                <button class="side-link" onclick="checkPassword()" title="Acceso seguro mediante contraseña a contenido privado"><span>🔐</span> Guardados con contraseña</button>
-            </div>
-
-            <div class="sidebar-section">
-                <div class="section-label">MÁS</div>
-                <button class="side-link active" onclick="window.location.href='html/creadores.html'" title="Conocer a los creadores de contenido de la red"><span>🤝</span> Creadores</button>
-                <button class="side-link active" onclick="window.location.href='html/colecciones.html'" title="Ver listas de reproducción y colecciones multimedia"><span>🎥</span> Colecciones</button>
-                <button class="side-link active" onclick="window.location.href='html/Ajustes.html'" title="Configurar preferencias generales del sistema"><span>⚙️</span> Ajustes</button>
-            </div>
-
-            <div class="sidebar-bottom">
-                <div class="mini-status"><span class="status-dot"></span> WIBSIPROJECT ONLINE</div>
-                <small>Plataforma de video</small>
-            </div>
-        </aside>
-
-        <main class="main">
-            <section class="categories-section" style="margin-top: 10px; margin-bottom: 25px;">
-                <div class="categories" id="tendenciasFiltros">
-                    <button class="category active" data-tendencia="Todos"><span>🔥</span> Top Global</button>
-                    <button class="category" data-tendencia="Musica"><span>🎵</span> Música & Phonk</button>
-                    <button class="category" data-tendencia="Gaming"><span>⌁</span> Gaming</button>
-                    <button class="category" data-tendencia="Tecnología"><span>⚡</span> Tecnología & 4K</button>
-                </div>
-            </section>
-
-            <section class="video-section">
-                <div class="section-heading">
-                    <div>
-                        <span class="tiny-label">LO MÁS VISTO</span>
-                        <h2>Videos Populares</h2>
-                    </div>
-                    <span class="category-count">Espacios Independientes</span>
-                </div>
-
-                <div class="video-grid" id="videoGrid">
-                    <!-- Tarjeta 1 -->
-                    <article class="video-card" data-id="video-1" data-category="Tecnología" data-title="Dentro del futuro digital" data-video="https://www.youtube.com/watch?v=pBUlV7rZp_c" data-image="../assets/img/portada1.jpg">
-                        <button class="edit-video-btn" onclick="editarVideo(this, event)">✏️ Editar Video</button>
-                        <div class="thumbnail">
-                            <img src="../assets/img/paisaje.jpg" alt="Video">
-                            <div class="thumbnail-gradient"></div>
-                            <div class="quality">4K</div>
-                            <div class="duration">12:48</div>
-                            <button class="play-button">▶</button>
-                        </div>
-                        <div class="video-info">
-                            <div class="video-title">Dentro del futuro digital</div>
-                            <div class="creator"><div class="creator-avatar">W</div><span>Wibsiproject Lab</span><i>✓</i></div>
-                            <div class="video-meta"><span>250K vistas</span><b>•</b><span>hace 4 h</span></div>
-                        </div>
-                    </article>
-
-                    <!-- Tarjeta 2 -->
-                    <article class="video-card" data-id="video-2" data-category="Musica" data-title="AGRESSIVE DRIFT PHONK MIX" data-video="https://www.youtube.com/watch?v=DgTJXfsgPi8" data-image="../assets/img/portada1.jpg">
-                        <button class="edit-video-btn" onclick="editarVideo(this, event)">✏️ Editar Video</button>
-                        <div class="thumbnail">
-                            <img src="../assets/img/tortuga.jpg" alt="Phonk">
-                            <div class="thumbnail-gradient"></div>
-                            <div class="quality">HD</div>
-                            <div class="duration">04:15</div>
-                            <button class="play-button">▶</button>
-                        </div>
-                        <div class="video-info">
-                            <div class="video-title">AGRESSIVE DRIFT PHONK MIX</div>
-                            <div class="creator"><div class="creator-avatar purple">P</div><span>Phonk Nation</span><i>✓</i></div>
-                            <div class="video-meta"><span>180K vistas</span><b>•</b><span>hace 1 día</span></div>
-                        </div>
-                    </article>
-
-                    <!-- Tarjeta 3 -->
-                    <article class="video-card" data-id="video-3" data-category="Gaming" data-title="Gameplay Black Ops II Partida Épica Gaming" data-video="https://youtu.be/c95WGXY42jo" data-image="../assets/img/portada2.jpg">
-                        <button class="edit-video-btn" onclick="editarVideo(this, event)">✏️ Editar Video</button>
-                        <div class="thumbnail">
-                            <img src="../assets/img/phonk1.jpg" alt="Video">
-                            <div class="thumbnail-gradient"></div>
-                            <div class="quality">4K</div>
-                            <div class="duration">08:35</div>
-                            <button class="play-button">▶</button>
-                        </div>
-                        <div class="video-info">
-                            <div class="video-title">Gameplay Black Ops II Partida Épica Gaming</div>
-                            <div class="creator"><div class="creator-avatar cyan">N</div><span>Night Archive</span><i>✓</i></div>
-                            <div class="video-meta"><span>310K vistas</span><b>•</b><span>ayer</span></div>
-                        </div>
-                    </article>
-
-                    <!-- Tarjeta 4 -->
-                    <article class="video-card" data-id="video-4" data-category="Tecnología" data-title="Innovación en Inteligencia Artificial" data-video="https://www.youtube.com/watch?v=pBUlV7rZp_c" data-image="../assets/img/portada1.jpg">
-                        <button class="edit-video-btn" onclick="editarVideo(this, event)">✏️ Editar Video</button>
-                        <div class="thumbnail">
-                            <img src="../assets/img/portada1.jpg" alt="IA">
-                            <div class="thumbnail-gradient"></div>
-                            <div class="quality">4K</div>
-                            <div class="duration">15:20</div>
-                            <button class="play-button">▶</button>
-                        </div>
-                        <div class="video-info">
-                            <div class="video-title">Innovación en Inteligencia Artificial</div>
-                            <div class="creator"><div class="creator-avatar">W</div><span>Tech Global</span><i>✓</i></div>
-                            <div class="video-meta"><span>420K vistas</span><b>•</b><span>hace 6 h</span></div>
-                        </div>
-                    </article>
-
-
-
-
-
-
-
-   <!-- Tarjeta 4 -->
-                    <article class="video-card" data-id="video-4" data-category="Tecnología" data-title="Innovación en Inteligencia Artificial" data-video="https://youtu.be/CiGVMIErCDw" data-image="../assets/img/portada1.jpg">
-                        <button class="edit-video-btn" onclick="editarVideo(this, event)">✏️ Editar Video</button>
-                        <div class="thumbnail">
-                            <img src="../assets/img/portada1.jpg" alt="IA">
-                            <div class="thumbnail-gradient"></div>
-                            <div class="quality">4K</div>
-                            <div class="duration">15:20</div>
-                            <button class="play-button">▶</button>
-                        </div>
-                        <div class="video-info">
-                            <div class="video-title">Innovación en Inteligencia Artificial</div>
-                            <div class="creator"><div class="creator-avatar">W</div><span>Tech Global</span><i>✓</i></div>
-                            <div class="video-meta"><span>420K vistas</span><b>•</b><span>hace 6 h</span></div>
-                        </div>
-                    </article>
-
-
-
-
-
-
-
-                  <article class="video-card" data-id="video-4" data-category="Tecnología" data-title="Innovación en Inteligencia Artificial" data-video="https://youtu.be/9vE1WlkRaj8?list=RD9vE1WlkRaj8" data-image="../assets/img/portada1.jpg">
-                        <button class="edit-video-btn" onclick="editarVideo(this, event)">✏️ Editar Video</button>
-                        <div class="thumbnail">
-                            <img src="../assets/img/portada1.jpg" alt="IA">
-                            <div class="thumbnail-gradient"></div>
-                            <div class="quality">4K</div>
-                            <div class="duration">15:20</div>
-                            <button class="play-button">▶</button>
-                        </div>
-                        <div class="video-info">
-                            <div class="video-title">Innovación en Inteligencia Artificial</div>
-                            <div class="creator"><div class="creator-avatar">W</div><span>Tech Global</span><i>✓</i></div>
-                            <div class="video-meta"><span>420K vistas</span><b>•</b><span>hace 6 h</span></div>
-                        </div>
-                    </article>
-
-
-
-
-
-                  <article class="video-card" data-id="video-4" data-category="Tecnología" data-title="Innovación en Inteligencia Artificial" data-video="https://youtu.be/8dOMXfWmghg?list=RD8dOMXfWmghg" data-image="../assets/img/portada1.jpg">
-                        <button class="edit-video-btn" onclick="editarVideo(this, event)">✏️ Editar Video</button>
-                        <div class="thumbnail">
-                            <img src="../assets/img/portada1.jpg" alt="IA">
-                            <div class="thumbnail-gradient"></div>
-                            <div class="quality">4K</div>
-                            <div class="duration">15:20</div>
-                            <button class="play-button">▶</button>
-                        </div>
-                        <div class="video-info">
-                            <div class="video-title">Innovación en Inteligencia Artificial</div>
-                            <div class="creator"><div class="creator-avatar">W</div><span>Tech Global</span><i>✓</i></div>
-                            <div class="video-meta"><span>420K vistas</span><b>•</b><span>hace 6 h</span></div>
-                        </div>
-                    </article>
-
-
-
-
-
-                  <article class="video-card" data-id="video-4" data-category="Tecnología" data-title="Innovación en Inteligencia Artificial" data-video="https://youtu.be/yEbhDfZ6WD0?list=RDEMNcWnYEuMgWpcYQ4O1iFISA" data-image="../assets/img/portada1.jpg">
-                        <button class="edit-video-btn" onclick="editarVideo(this, event)">✏️ Editar Video</button>
-                        <div class="thumbnail">
-                            <img src="../assets/img/portada1.jpg" alt="IA">
-                            <div class="thumbnail-gradient"></div>
-                            <div class="quality">4K</div>
-                            <div class="duration">15:20</div>
-                            <button class="play-button">▶</button>
-                        </div>
-                        <div class="video-info">
-                            <div class="video-title">Innovación en Inteligencia Artificial</div>
-                            <div class="creator"><div class="creator-avatar">W</div><span>Tech Global</span><i>✓</i></div>
-                            <div class="video-meta"><span>420K vistas</span><b>•</b><span>hace 6 h</span></div>
-                        </div>
-                    </article>
-
-
-
-
-
-                  <article class="video-card" data-id="video-4" data-category="Tecnología" data-title="Innovación en Inteligencia Artificial" data-video="https://youtu.be/rK9gOo22vyg?list=RDEMNcWnYEuMgWpcYQ4O1iFISA" data-image="../assets/img/portada1.jpg">
-                        <button class="edit-video-btn" onclick="editarVideo(this, event)">✏️ Editar Video</button>
-                        <div class="thumbnail">
-                            <img src="../assets/img/portada1.jpg" alt="IA">
-                            <div class="thumbnail-gradient"></div>
-                            <div class="quality">4K</div>
-                            <div class="duration">15:20</div>
-                            <button class="play-button">▶</button>
-                        </div>
-                        <div class="video-info">
-                            <div class="video-title">Innovación en Inteligencia Artificial</div>
-                            <div class="creator"><div class="creator-avatar">W</div><span>Tech Global</span><i>✓</i></div>
-                            <div class="video-meta"><span>420K vistas</span><b>•</b><span>hace 6 h</span></div>
-                        </div>
-                    </article>
-
-
-                </div>
-            </section>
-        </main>
+    <div class="logo-box">
+        W
     </div>
 
-    
+    <div class="logo-text">
 
-    <!-- Modal Reproductor Principal -->
-    <div class="modal" id="videoModal">
-        <div class="player-window">
-            <div class="player-header">
-                <div class="player-brand">WIBSIPROJECT<span>.</span></div>
-                <button onclick="minimizarAReproductorBarra()" title="Minimizar" style="font-size: 16px; font-weight: bold; background: transparent; border: none; color: #fff; cursor: pointer; margin-left: auto; margin-right: 15px;">▼</button>
-                <button id="closePlayer">✕</button>
-            </div>
-            <div class="player">
-                <video id="videoPlayer" controls playsinline></video>
-            </div>
-            <div class="player-details">
-                <div>
-                    <span class="player-tag">WIBSIPROJECT TENDENCIA</span>
-                    <h2 id="playerTitle">Video</h2>
-                    <p>Reproduciendo contenido multimedia en tendencia.</p>
-                </div>
-                <div class="player-actions">
-                    <button id="likeButton">♡ <span>Me gusta</span></button>
-                    <button>◇ <span>Guardar</span></button>
-                    <button>↗ <span>Compartir</span></button>
-                </div>
-            </div>
-        </div>
+        <strong>
+            WIBSIPROJECT.
+        </strong>
+
+        <small>
+            VIDEO NETWORK
+        </small>
+
     </div>
 
-    <!-- Barra Flotante YMusic -->
-    <div id="ymusicBar" class="ymusic-floating-bar" style="display: none;">
-        <div class="ymusic-progress-bar">
-            <div class="ymusic-progress-filled" style="width: 0%;"></div>
-        </div>
+</div>
 
-        <div class="ymusic-left-controls">
-            <button class="ymusic-icon-btn" onclick="controlAnterior(event)" title="Anterior">⏮</button>
-            <button id="barPlayPause" class="ymusic-icon-btn play-main" onclick="togglePlayBar(event)" title="Pausa">❚❚</button>
-            <button class="ymusic-icon-btn" onclick="controlSiguiente(event)" title="Siguiente">⏭</button>
-            <span class="ymusic-time">0:00 / 0:00</span>
-        </div>
+<div class="search">
 
-        <div class="ymusic-center-info" onclick="abrirModalDesdeBarra()">
-            <img id="barThumb" src="../assets/img/portada1.jpg" alt="Miniatura">
-            <div class="ymusic-text-group">
-                <div id="barTitle" class="ymusic-bar-title">Selecciona un video</div>
-                <div class="ymusic-bar-channel">Wibsiproject Network</div>
-            </div>
-        </div>
+    <span>⌕</span>
 
-        <div class="ymusic-right-controls" onclick="event.stopPropagation()">
-            <button class="ymusic-icon-btn" id="btnLikeBar" onclick="toggleLikeBar(this)" title="Me gusta">👍</button>
-            <button class="ymusic-icon-btn hide-mobile" id="btnMuteBar" onclick="toggleMuteBar(this)" title="Volumen">🔊</button>
-            <button class="ymusic-icon-btn close-btn" onclick="abrirModalDesdeBarra()" title="Maximizar">▲</button>
-        </div>
+    <input
+        id="searchInput"
+        type="text"
+        placeholder="Buscar tendencias, música..."
+    >
+
+</div>
+
+<div class="actions">
+
+    <button
+        class="action"
+        id="randomButton"
+    >
+        ✦ Sorpréndeme
+    </button>
+
+    <button
+        class="action"
+        id="topPlaylistButton"
+    >
+        ▣ Mis playlists
+    </button>
+
+    <button
+        class="profile"
+        onclick="window.location.href='cuenta.html'"
+    >
+        AM
+    </button>
+
+</div>
+```
+
+</header>
+
+<div class="layout">
+
+<!-- =====================================================
+     SIDEBAR
+===================================================== -->
+
+<aside class="sidebar">
+
+```
+<div class="label">
+    EXPLORAR
+</div>
+
+<button
+    class="side"
+    onclick="window.location.href='index.html'"
+>
+    <span>⌂</span>
+    Inicio
+</button>
+
+<button class="side active">
+    <span>🔥</span>
+    Tendencias
+</button>
+
+<button
+    class="side"
+    onclick="window.location.href='Wshorts.html'"
+>
+    <span>⚡</span>
+    Shorts
+</button>
+
+<button
+    class="side"
+    id="randomSide"
+>
+    <span>🔀</span>
+    Aleatorio
+</button>
+
+<br>
+
+<div class="label">
+    TU ESPACIO
+</div>
+
+<button
+    class="side"
+    id="sidebarPlaylist"
+>
+    <span>▣</span>
+    Mis playlists
+</button>
+
+<button
+    class="side"
+    onclick="window.location.href='favoritos.html'"
+>
+    <span>♥</span>
+    Favoritos
+</button>
+
+<button
+    class="side"
+    onclick="window.location.href='historial.html'"
+>
+    <span>◷</span>
+    Historial
+</button>
+
+<button
+    class="side"
+    onclick="checkPassword()"
+>
+    <span>🔐</span>
+    Privado
+</button>
+
+<br>
+
+<div class="label">
+    MÁS
+</div>
+
+<button
+    class="side"
+    onclick="window.location.href='creadores.html'"
+>
+    <span>♟</span>
+    Creadores
+</button>
+
+<button
+    class="side"
+    onclick="window.location.href='colecciones.html'"
+>
+    <span>▣</span>
+    Colecciones
+</button>
+
+<button
+    class="side"
+    onclick="window.location.href='Ajustes.html'"
+>
+    <span>⚙</span>
+    Ajustes
+</button>
+```
+
+</aside>
+
+<!-- =====================================================
+     CONTENIDO
+===================================================== -->
+
+<main class="main">
+
+<!-- =====================================================
+     HERO
+===================================================== -->
+
+<section class="hero">
+
+```
+<img
+    class="hero-image"
+    src="../assets/img/tortuga.jpg"
+    alt=""
+>
+
+<div class="hero-content">
+
+    <div class="badge">
+        🔥 WIBSIPROJECT / GLOBAL
     </div>
 
-    <div class="toast" id="toast">
-        <span>✓</span>
-        <p>Guardado correctamente</p>
+    <h1>
+        Lo que todos están
+        <span>viendo.</span>
+    </h1>
+
+    <p>
+        Descubre las tendencias del momento,
+        guarda tus videos y deja que WIBSIPROJECT
+        los organice automáticamente en tus
+        playlists.
+    </p>
+
+    <div class="hero-buttons">
+
+        <button
+            class="hero-button"
+            onclick="randomVideo()"
+        >
+            ▶ Reproducir algo
+        </button>
+
+        <button
+            class="hero-button secondary"
+            id="heroPlaylistButton"
+        >
+            ▣ Mis playlists
+        </button>
+
     </div>
 
-    <script>
-        function checkPassword() {
-            const passwordCorrecta = "2436anthony123privado123"; 
-            let passwordIngresada = prompt("Ingresa la contraseña para ver los videos guardados:");
-            if (passwordIngresada === passwordCorrecta) {
-                window.location.href = "privado.html";
-            } else if (passwordIngresada !== null) {
-                alert("Contraseña incorrecta. Acceso denegado.");
-            }
+</div>
+```
+
+</section>
+
+<!-- =====================================================
+     PLAYLISTS
+===================================================== -->
+
+<section
+    class="playlists-section"
+    id="playlistsSection"
+>
+
+```
+<div class="playlist-header">
+
+    <div>
+
+        <small>
+            TU CONTENIDO
+        </small>
+
+        <h2>
+            Mis playlists
+        </h2>
+
+    </div>
+
+    <small id="playlistTotal">
+        0 GUARDADOS
+    </small>
+
+</div>
+
+
+<div class="playlist-grid">
+
+    <div
+        class="playlist-card"
+        data-playlist-view="entrenamiento"
+    >
+
+        <span class="playlist-count"
+              id="count-entrenamiento">
+            0
+        </span>
+
+        <div class="playlist-icon">
+            🏋️
+        </div>
+
+        <h3>
+            Entrenamiento
+        </h3>
+
+        <p>
+            Rutinas, gimnasio y fitness
+        </p>
+
+    </div>
+
+
+    <div
+        class="playlist-card"
+        data-playlist-view="yoga"
+    >
+
+        <span class="playlist-count"
+              id="count-yoga">
+            0
+        </span>
+
+        <div class="playlist-icon">
+            🧘
+        </div>
+
+        <h3>
+            Yoga
+        </h3>
+
+        <p>
+            Yoga, relajación y meditación
+        </p>
+
+    </div>
+
+
+    <div
+        class="playlist-card"
+        data-playlist-view="fiestas"
+    >
+
+        <span class="playlist-count"
+              id="count-fiestas">
+            0
+        </span>
+
+        <div class="playlist-icon">
+            🎉
+        </div>
+
+        <h3>
+            Fiestas
+        </h3>
+
+        <p>
+            Música, baile y fiestas
+        </p>
+
+    </div>
+
+
+    <div
+        class="playlist-card"
+        data-playlist-view="tendencias"
+    >
+
+        <span class="playlist-count"
+              id="count-tendencias">
+            0
+        </span>
+
+        <div class="playlist-icon">
+            🔥
+        </div>
+
+        <h3>
+            Tendencias
+        </h3>
+
+        <p>
+            Videos virales y populares
+        </p>
+
+    </div>
+
+</div>
+```
+
+</section>
+
+<!-- =====================================================
+     PLAYLIST ABIERTA
+===================================================== -->
+
+<section
+    class="playlist-view"
+    id="playlistView"
+>
+
+```
+<div class="playlist-view-top">
+
+    <div>
+
+        <small
+            id="playlistViewLabel"
+            style="
+                color:#657083;
+                font-size:9px;
+                letter-spacing:2px;
+            "
+        >
+            PLAYLIST
+        </small>
+
+        <h2 id="playlistViewTitle">
+            Selecciona una playlist
+        </h2>
+
+    </div>
+
+    <button
+        class="close-playlist"
+        id="closePlaylist"
+    >
+        ✕ Cerrar
+    </button>
+
+</div>
+
+<div
+    class="grid"
+    id="playlistGrid"
+></div>
+
+<div
+    class="empty"
+    id="playlistEmpty"
+    style="display:none;"
+>
+
+    <h3>
+        Esta playlist está vacía
+    </h3>
+
+    <p>
+        Agrega videos usando el botón ➕ de cada tarjeta.
+    </p>
+
+</div>
+```
+
+</section>
+
+<!-- =====================================================
+     FILTROS
+===================================================== -->
+
+<div class="filters">
+
+```
+<button
+    class="filter active"
+    data-category="Todos"
+>
+    🔥 Todo
+</button>
+
+<button
+    class="filter"
+    data-category="Musica"
+>
+    🎵 Música
+</button>
+
+<button
+    class="filter"
+    data-category="Gaming"
+>
+    🎮 Gaming
+</button>
+
+<button
+    class="filter"
+    data-category="Tecnología"
+>
+    ⚡ Tecnología
+</button>
+```
+
+</div>
+
+<!-- =====================================================
+     TÍTULO
+===================================================== -->
+
+<div class="section-title">
+
+```
+<div>
+
+    <small>
+        DESCUBRIMIENTO
+    </small>
+
+    <h2>
+        Tendencias actuales
+    </h2>
+
+</div>
+
+<small id="countText">
+    6 VIDEOS
+</small>
+```
+
+</div>
+
+<!-- =====================================================
+     VIDEOS
+===================================================== -->
+
+<div
+    class="grid"
+    id="videoGrid"
+>
+
+<!-- VIDEO 1 -->
+
+<article
+    class="card"
+    data-id="music001"
+    data-category="Musica"
+    data-title="AGRESSIVE DRIFT PHONK MIX"
+    data-video="https://www.youtube.com/watch?v=DgTJXfsgPi8"
+    data-image="../assets/img/tortuga.jpg"
+    data-creator="Phonk Nation"
+>
+
+```
+<div class="thumb">
+
+    <img
+        src="../assets/img/tortuga.jpg"
+        alt="Phonk"
+    >
+
+    <div class="overlay"></div>
+
+    <span class="playlist-badge">
+        🎉 Fiestas
+    </span>
+
+    <button
+        class="heart"
+        title="Guardar en favoritos"
+    >
+        ♡
+    </button>
+
+    <button
+        class="playlist-add"
+        title="Agregar a playlist"
+    >
+        ＋
+    </button>
+
+    <button class="play">
+        ▶
+    </button>
+
+    <span class="quality">
+        HD
+    </span>
+
+</div>
+
+<div class="info">
+
+    <div class="title">
+        AGRESSIVE DRIFT PHONK MIX
+    </div>
+
+    <div class="creator">
+
+        <div class="avatar">
+            P
+        </div>
+
+        Phonk Nation
+
+    </div>
+
+    <div class="meta">
+        180K vistas • hace 1 día
+    </div>
+
+</div>
+```
+
+</article>
+
+<!-- VIDEO 2 -->
+
+<article
+    class="card"
+    data-id="music002"
+    data-category="Tecnología"
+    data-title="Dentro del futuro digital"
+    data-video="https://www.youtube.com/watch?v=pBUlV7rZp_c"
+    data-image="../assets/img/paisaje.jpg"
+    data-creator="Wibsiproject Lab"
+>
+
+```
+<div class="thumb">
+
+    <img
+        src="../assets/img/paisaje.jpg"
+        alt="Futuro digital"
+    >
+
+    <div class="overlay"></div>
+
+    <span class="playlist-badge">
+        🔥 Tendencias
+    </span>
+
+    <button class="heart">
+        ♡
+    </button>
+
+    <button
+        class="playlist-add"
+        title="Agregar a playlist"
+    >
+        ＋
+    </button>
+
+    <button class="play">
+        ▶
+    </button>
+
+    <span class="quality">
+        4K
+    </span>
+
+</div>
+
+<div class="info">
+
+    <div class="title">
+        Dentro del futuro digital
+    </div>
+
+    <div class="creator">
+
+        <div class="avatar">
+            W
+        </div>
+
+        Wibsiproject Lab
+
+    </div>
+
+    <div class="meta">
+        250K vistas • hace 4 h
+    </div>
+
+</div>
+```
+
+</article>
+
+<!-- VIDEO 3 -->
+
+<article
+    class="card"
+    data-id="music003"
+    data-category="Gaming"
+    data-title="Gameplay Black Ops II"
+    data-video="https://youtu.be/c95WGXY42jo"
+    data-image="../assets/img/phonk1.jpg"
+    data-creator="Night Archive"
+>
+
+```
+<div class="thumb">
+
+    <img
+        src="../assets/img/phonk1.jpg"
+        alt="Gaming"
+    >
+
+    <div class="overlay"></div>
+
+    <span class="playlist-badge">
+        🔥 Tendencias
+    </span>
+
+    <button class="heart">
+        ♡
+    </button>
+
+    <button
+        class="playlist-add"
+        title="Agregar a playlist"
+    >
+        ＋
+    </button>
+
+    <button class="play">
+        ▶
+    </button>
+
+    <span class="quality">
+        HD
+    </span>
+
+</div>
+
+<div class="info">
+
+    <div class="title">
+        Gameplay Black Ops II — Partida Épica
+    </div>
+
+    <div class="creator">
+
+        <div class="avatar">
+            N
+        </div>
+
+        Night Archive
+
+    </div>
+
+    <div class="meta">
+        310K vistas • ayer
+    </div>
+
+</div>
+```
+
+</article>
+
+<!-- VIDEO 4 -->
+
+<article
+    class="card"
+    data-id="music004"
+    data-category="Tecnología"
+    data-title="Innovación en Inteligencia Artificial"
+    data-video="https://youtu.be/CiGVMIErCDw"
+    data-image="../assets/img/portada1.jpg"
+    data-creator="Tech Global"
+>
+
+```
+<div class="thumb">
+
+    <img
+        src="../assets/img/portada1.jpg"
+        alt="IA"
+    >
+
+    <div class="overlay"></div>
+
+    <span class="playlist-badge">
+        🔥 Tendencias
+    </span>
+
+    <button class="heart">
+        ♡
+    </button>
+
+    <button
+        class="playlist-add"
+        title="Agregar a playlist"
+    >
+        ＋
+    </button>
+
+    <button class="play">
+        ▶
+    </button>
+
+    <span class="quality">
+        4K
+    </span>
+
+</div>
+
+<div class="info">
+
+    <div class="title">
+        Innovación en Inteligencia Artificial
+    </div>
+
+    <div class="creator">
+
+        <div class="avatar">
+            T
+        </div>
+
+        Tech Global
+
+    </div>
+
+    <div class="meta">
+        420K vistas • hace 6 h
+    </div>
+
+</div>
+```
+
+</article>
+
+<!-- VIDEO 5 -->
+
+<article
+    class="card"
+    data-id="music005"
+    data-category="Musica"
+    data-title="Dark Phonk Night Drive"
+    data-video="https://youtu.be/8dOMXfWmghg"
+    data-image="../assets/img/tortuga.jpg"
+    data-creator="Dark Audio"
+>
+
+```
+<div class="thumb">
+
+    <img
+        src="../assets/img/tortuga.jpg"
+        alt="Dark Phonk"
+    >
+
+    <div class="overlay"></div>
+
+    <span class="playlist-badge">
+        🎉 Fiestas
+    </span>
+
+    <button class="heart">
+        ♡
+    </button>
+
+    <button
+        class="playlist-add"
+        title="Agregar a playlist"
+    >
+        ＋
+    </button>
+
+    <button class="play">
+        ▶
+    </button>
+
+    <span class="quality">
+        HD
+    </span>
+
+</div>
+
+<div class="info">
+
+    <div class="title">
+        Dark Phonk Night Drive
+    </div>
+
+    <div class="creator">
+
+        <div class="avatar">
+            D
+        </div>
+
+        Dark Audio
+
+    </div>
+
+    <div class="meta">
+        350K vistas • hace 3 días
+    </div>
+
+</div>
+```
+
+</article>
+
+<!-- VIDEO 6 -->
+
+<article
+    class="card"
+    data-id="music006"
+    data-category="Gaming"
+    data-title="Black Ops II El regreso"
+    data-video="https://youtu.be/yEbhDfZ6WD0"
+    data-image="../assets/img/phonk1.jpg"
+    data-creator="Gaming Archive"
+>
+
+```
+<div class="thumb">
+
+    <img
+        src="../assets/img/phonk1.jpg"
+        alt="Gaming"
+    >
+
+    <div class="overlay"></div>
+
+    <span class="playlist-badge">
+        🔥 Tendencias
+    </span>
+
+    <button class="heart">
+        ♡
+    </button>
+
+    <button
+        class="playlist-add"
+        title="Agregar a playlist"
+    >
+        ＋
+    </button>
+
+    <button class="play">
+        ▶
+    </button>
+
+    <span class="quality">
+        HD
+    </span>
+
+</div>
+
+<div class="info">
+
+    <div class="title">
+        Black Ops II — El regreso
+    </div>
+
+    <div class="creator">
+
+        <div class="avatar">
+            G
+        </div>
+
+        Gaming Archive
+
+    </div>
+
+    <div class="meta">
+        275K vistas • hace 3 días
+    </div>
+
+</div>
+```
+
+</article>
+
+</div>
+
+<div
+    class="empty"
+    id="empty"
+>
+
+```
+<h3>
+    No encontramos resultados
+</h3>
+
+<p>
+    Prueba otra búsqueda.
+</p>
+```
+
+</div>
+
+</main>
+
+</div>
+
+<!-- =====================================================
+     MODAL PLAYLIST
+===================================================== -->
+
+<div
+    class="modal"
+    id="playlistModal"
+>
+
+```
+<div class="modal-box">
+
+    <h2>
+        ➕ Agregar a playlist
+    </h2>
+
+    <p id="modalVideoTitle">
+        Selecciona dónde guardar este video.
+    </p>
+
+    <div
+        class="detected"
+        id="detectedText"
+    >
+        🤖 Detectando...
+    </div>
+
+    <div class="playlist-options">
+
+        <button
+            class="playlist-option"
+            data-playlist-option="entrenamiento"
+        >
+            <strong>
+                🏋️ Entrenamiento
+            </strong>
+
+            <small>
+                Fitness, gym y rutinas
+            </small>
+        </button>
+
+        <button
+            class="playlist-option"
+            data-playlist-option="yoga"
+        >
+            <strong>
+                🧘 Yoga
+            </strong>
+
+            <small>
+                Yoga y relajación
+            </small>
+        </button>
+
+        <button
+            class="playlist-option"
+            data-playlist-option="fiestas"
+        >
+            <strong>
+                🎉 Fiestas
+            </strong>
+
+            <small>
+                Música y baile
+            </small>
+        </button>
+
+        <button
+            class="playlist-option"
+            data-playlist-option="tendencias"
+        >
+            <strong>
+                🔥 Tendencias
+            </strong>
+
+            <small>
+                Videos populares
+            </small>
+        </button>
+
+    </div>
+
+    <div class="modal-actions">
+
+        <button
+            class="modal-btn"
+            id="cancelPlaylist"
+        >
+            Cancelar
+        </button>
+
+        <button
+            class="modal-btn primary"
+            id="savePlaylist"
+        >
+            Guardar playlist
+        </button>
+
+    </div>
+
+</div>
+```
+
+</div>
+
+<!-- =====================================================
+     TOAST
+===================================================== -->
+
+<div
+    class="toast"
+    id="toast"
+></div>
+
+<!-- =====================================================
+     MUSIC BAR
+===================================================== -->
+
+<div id="musicBar">
+
+```
+<div
+    class="progress"
+    id="progress"
+>
+    <div
+        class="progress-fill"
+        id="progressFill"
+    ></div>
+</div>
+
+<div class="music-left">
+
+    <button
+        class="music-btn"
+        id="previousButton"
+    >
+        ⏮
+    </button>
+
+    <button
+        class="music-btn play-main"
+        id="playPauseButton"
+    >
+        ▶
+    </button>
+
+    <button
+        class="music-btn"
+        id="nextButton"
+    >
+        ⏭
+    </button>
+
+</div>
+
+<div class="music-info">
+
+    <img
+        id="barThumb"
+        src="../assets/img/tortuga.jpg"
+        alt=""
+    >
+
+    <div class="music-text">
+
+        <div id="barTitle">
+            Selecciona un video
+        </div>
+
+        <div id="barCreator">
+            WIBSIPROJECT
+        </div>
+
+    </div>
+
+</div>
+
+<div class="music-right">
+
+    <button
+        class="bar-action favorite"
+        id="favoriteButton"
+    >
+        ♡ <span>Favoritos</span>
+    </button>
+
+    <button
+        class="bar-action"
+        id="downloadButton"
+    >
+        ⬇ <span>Descargar</span>
+    </button>
+
+    <button
+        class="bar-action"
+        id="muteButton"
+    >
+        🔊
+    </button>
+
+    <button
+        class="bar-action"
+        id="closeBar"
+    >
+        ✕
+    </button>
+
+</div>
+```
+
+</div>
+
+<script>
+
+/* =====================================================
+   ELEMENTOS PRINCIPALES
+===================================================== */
+
+const cards =
+    Array.from(
+        document.querySelectorAll(".card")
+    );
+
+let currentCard = null;
+let currentIndex = -1;
+
+let currentVideo = null;
+let currentIframe = null;
+
+let isPlaying = false;
+let isMuted = false;
+
+
+/* =====================================================
+   NOMBRES DE PLAYLISTS
+===================================================== */
+
+const playlistNames = {
+
+    entrenamiento:"🏋️ Entrenamiento",
+
+    yoga:"🧘 Yoga",
+
+    fiestas:"🎉 Fiestas",
+
+    tendencias:"🔥 Tendencias"
+
+};
+
+
+/* =====================================================
+   PLAYLISTS LOCALSTORAGE
+===================================================== */
+
+const PLAYLIST_KEY =
+    "wibsiproject_playlists";
+
+
+function getPlaylists(){
+
+    const saved =
+        localStorage.getItem(
+            PLAYLIST_KEY
+        );
+
+    if(!saved){
+
+        return {
+            entrenamiento:[],
+            yoga:[],
+            fiestas:[],
+            tendencias:[]
+        };
+
+    }
+
+    try{
+
+        const data =
+            JSON.parse(saved);
+
+        return {
+
+            entrenamiento:
+                Array.isArray(data.entrenamiento)
+                ? data.entrenamiento
+                : [],
+
+            yoga:
+                Array.isArray(data.yoga)
+                ? data.yoga
+                : [],
+
+            fiestas:
+                Array.isArray(data.fiestas)
+                ? data.fiestas
+                : [],
+
+            tendencias:
+                Array.isArray(data.tendencias)
+                ? data.tendencias
+                : []
+
+        };
+
+    }catch(error){
+
+        return {
+            entrenamiento:[],
+            yoga:[],
+            fiestas:[],
+            tendencias:[]
+        };
+
+    }
+
+}
+
+
+function savePlaylists(data){
+
+    localStorage.setItem(
+        PLAYLIST_KEY,
+        JSON.stringify(data)
+    );
+
+}
+
+
+/* =====================================================
+   DATOS DEL VIDEO
+===================================================== */
+
+function getVideoData(card){
+
+    return {
+
+        id:card.dataset.id,
+
+        title:card.dataset.title,
+
+        video:card.dataset.video,
+
+        image:card.dataset.image,
+
+        creator:card.dataset.creator,
+
+        category:card.dataset.category
+
+    };
+
+}
+
+
+/* =====================================================
+   RECONOCIMIENTO AUTOMÁTICO
+===================================================== */
+
+function detectPlaylist(card){
+
+    /*
+       Si posteriormente quieres controlar
+       manualmente la playlist de un video,
+       puedes agregar:
+
+       data-playlist="yoga"
+
+       al article.
+
+       Esa clasificación tendrá prioridad.
+    */
+
+    if(card.dataset.playlist){
+
+        return card.dataset.playlist;
+
+    }
+
+
+    const text = (
+
+        (card.dataset.title || "") +
+        " " +
+        (card.dataset.creator || "") +
+        " " +
+        (card.dataset.category || "")
+
+    ).toLowerCase();
+
+
+    /* =========================
+       ENTRENAMIENTO
+    ========================= */
+
+    const entrenamiento = [
+
+        "gym",
+        "gimnasio",
+        "workout",
+        "training",
+        "entrenamiento",
+        "fitness",
+        "fit",
+        "cardio",
+        "crossfit",
+        "musculo",
+        "músculo",
+        "pesas",
+        "rutina",
+        "abs",
+        "abdominal",
+        "ejercicio",
+        "exercise",
+        "running",
+        "correr"
+
+    ];
+
+
+    /* =========================
+       YOGA
+    ========================= */
+
+    const yoga = [
+
+        "yoga",
+        "meditacion",
+        "meditación",
+        "meditation",
+        "relax",
+        "relajacion",
+        "relajación",
+        "mindfulness",
+        "zen",
+        "respiracion",
+        "respiración",
+        "stretching",
+        "estiramiento"
+
+    ];
+
+
+    /* =========================
+       FIESTAS
+    ========================= */
+
+    const fiestas = [
+
+        "fiesta",
+        "fiestas",
+        "party",
+        "dance",
+        "baile",
+        "club",
+        "nightclub",
+        "dj",
+        "phonk",
+        "drift",
+        "mix",
+        "remix",
+        "music",
+        "musica",
+        "música",
+        "night drive",
+        "electronic",
+        "reggaeton",
+        "festival"
+
+    ];
+
+
+    /* =========================
+       TENDENCIAS
+    ========================= */
+
+    const tendencias = [
+
+        "tendencia",
+        "tendencias",
+        "trend",
+        "trending",
+        "viral",
+        "popular",
+        "actual",
+        "nuevo",
+        "news",
+        "gaming",
+        "gameplay",
+        "technology",
+        "tecnologia",
+        "tecnología",
+        "ia",
+        "inteligencia artificial",
+        "futuro"
+
+    ];
+
+
+    if(
+        entrenamiento.some(
+            word => text.includes(word)
+        )
+    ){
+
+        return "entrenamiento";
+
+    }
+
+
+    if(
+        yoga.some(
+            word => text.includes(word)
+        )
+    ){
+
+        return "yoga";
+
+    }
+
+
+    if(
+        fiestas.some(
+            word => text.includes(word)
+        )
+    ){
+
+        return "fiestas";
+
+    }
+
+
+    return "tendencias";
+
+}
+
+
+/* =====================================================
+   ACTUALIZAR BADGES
+===================================================== */
+
+function updatePlaylistBadges(){
+
+    cards.forEach(card => {
+
+        const playlist =
+            detectPlaylist(card);
+
+        const badge =
+            card.querySelector(
+                ".playlist-badge"
+            );
+
+        if(badge){
+
+            badge.textContent =
+                playlistNames[playlist];
+
         }
 
-        document.addEventListener("DOMContentLoaded", () => {
-            const sesionActiva = JSON.parse(localStorage.getItem('wibsiproject_sesion_activa'));
-            const profileBtn = document.getElementById('profileBtnTop');
-            if (sesionActiva && profileBtn) {
-                if (sesionActiva.avatar) {
-                    profileBtn.style.backgroundImage = `url(${sesionActiva.avatar})`;
-                    profileBtn.style.backgroundSize = 'cover';
-                    profileBtn.style.backgroundRepeat = 'no-repeat';
-                    profileBtn.style.backgroundPosition = 'center';
-                    const spanInit = document.getElementById('topUserInitials');
-                    if (spanInit) spanInit.style.display = 'none';
-                }
-            }
+    });
+
+}
+
+
+/* =====================================================
+   COMPROBAR SI ESTÁ EN PLAYLIST
+===================================================== */
+
+function isInPlaylist(id){
+
+    const playlists =
+        getPlaylists();
+
+    return Object.values(
+        playlists
+    ).some(
+        list => list.includes(id)
+    );
+
+}
+
+
+/* =====================================================
+   ACTUALIZAR BOTONES +
+===================================================== */
+
+function updatePlaylistButtons(){
+
+    cards.forEach(card => {
+
+        const button =
+            card.querySelector(
+                ".playlist-add"
+            );
+
+        if(!button){
+            return;
+        }
+
+        const saved =
+            isInPlaylist(
+                card.dataset.id
+            );
+
+        button.classList.toggle(
+            "saved",
+            saved
+        );
+
+        button.textContent =
+            saved ? "✓" : "＋";
+
+        button.title =
+            saved
+            ? "Este video está guardado"
+            : "Agregar a playlist";
+
+    });
+
+}
+
+
+/* =====================================================
+   TOAST
+===================================================== */
+
+let toastTimer = null;
+
+
+function showToast(message){
+
+    const toast =
+        document.getElementById(
+            "toast"
+        );
+
+    toast.textContent =
+        message;
+
+    toast.classList.add(
+        "show"
+    );
+
+    clearTimeout(
+        toastTimer
+    );
+
+    toastTimer =
+        setTimeout(
+            () => {
+
+                toast.classList.remove(
+                    "show"
+                );
+
+            },
+            2500
+        );
+
+}
+
+
+/* =====================================================
+   MODAL PLAYLIST
+===================================================== */
+
+const playlistModal =
+    document.getElementById(
+        "playlistModal"
+    );
+
+let playlistCardSelected = null;
+let selectedPlaylist = null;
+
+
+function openPlaylistModal(card){
+
+    playlistCardSelected =
+        card;
+
+    selectedPlaylist =
+        detectPlaylist(card);
+
+
+    document.getElementById(
+        "modalVideoTitle"
+    ).textContent =
+        card.dataset.title;
+
+
+    document.getElementById(
+        "detectedText"
+    ).innerHTML =
+        "🤖 WIBSIPROJECT detectó: <strong>" +
+        playlistNames[selectedPlaylist] +
+        "</strong>";
+
+
+    document
+        .querySelectorAll(
+            ".playlist-option"
+        )
+        .forEach(option => {
+
+            option.classList.toggle(
+
+                "selected",
+
+                option.dataset.playlistOption ===
+                selectedPlaylist
+
+            );
+
         });
 
-        function cargarDatosPersistentes() {
-            const grid = document.getElementById("videoGrid");
-            if (!grid) return;
 
-            let videosSubidos = JSON.parse(localStorage.getItem("wibsiproject_videos_subidos")) || [];
-            
-            videosSubidos.forEach(item => {
-                if (!document.querySelector(`[data-id="${item.id}"]`)) {
-                    const nuevaCard = document.createElement("article");
-                    nuevaCard.className = "video-card";
-                    nuevaCard.dataset.id = item.id;
-                    nuevaCard.dataset.category = item.categoria || "Tecnología";
-                    nuevaCard.dataset.title = item.titulo;
-                    nuevaCard.dataset.video = item.videoUrl || "https://www.youtube.com/watch?v=pBUlV7rZp_c";
-                    nuevaCard.dataset.image = item.imagen || "../assets/img/portada1.jpg";
+    playlistModal.classList.add(
+        "active"
+    );
 
-                    nuevaCard.innerHTML = `
-                        <button class="edit-video-btn" onclick="editarVideo(this, event)">✏️ Editar Video</button>
-                        <div class="thumbnail">
-                            <img src="${item.imagen || '../assets/img/portada1.jpg'}" alt="Video">
-                            <div class="thumbnail-gradient"></div>
-                            <div class="quality">HD</div>
-                            <div class="duration">10:00</div>
-                            <button class="play-button">▶</button>
-                        </div>
-                        <div class="video-info">
-                            <div class="video-title">${item.titulo}</div>
-                            <div class="creator"><div class="creator-avatar">U</div><span>Usuario</span><i>✓</i></div>
-                            <div class="video-meta"><span>1K vistas</span><b>•</b><span>recién subido</span></div>
-                        </div>
-                    `;
-                    grid.prepend(nuevaCard);
-                }
-            });
+}
 
-            let datosEditados = JSON.parse(localStorage.getItem("wibsiproject_tendencias_videos")) || {};
-            const tarjetas = document.querySelectorAll(".video-card");
 
-            tarjetas.forEach((card, index) => {
-                const idCard = card.dataset.id || `video-${index}`;
-                card.dataset.id = idCard;
+function closePlaylistModal(){
 
-                const tituloElem = card.querySelector(".video-title");
-                if (!tituloElem) return;
+    playlistModal.classList.remove(
+        "active"
+    );
 
-                if (datosEditados[idCard] && datosEditados[idCard].titulo) {
-                    tituloElem.textContent = datosEditados[idCard].titulo;
-                    card.setAttribute("data-title", datosEditados[idCard].titulo);
-                }
+    playlistCardSelected =
+        null;
 
-                const textoTitulo = tituloElem.textContent.toLowerCase();
-                let categoriaDetectada = "Tecnología";
+    selectedPlaylist =
+        null;
 
-                if (textoTitulo.includes("phonk") || textoTitulo.includes("mix") || textoTitulo.includes("musica") || textoTitulo.includes("drift")) {
-                    categoriaDetectada = "Musica";
-                } else if (textoTitulo.includes("gameplay") || textoTitulo.includes("gaming") || textoTitulo.includes("juego") || textoTitulo.includes("black ops")) {
-                    categoriaDetectada = "Gaming";
-                } else if (textoTitulo.includes("futuro") || textoTitulo.includes("ia") || textoTitulo.includes("inteligencia") || textoTitulo.includes("tech")) {
-                    categoriaDetectada = "Tecnología";
-                }
+}
 
-                card.setAttribute("data-category", categoriaDetectada);
-            });
-        }
 
-        window.registrarNuevoVideo = function(titulo, categoria, videoUrl, imagen) {
-            let videosSubidos = JSON.parse(localStorage.getItem("wibsiproject_videos_subidos")) || [];
-            const nuevoId = "video-custom-" + Date.now();
-            
-            videosSubidos.push({
-                id: nuevoId,
-                titulo: titulo,
-                categoria: categoria || "Tecnología",
-                videoUrl: videoUrl,
-                imagen: imagen
-            });
+/* =====================================================
+   OPCIONES DE PLAYLIST
+===================================================== */
 
-            localStorage.setItem("wibsiproject_videos_subidos", JSON.stringify(videosSubidos));
-            cargarDatosPersistentes();
-        }
+document
+    .querySelectorAll(
+        ".playlist-option"
+    )
+    .forEach(option => {
 
-        function editarVideo(btn, event) {
-            event.stopPropagation(); 
-            const card = btn.closest(".video-card");
-            const tituloElem = card.querySelector(".video-title");
-            const idCard = card.dataset.id;
-            
-            let nuevoTitulo = prompt("Edita el título de este video:", tituloElem.textContent);
-            if (nuevoTitulo !== null && nuevoTitulo.trim() !== "") {
-                card.classList.add("editing-animation");
+        option.addEventListener(
+            "click",
+            () => {
 
-                tituloElem.textContent = nuevoTitulo;
-                card.setAttribute("data-title", nuevoTitulo);
+                selectedPlaylist =
+                    option.dataset.playlistOption;
 
-                let datosEditados = JSON.parse(localStorage.getItem("wibsiproject_tendencias_videos")) || {};
-                datosEditados[idCard] = { titulo: nuevoTitulo };
-                localStorage.setItem("wibsiproject_tendencias_videos", JSON.stringify(datosEditados));
 
-                let videosSubidos = JSON.parse(localStorage.getItem("wibsiproject_videos_subidos")) || [];
-                let idx = videosSubidos.findIndex(v => v.id === idCard);
-                if (idx !== -1) {
-                    videosSubidos[idx].titulo = nuevoTitulo;
-                    localStorage.setItem("wibsiproject_videos_subidos", JSON.stringify(videosSubidos));
-                }
+                document
+                    .querySelectorAll(
+                        ".playlist-option"
+                    )
+                    .forEach(item => {
 
-                cargarDatosPersistentes();
+                        item.classList.toggle(
 
-                setTimeout(() => {
-                    card.classList.remove("editing-animation");
-                }, 600);
+                            "selected",
+
+                            item === option
+
+                        );
+
+                    });
+
             }
+        );
+
+    });
+
+
+/* =====================================================
+   GUARDAR PLAYLIST
+===================================================== */
+
+document
+    .getElementById(
+        "savePlaylist"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            if(
+                !playlistCardSelected ||
+                !selectedPlaylist
+            ){
+
+                return;
+
+            }
+
+
+            const data =
+                getVideoData(
+                    playlistCardSelected
+                );
+
+
+            const playlists =
+                getPlaylists();
+
+
+            /*
+               El mismo video puede estar
+               en varias playlists.
+            */
+
+            if(
+                !playlists[selectedPlaylist]
+                    .includes(data.id)
+            ){
+
+                playlists[selectedPlaylist]
+                    .push(data.id);
+
+                savePlaylists(
+                    playlists
+                );
+
+                updatePlaylistButtons();
+
+                updatePlaylistCounts();
+
+                showToast(
+                    "✓ Guardado en " +
+                    playlistNames[selectedPlaylist]
+                );
+
+            }else{
+
+                /*
+                   Si ya estaba guardado,
+                   se elimina de esa playlist.
+                */
+
+                playlists[selectedPlaylist] =
+                    playlists[selectedPlaylist]
+                        .filter(
+                            id => id !== data.id
+                        );
+
+                savePlaylists(
+                    playlists
+                );
+
+                updatePlaylistButtons();
+
+                updatePlaylistCounts();
+
+                showToast(
+                    "✓ Eliminado de " +
+                    playlistNames[selectedPlaylist]
+                );
+
+            }
+
+
+            closePlaylistModal();
+
+        }
+    );
+
+
+document
+    .getElementById(
+        "cancelPlaylist"
+    )
+    .addEventListener(
+        "click",
+        closePlaylistModal
+    );
+
+
+playlistModal.addEventListener(
+    "click",
+    event => {
+
+        if(
+            event.target ===
+            playlistModal
+        ){
+
+            closePlaylistModal();
+
         }
 
-        cargarDatosPersistentes();
+    }
+);
 
-        document.addEventListener("DOMContentLoaded", () => {
-            const botonesFiltro = document.querySelectorAll("#tendenciasFiltros .category");
-            const grid = document.getElementById("videoGrid");
 
-            botonesFiltro.forEach(boton => {
-                boton.addEventListener("click", () => {
-                    botonesFiltro.forEach(b => b.classList.remove("active"));
-                    boton.classList.add("active");
+/* =====================================================
+   BOTONES PLAYLIST DE TARJETAS
+===================================================== */
 
-                    const filtro = boton.dataset.tendencia;
-                    const tarjetasActualizadas = document.querySelectorAll(".video-card");
+cards.forEach(card => {
 
-                    grid.style.opacity = "0";
-                    grid.style.transform = "translateY(8px)";
-                    grid.style.transition = "opacity 0.2s ease, transform 0.2s ease";
+    const button =
+        card.querySelector(
+            ".playlist-add"
+        );
 
-                    setTimeout(() => {
-                        tarjetasActualizadas.forEach(card => {
-                            const categoria = card.getAttribute("data-category");
-                            if (filtro === "Todos" || categoria === filtro) {
-                                card.style.display = "flex";
-                            } else {
-                                card.style.display = "none";
-                            }
-                        });
+    if(button){
 
-                        grid.style.opacity = "1";
-                        grid.style.transform = "translateY(0)";
-                    }, 200);
-                });
-            });
+        button.addEventListener(
+            "click",
+            event => {
+
+                event.stopPropagation();
+
+                openPlaylistModal(
+                    card
+                );
+
+            }
+        );
+
+    }
+
+});
+
+
+/* =====================================================
+   MOSTRAR CONTADORES
+===================================================== */
+
+function updatePlaylistCounts(){
+
+    const playlists =
+        getPlaylists();
+
+
+    Object.keys(
+        playlists
+    ).forEach(name => {
+
+        const counter =
+            document.getElementById(
+                "count-" + name
+            );
+
+        if(counter){
+
+            counter.textContent =
+                playlists[name].length;
+
+        }
+
+    });
+
+
+    const total =
+        Object.values(
+            playlists
+        ).reduce(
+            (sum,list) =>
+                sum + list.length,
+            0
+        );
+
+
+    document.getElementById(
+        "playlistTotal"
+    ).textContent =
+        total + " GUARDADOS";
+
+}
+
+
+/* =====================================================
+   MOSTRAR PLAYLIST
+===================================================== */
+
+const playlistView =
+    document.getElementById(
+        "playlistView"
+    );
+
+const playlistGrid =
+    document.getElementById(
+        "playlistGrid"
+    );
+
+const playlistEmpty =
+    document.getElementById(
+        "playlistEmpty"
+    );
+
+
+function showPlaylist(name){
+
+    const playlists =
+        getPlaylists();
+
+
+    const ids =
+        playlists[name] || [];
+
+
+    playlistGrid.innerHTML =
+        "";
+
+
+    document.getElementById(
+        "playlistViewTitle"
+    ).textContent =
+        playlistNames[name];
+
+
+    document.getElementById(
+        "playlistViewLabel"
+    ).textContent =
+        "PLAYLIST • " +
+        ids.length +
+        " VIDEOS";
+
+
+    if(ids.length === 0){
+
+        playlistEmpty.style.display =
+            "block";
+
+    }else{
+
+        playlistEmpty.style.display =
+            "none";
+
+
+        ids.forEach(id => {
+
+            const card =
+                cards.find(
+                    item =>
+                        item.dataset.id === id
+                );
+
+
+            if(!card){
+                return;
+            }
+
+
+            const clone =
+                card.cloneNode(true);
+
+
+            /*
+               Evitamos IDs duplicados
+               en el DOM clonado.
+            */
+
+            clone.dataset.playlistClone =
+                "true";
+
+
+            playlistGrid.appendChild(
+                clone
+            );
+
+
+            const heart =
+                clone.querySelector(
+                    ".heart"
+                );
+
+
+            if(heart){
+
+                heart.addEventListener(
+                    "click",
+                    event => {
+
+                        event.stopPropagation();
+
+                        toggleFavorite(
+                            card
+                        );
+
+                    }
+                );
+
+                updateHeart(
+                    clone
+                );
+
+            }
+
+
+            const add =
+                clone.querySelector(
+                    ".playlist-add"
+                );
+
+
+            if(add){
+
+                add.addEventListener(
+                    "click",
+                    event => {
+
+                        event.stopPropagation();
+
+                        openPlaylistModal(
+                            card
+                        );
+
+                    }
+                );
+
+            }
+
+
+            clone.addEventListener(
+                "click",
+                event => {
+
+                    if(
+                        event.target.closest(
+                            ".heart"
+                        ) ||
+                        event.target.closest(
+                            ".playlist-add"
+                        )
+                    ){
+
+                        return;
+
+                    }
+
+                    playCard(card);
+
+                }
+            );
+
         });
-    </script>
-    <script src="../js/script.js"></script>
+
+    }
+
+
+    playlistView.classList.add(
+        "active"
+    );
+
+
+    playlistView.scrollIntoView({
+        behavior:"smooth",
+        block:"start"
+    });
+
+}
+
+
+document
+    .querySelectorAll(
+        ".playlist-card"
+    )
+    .forEach(card => {
+
+        card.addEventListener(
+            "click",
+            () => {
+
+                showPlaylist(
+                    card.dataset.playlistView
+                );
+
+            }
+        );
+
+    });
+
+
+document
+    .getElementById(
+        "closePlaylist"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            playlistView.classList.remove(
+                "active"
+            );
+
+        }
+    );
+
+
+/* =====================================================
+   BOTONES MIS PLAYLISTS
+===================================================== */
+
+function openMyPlaylists(){
+
+    document
+        .getElementById(
+            "playlistsSection"
+        )
+        .scrollIntoView({
+            behavior:"smooth",
+            block:"start"
+        });
+
+}
+
+
+document
+    .getElementById(
+        "topPlaylistButton"
+    )
+    .addEventListener(
+        "click",
+        openMyPlaylists
+    );
+
+
+document
+    .getElementById(
+        "sidebarPlaylist"
+    )
+    .addEventListener(
+        "click",
+        openMyPlaylists
+    );
+
+
+document
+    .getElementById(
+        "heroPlaylistButton"
+    )
+    .addEventListener(
+        "click",
+        openMyPlaylists
+    );
+
+
+/* =====================================================
+   FAVORITOS
+===================================================== */
+
+function getFavorites(){
+
+    return JSON.parse(
+        localStorage.getItem(
+            "wibsiproject_favoritos"
+        )
+    ) || [];
+
+}
+
+
+function saveFavorites(data){
+
+    localStorage.setItem(
+        "wibsiproject_favoritos",
+        JSON.stringify(data)
+    );
+
+}
+
+
+function isFavorite(id){
+
+    return getFavorites()
+        .some(
+            video => video.id === id
+        );
+
+}
+
+
+function updateHeart(card){
+
+    const heart =
+        card.querySelector(
+            ".heart"
+        );
+
+    if(!heart){
+        return;
+    }
+
+
+    const active =
+        isFavorite(
+            card.dataset.id
+        );
+
+
+    heart.classList.toggle(
+        "active",
+        active
+    );
+
+
+    heart.textContent =
+        active
+        ? "♥"
+        : "♡";
+
+}
+
+
+function updateAllHearts(){
+
+    cards.forEach(
+        updateHeart
+    );
+
+}
+
+
+function toggleFavorite(card){
+
+    const data =
+        getVideoData(card);
+
+
+    let favorites =
+        getFavorites();
+
+
+    const index =
+        favorites.findIndex(
+            video =>
+                video.id === data.id
+        );
+
+
+    if(index >= 0){
+
+        favorites.splice(
+            index,
+            1
+        );
+
+        showToast(
+            "♡ Eliminado de favoritos"
+        );
+
+    }else{
+
+        favorites.push(
+            data
+        );
+
+        showToast(
+            "♥ Agregado a favoritos"
+        );
+
+    }
+
+
+    saveFavorites(
+        favorites
+    );
+
+
+    updateAllHearts();
+
+
+    if(
+        currentCard === card
+    ){
+
+        updatePlayerFavorite();
+
+    }
+
+}
+
+
+/* =====================================================
+   HEARTS
+===================================================== */
+
+cards.forEach(card => {
+
+    const heart =
+        card.querySelector(
+            ".heart"
+        );
+
+
+    if(heart){
+
+        heart.addEventListener(
+            "click",
+            event => {
+
+                event.stopPropagation();
+
+                toggleFavorite(
+                    card
+                );
+
+            }
+        );
+
+    }
+
+});
+
+
+/* =====================================================
+   YOUTUBE
+===================================================== */
+
+function getYouTubeID(url){
+
+    try{
+
+        const parsed =
+            new URL(url);
+
+
+        if(
+            parsed.hostname.includes(
+                "youtu.be"
+            )
+        ){
+
+            return parsed.pathname
+                .replace("/","");
+
+        }
+
+
+        if(
+            parsed.hostname.includes(
+                "youtube.com"
+            )
+        ){
+
+            if(
+                parsed.searchParams.has("v")
+            ){
+
+                return parsed
+                    .searchParams
+                    .get("v");
+
+            }
+
+
+            const parts =
+                parsed.pathname
+                    .split("/");
+
+
+            const index =
+                parts.findIndex(
+                    p =>
+                        p === "shorts" ||
+                        p === "embed" ||
+                        p === "live"
+                );
+
+
+            if(
+                index !== -1 &&
+                parts[index + 1]
+            ){
+
+                return parts[
+                    index + 1
+                ];
+
+            }
+
+        }
+
+    }catch(error){}
+
+
+    return null;
+
+}
+
+
+/* =====================================================
+   PLAYER
+===================================================== */
+
+function stopPlayer(){
+
+    if(currentVideo){
+
+        currentVideo.pause();
+
+        currentVideo.remove();
+
+        currentVideo =
+            null;
+
+    }
+
+
+    if(currentIframe){
+
+        currentIframe.remove();
+
+        currentIframe =
+            null;
+
+    }
+
+}
+
+
+function createPlayer(card){
+
+    stopPlayer();
+
+
+    const url =
+        card.dataset.video;
+
+
+    const youtube =
+        getYouTubeID(url);
+
+
+    if(youtube){
+
+        const iframe =
+            document.createElement(
+                "iframe"
+            );
+
+
+        iframe.src =
+            "https://www.youtube.com/embed/" +
+            youtube +
+            "?autoplay=1&enablejsapi=1&rel=0";
+
+
+        iframe.style.position =
+            "fixed";
+
+        iframe.style.width =
+            "1px";
+
+        iframe.style.height =
+            "1px";
+
+        iframe.style.left =
+            "-9999px";
+
+        iframe.style.opacity =
+            "0";
+
+        iframe.allow =
+            "autoplay";
+
+
+        document.body.appendChild(
+            iframe
+        );
+
+
+        currentIframe =
+            iframe;
+
+
+        isPlaying =
+            true;
+
+    }else{
+
+        const video =
+            document.createElement(
+                "video"
+            );
+
+
+        video.src =
+            url;
+
+        video.autoplay =
+            true;
+
+        video.playsInline =
+            true;
+
+        video.style.position =
+            "fixed";
+
+        video.style.width =
+            "1px";
+
+        video.style.height =
+            "1px";
+
+        video.style.left =
+            "-9999px";
+
+
+        document.body.appendChild(
+            video
+        );
+
+
+        currentVideo =
+            video;
+
+
+        video.addEventListener(
+            "timeupdate",
+            updateProgress
+        );
+
+
+        video.addEventListener(
+            "ended",
+            playNext
+        );
+
+
+        video.play()
+            .catch(
+                () => {}
+            );
+
+
+        isPlaying =
+            true;
+
+    }
+
+
+    updatePlayButton();
+
+}
+
+
+/* =====================================================
+   REPRODUCIR TARJETA
+===================================================== */
+
+function playCard(card){
+
+    currentCard =
+        card;
+
+
+    currentIndex =
+        cards.indexOf(card);
+
+
+    document.getElementById(
+        "barTitle"
+    ).textContent =
+        card.dataset.title;
+
+
+    document.getElementById(
+        "barCreator"
+    ).textContent =
+        card.dataset.creator;
+
+
+    document.getElementById(
+        "barThumb"
+    ).src =
+        card.dataset.image;
+
+
+    document.getElementById(
+        "musicBar"
+    ).classList.add(
+        "active"
+    );
+
+
+    createPlayer(
+        card
+    );
+
+
+    updatePlayerFavorite();
+
+}
+
+
+/* =====================================================
+   CLICK TARJETAS
+===================================================== */
+
+cards.forEach(card => {
+
+    card.addEventListener(
+        "click",
+        event => {
+
+            if(
+                event.target.closest(
+                    ".heart"
+                ) ||
+                event.target.closest(
+                    ".playlist-add"
+                )
+            ){
+
+                return;
+
+            }
+
+
+            playCard(
+                card
+            );
+
+        }
+    );
+
+});
+
+
+/* =====================================================
+   FAVORITO DEL PLAYER
+===================================================== */
+
+function updatePlayerFavorite(){
+
+    if(!currentCard){
+        return;
+    }
+
+
+    const active =
+        isFavorite(
+            currentCard.dataset.id
+        );
+
+
+    const button =
+        document.getElementById(
+            "favoriteButton"
+        );
+
+
+    button.classList.toggle(
+        "active",
+        active
+    );
+
+
+    button.innerHTML =
+        active
+        ? "♥ <span>Favorito</span>"
+        : "♡ <span>Favoritos</span>";
+
+}
+
+
+document
+    .getElementById(
+        "favoriteButton"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            if(currentCard){
+
+                toggleFavorite(
+                    currentCard
+                );
+
+            }
+
+        }
+    );
+
+
+/* =====================================================
+   PLAY / PAUSE
+===================================================== */
+
+function togglePlay(){
+
+    if(!currentCard){
+        return;
+    }
+
+
+    if(currentVideo){
+
+        if(
+            currentVideo.paused
+        ){
+
+            currentVideo.play();
+
+            isPlaying =
+                true;
+
+        }else{
+
+            currentVideo.pause();
+
+            isPlaying =
+                false;
+
+        }
+
+    }else if(currentIframe){
+
+        currentIframe
+            .contentWindow
+            .postMessage(
+
+                JSON.stringify({
+
+                    event:"command",
+
+                    func:
+                        isPlaying
+                        ? "pauseVideo"
+                        : "playVideo"
+
+                }),
+
+                "*"
+
+            );
+
+
+        isPlaying =
+            !isPlaying;
+
+    }
+
+
+    updatePlayButton();
+
+}
+
+
+document
+    .getElementById(
+        "playPauseButton"
+    )
+    .addEventListener(
+        "click",
+        togglePlay
+    );
+
+
+function updatePlayButton(){
+
+    document.getElementById(
+        "playPauseButton"
+    ).textContent =
+        isPlaying
+        ? "❚❚"
+        : "▶";
+
+}
+
+
+/* =====================================================
+   SIGUIENTE
+===================================================== */
+
+function playNext(){
+
+    if(!cards.length){
+        return;
+    }
+
+
+    let index =
+        currentIndex + 1;
+
+
+    if(
+        index >= cards.length
+    ){
+
+        index = 0;
+
+    }
+
+
+    playCard(
+        cards[index]
+    );
+
+}
+
+
+document
+    .getElementById(
+        "nextButton"
+    )
+    .addEventListener(
+        "click",
+        playNext
+    );
+
+
+/* =====================================================
+   ANTERIOR
+===================================================== */
+
+document
+    .getElementById(
+        "previousButton"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            if(!cards.length){
+                return;
+            }
+
+
+            let index =
+                currentIndex - 1;
+
+
+            if(index < 0){
+
+                index =
+                    cards.length - 1;
+
+            }
+
+
+            playCard(
+                cards[index]
+            );
+
+        }
+    );
+
+
+/* =====================================================
+   PROGRESO
+===================================================== */
+
+function updateProgress(){
+
+    if(
+        !currentVideo ||
+        !currentVideo.duration
+    ){
+
+        return;
+
+    }
+
+
+    const percent =
+        currentVideo.currentTime /
+        currentVideo.duration *
+        100;
+
+
+    document.getElementById(
+        "progressFill"
+    ).style.width =
+        percent + "%";
+
+}
+
+
+document
+    .getElementById(
+        "progress"
+    )
+    .addEventListener(
+        "click",
+        event => {
+
+            if(
+                !currentVideo ||
+                !currentVideo.duration
+            ){
+
+                return;
+
+            }
+
+
+            const rect =
+                event.currentTarget
+                    .getBoundingClientRect();
+
+
+            const percent =
+                (
+                    event.clientX -
+                    rect.left
+                ) /
+                rect.width;
+
+
+            currentVideo.currentTime =
+                percent *
+                currentVideo.duration;
+
+        }
+    );
+
+
+/* =====================================================
+   DESCARGA
+===================================================== */
+
+document
+    .getElementById(
+        "downloadButton"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            if(!currentCard){
+                return;
+            }
+
+
+            const url =
+                currentCard.dataset.video;
+
+
+            if(
+                getYouTubeID(url)
+            ){
+
+                alert(
+                    "Este video pertenece a YouTube. " +
+                    "La descarga directa no está disponible " +
+                    "desde WIBSIPROJECT."
+                );
+
+                return;
+
+            }
+
+
+            const link =
+                document.createElement(
+                    "a"
+                );
+
+
+            link.href =
+                url;
+
+
+            link.download =
+                currentCard
+                    .dataset
+                    .title
+                    .replace(
+                        /[^\w\s-]/g,
+                        ""
+                    )
+                    .trim() +
+                ".mp4";
+
+
+            document.body.appendChild(
+                link
+            );
+
+
+            link.click();
+
+
+            link.remove();
+
+        }
+    );
+
+
+/* =====================================================
+   MUTE
+===================================================== */
+
+document
+    .getElementById(
+        "muteButton"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            isMuted =
+                !isMuted;
+
+
+            if(currentVideo){
+
+                currentVideo.muted =
+                    isMuted;
+
+            }
+
+
+            if(currentIframe){
+
+                currentIframe
+                    .contentWindow
+                    .postMessage(
+
+                        JSON.stringify({
+
+                            event:"command",
+
+                            func:
+                                isMuted
+                                ? "mute"
+                                : "unMute"
+
+                        }),
+
+                        "*"
+
+                    );
+
+            }
+
+
+            document.getElementById(
+                "muteButton"
+            ).textContent =
+                isMuted
+                ? "🔇"
+                : "🔊";
+
+        }
+    );
+
+
+/* =====================================================
+   CERRAR PLAYER
+===================================================== */
+
+document
+    .getElementById(
+        "closeBar"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            stopPlayer();
+
+
+            currentCard =
+                null;
+
+
+            currentIndex =
+                -1;
+
+
+            isPlaying =
+                false;
+
+
+            document.getElementById(
+                "musicBar"
+            ).classList.remove(
+                "active"
+            );
+
+        }
+    );
+
+
+/* =====================================================
+   ALEATORIO
+===================================================== */
+
+function randomVideo(){
+
+    if(!cards.length){
+        return;
+    }
+
+
+    const index =
+        Math.floor(
+            Math.random() *
+            cards.length
+        );
+
+
+    playCard(
+        cards[index]
+    );
+
+}
+
+
+document
+    .getElementById(
+        "randomButton"
+    )
+    .addEventListener(
+        "click",
+        randomVideo
+    );
+
+
+document
+    .getElementById(
+        "randomSide"
+    )
+    .addEventListener(
+        "click",
+        randomVideo
+    );
+
+
+/* =====================================================
+   FILTROS
+===================================================== */
+
+const filters =
+    document.querySelectorAll(
+        ".filter"
+    );
+
+
+filters.forEach(
+    filter => {
+
+        filter.addEventListener(
+            "click",
+            () => {
+
+                filters.forEach(
+                    f =>
+                        f.classList.remove(
+                            "active"
+                        )
+                );
+
+
+                filter.classList.add(
+                    "active"
+                );
+
+
+                const category =
+                    filter.dataset.category;
+
+
+                let count = 0;
+
+
+                cards.forEach(
+                    card => {
+
+                        const show =
+                            category === "Todos" ||
+                            card.dataset.category ===
+                            category;
+
+
+                        card.style.display =
+                            show
+                            ? ""
+                            : "none";
+
+
+                        if(show){
+
+                            count++;
+
+                        }
+
+                    }
+                );
+
+
+                document.getElementById(
+                    "countText"
+                ).textContent =
+                    count +
+                    " VIDEOS";
+
+
+                document.getElementById(
+                    "empty"
+                ).style.display =
+                    count
+                    ? "none"
+                    : "block";
+
+            }
+        );
+
+    }
+);
+
+
+/* =====================================================
+   BUSCAR
+===================================================== */
+
+document
+    .getElementById(
+        "searchInput"
+    )
+    .addEventListener(
+        "input",
+        event => {
+
+            const text =
+                event.target.value
+                    .toLowerCase()
+                    .trim();
+
+
+            let count = 0;
+
+
+            cards.forEach(
+                card => {
+
+                    const content = (
+
+                        card.dataset.title +
+                        " " +
+                        card.dataset.creator +
+                        " " +
+                        card.dataset.category
+
+                    ).toLowerCase();
+
+
+                    const show =
+                        content.includes(
+                            text
+                        );
+
+
+                    card.style.display =
+                        show
+                        ? ""
+                        : "none";
+
+
+                    if(show){
+
+                        count++;
+
+                    }
+
+                }
+            );
+
+
+            document.getElementById(
+                "countText"
+            ).textContent =
+                count +
+                " VIDEOS";
+
+
+            document.getElementById(
+                "empty"
+            ).style.display =
+                count
+                ? "none"
+                : "block";
+
+        }
+    );
+
+
+/* =====================================================
+   CONTRASEÑA
+===================================================== */
+
+function checkPassword(){
+
+    const password =
+        prompt(
+            "Ingresa la contraseña para ver los videos guardados:"
+        );
+
+
+    if(
+        password ===
+        "2436anthony123privado123"
+    ){
+
+        window.location.href =
+            "privado.html";
+
+    }else if(
+        password !== null
+    ){
+
+        alert(
+            "Contraseña incorrecta."
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   INICIALIZAR
+===================================================== */
+
+updateAllHearts();
+
+updatePlaylistBadges();
+
+updatePlaylistButtons();
+
+updatePlaylistCounts();
+
+</script>
 
 </body>
 </html>

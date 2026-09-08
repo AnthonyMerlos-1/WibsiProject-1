@@ -311,7 +311,7 @@
                 <div class="wchat-header-actions">
                     <button class="wchat-action-btn" onclick="abrirModalId()" title="Enviar Solicitud">➕ ID</button>
                     <button class="wchat-action-btn" onclick="abrirBuzon()" title="Buzón">
-                        📥 Buzón <span class="badge-count" id="badgeCount">1</span>
+                        📥 Buzón <span class="badge-count" id="badgeCount" style="display:none;">0</span>
                     </button>
                 </div>
             </div>
@@ -343,7 +343,7 @@
                         <div class="wchat-chat-preview">¡Hola! Ya puedes usar tu ID en cualquier sección.</div>
                     </div>
                 </div>
-                <!-- Los amigos reales (agregados por ID) se insertan aquí dinámicamente y se guardan en localStorage -->
+                <!-- Los amigos reales (agregados por ID) se insertan aquí dinámicamente desde Firestore -->
             </div>
         </div>
 
@@ -395,7 +395,7 @@
             </div>
             <div class="modal-body">
                 <p>Escribe el Wchat ID de la persona con la que deseas conectar para enviarle una invitación a su buzón.</p>
-                <input type="text" class="modal-input" id="targetIdInput" placeholder="Ej: WCHAT-USER-7712">
+                <input type="text" class="modal-input" id="targetIdInput" placeholder="Ej: WIB-XXXXXX-1234">
             </div>
             <div class="modal-footer">
                 <button class="modal-btn-cancel" onclick="cerrarModalId()">Cancelar</button>
@@ -412,7 +412,7 @@
                 <button class="modal-close" onclick="cerrarBuzon()">✕</button>
             </div>
             <div class="modal-body" id="mailboxContent">
-                <!-- Las solicitudes de amistad reales se renderizan aquí desde localStorage -->
+                <!-- Las solicitudes de amistad reales se renderizan aquí desde Firestore -->
                 <p id="mailboxEmptyMsg" style="text-align:center; color:#6b7280; padding: 10px 0;">No tienes solicitudes pendientes.</p>
             </div>
             <div class="modal-footer">
@@ -421,49 +421,65 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+        import {
+            getFirestore,
+            doc,
+            getDoc,
+            setDoc,
+            deleteDoc,
+            collection,
+            addDoc,
+            query,
+            where,
+            orderBy,
+            getDocs,
+            onSnapshot,
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+
         /* =====================================================================
-           WCHAT — integrado con las cuentas creadas/logueadas en cuenta.html
-           Claves usadas en localStorage:
-             - wibsitihub_sesion_activa      -> (de cuenta.html) sesión activa
-             - wibsitihub_usuarios_registrados -> (de cuenta.html) todos los usuarios
-             - wchat_solicitudes_amistad     -> array de solicitudes pendientes
-             - wchat_amigos                  -> { [miId]: [ {id, name}, ... ] }
-             - wchat_mensajes                -> { [parKey]: [ {fromId, texto, hora}, ... ] }
-           Como localStorage es compartido por el navegador, dos cuentas distintas
-           logueadas en dos pestañas distintas pueden "enviarse" solicitudes y
-           mensajes entre sí, y el evento 'storage' avisa a la otra pestaña en vivo.
+           WCHAT — ahora conectado a Firebase Firestore, así que las solicitudes
+           de amistad, la lista de amigos y los mensajes funcionan entre
+           CUALQUIER dispositivo, no solo en el mismo navegador.
+
+           Colecciones usadas en Firestore:
+             - usuarios/{id}                 -> perfil público básico (nombre, email, avatar)
+             - solicitudes/{autoId}          -> solicitudes de amistad pendientes
+             - amistades/{parKey}            -> amistades confirmadas + último mensaje
+             - mensajes/{parKey}/msgs/{id}   -> historial de mensajes de cada chat
+             - escribiendo/{parKey}          -> indicador de "escribiendo..."
+
+           La SESIÓN (quién soy yo en este dispositivo) se sigue leyendo de
+           sessionStorage/localStorage, tal como la deja cuenta.html.
         ===================================================================== */
 
-        const SESSION_KEY   = 'wibsitihub_sesion_activa';
-        const USERS_KEY     = 'wibsitihub_usuarios_registrados';
-        const REQUESTS_KEY  = 'wchat_solicitudes_amistad';
-        const FRIENDS_KEY   = 'wchat_amigos';
-        const MESSAGES_KEY  = 'wchat_mensajes';
+        const firebaseConfig = {
+            apiKey: "AIzaSyAg8n3AcKE-0QDQYcswUBYZwI702TzPZIU",
+            authDomain: "anthonypg.firebaseapp.com",
+            projectId: "anthonypg",
+            storageBucket: "anthonypg.firebasestorage.app",
+            messagingSenderId: "620424695699",
+            appId: "1:620424695699:web:429c9ace801a5bc75a6266",
+            measurementId: "G-YVFYEWDQ98"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const SESSION_KEY = 'wibsitihub_sesion_activa';
 
         let miUsuario = null;
         let miId = null;
         let chatActivoId = 'soporte';
+        let amigosActuales = [];       // [{id, name, lastMessage, parKey}]
+        let solicitudesActuales = [];  // [{reqId, fromId, fromName, toId, fecha}]
+        let buzonInicializado = false;
+        let unsubscribeMensajes = null;
+        let unsubscribeTyping = null;
 
-        // ---------- Utilidades de almacenamiento ----------
-        function leerJSON(clave, porDefecto) {
-            try {
-                const val = JSON.parse(localStorage.getItem(clave));
-                return val === null || val === undefined ? porDefecto : val;
-            } catch (e) {
-                return porDefecto;
-            }
-        }
-        function guardarJSON(clave, valor) {
-            localStorage.setItem(clave, JSON.stringify(valor));
-        }
-        function obtenerUsuarios() { return leerJSON(USERS_KEY, []); }
-        function obtenerSolicitudes() { return leerJSON(REQUESTS_KEY, []); }
-        function guardarSolicitudes(lista) { guardarJSON(REQUESTS_KEY, lista); }
-        function obtenerAmigosMapa() { return leerJSON(FRIENDS_KEY, {}); }
-        function guardarAmigosMapa(mapa) { guardarJSON(FRIENDS_KEY, mapa); }
-        function obtenerMensajesMapa() { return leerJSON(MESSAGES_KEY, {}); }
-        function guardarMensajesMapa(mapa) { guardarJSON(MESSAGES_KEY, mapa); }
+        // ---------- Utilidades ----------
         function parKey(idA, idB) { return [idA, idB].sort().join('___'); }
         function iniciales(nombre) {
             return (nombre || '?').trim().split(/\s+/).map(p => p[0]).join('').substring(0, 2).toUpperCase();
@@ -475,12 +491,10 @@
 
         // ---------- Sesión: los datos vienen de cuenta.html ----------
         function obtenerSesionActivaWchat() {
-            // Prioridad 1: sesión de esta pestaña (usuario normal, aislada por pestaña) — igual que en cuenta.html
             const sesionPestana = sessionStorage.getItem(SESSION_KEY);
             if (sesionPestana) {
                 try { return JSON.parse(sesionPestana); } catch (e) { /* ignorar */ }
             }
-            // Prioridad 2: sesión de administrador (se guarda en localStorage, sin cambios)
             const sesionAdmin = localStorage.getItem(SESSION_KEY);
             if (sesionAdmin) {
                 try {
@@ -505,30 +519,48 @@
             return true;
         }
 
-        function copiarMiId() {
+        window.copiarMiId = function() {
             navigator.clipboard.writeText(miId);
             alert('¡Tu Wchat ID ' + miId + ' ha sido copiado al portapapeles!');
-        }
+        };
 
-        // ---------- Buzón / Solicitudes de amistad ----------
-        function abrirBuzon() {
+        // ---------- Buzón / Solicitudes de amistad (tiempo real) ----------
+        window.abrirBuzon = function() {
             renderizarBuzon();
             document.getElementById('mailboxModal').classList.add('active');
-        }
-        function cerrarBuzon() {
+        };
+        window.cerrarBuzon = function() {
             document.getElementById('mailboxModal').classList.remove('active');
-        }
+        };
 
-        function abrirModalId() {
+        window.abrirModalId = function() {
             document.getElementById('friendModal').classList.add('active');
             document.getElementById('targetIdInput').focus();
-        }
-        function cerrarModalId() {
+        };
+        window.cerrarModalId = function() {
             document.getElementById('friendModal').classList.remove('active');
             document.getElementById('targetIdInput').value = '';
+        };
+
+        function suscribirBuzon() {
+            const q = query(collection(db, 'solicitudes'), where('toId', '==', miId));
+            onSnapshot(q, (snap) => {
+                const anteriorCount = solicitudesActuales.length;
+                solicitudesActuales = snap.docs.map(d => ({ reqId: d.id, ...d.data() }));
+                actualizarBadge();
+                if (document.getElementById('mailboxModal').classList.contains('active')) {
+                    renderizarBuzon();
+                }
+                if (buzonInicializado && solicitudesActuales.length > anteriorCount) {
+                    mostrarNotificacionLocal('📥 ¡Tienes una nueva solicitud de amistad en tu buzón!');
+                }
+                buzonInicializado = true;
+            }, (error) => {
+                console.error('Error al escuchar solicitudes:', error);
+            });
         }
 
-        function enviarSolicitudId() {
+        window.enviarSolicitudId = async function() {
             const idDestino = document.getElementById('targetIdInput').value.trim();
             if (!idDestino) return;
 
@@ -537,53 +569,55 @@
                 return;
             }
 
-            const usuarios = obtenerUsuarios();
-            const usuarioDestino = usuarios.find(u => u.id === idDestino);
-            if (!usuarioDestino) {
-                alert('No existe ningún usuario registrado con ese ID. Verifica que la persona ya tenga una cuenta en cuenta.html.');
-                return;
+            try {
+                const usuarioSnap = await getDoc(doc(db, 'usuarios', idDestino));
+                if (!usuarioSnap.exists()) {
+                    alert('No existe ningún usuario registrado con ese ID. Verifica que la persona ya tenga una cuenta.');
+                    return;
+                }
+
+                const parKeyVal = parKey(miId, idDestino);
+                const amistadSnap = await getDoc(doc(db, 'amistades', parKeyVal));
+                if (amistadSnap.exists()) {
+                    alert('Ya tienes agregado a este usuario como amigo.');
+                    window.cerrarModalId();
+                    return;
+                }
+
+                const yaEnviadaQ = query(
+                    collection(db, 'solicitudes'),
+                    where('fromId', '==', miId),
+                    where('toId', '==', idDestino)
+                );
+                const yaEnviadaSnap = await getDocs(yaEnviadaQ);
+                if (!yaEnviadaSnap.empty) {
+                    alert('Ya le enviaste una solicitud a este usuario, espera su respuesta.');
+                    window.cerrarModalId();
+                    return;
+                }
+
+                await addDoc(collection(db, 'solicitudes'), {
+                    fromId: miId,
+                    fromName: miUsuario.name,
+                    toId: idDestino,
+                    fecha: serverTimestamp()
+                });
+
+                mostrarNotificacionLocal(`¡Invitación enviada con éxito al ID: ${idDestino}!`);
+                window.cerrarModalId();
+            } catch (e) {
+                console.error(e);
+                alert('Ocurrió un error al enviar la solicitud. Revisa tu conexión e intenta de nuevo.');
             }
-
-            const amigosMapa = obtenerAmigosMapa();
-            const misAmigos = amigosMapa[miId] || [];
-            if (misAmigos.some(a => a.id === idDestino)) {
-                alert('Ya tienes agregado a este usuario como amigo.');
-                cerrarModalId();
-                return;
-            }
-
-            const solicitudes = obtenerSolicitudes();
-            const yaExiste = solicitudes.some(s => s.fromId === miId && s.toId === idDestino);
-            if (yaExiste) {
-                alert('Ya le enviaste una solicitud a este usuario, espera su respuesta.');
-                cerrarModalId();
-                return;
-            }
-
-            solicitudes.push({
-                reqId: 'REQ-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
-                fromId: miId,
-                fromName: miUsuario.name,
-                toId: idDestino,
-                fecha: Date.now()
-            });
-            guardarSolicitudes(solicitudes);
-
-            mostrarNotificacionLocal(`¡Invitación enviada con éxito al ID: ${idDestino}!`);
-            cerrarModalId();
-            actualizarBadge();
-        }
+        };
 
         function renderizarBuzon() {
-            const solicitudes = obtenerSolicitudes().filter(s => s.toId === miId);
             const contenedor = document.getElementById('mailboxContent');
-
-            if (solicitudes.length === 0) {
+            if (solicitudesActuales.length === 0) {
                 contenedor.innerHTML = `<p id="mailboxEmptyMsg" style="text-align:center; color:#6b7280; padding: 10px 0;">No tienes solicitudes pendientes.</p>`;
                 return;
             }
-
-            contenedor.innerHTML = solicitudes.map(s => `
+            contenedor.innerHTML = solicitudesActuales.map(s => `
                 <div class="invite-item" id="invite-${s.reqId}">
                     <div class="invite-info">
                         <h4>${escapeHtml(s.fromName)}</h4>
@@ -597,81 +631,94 @@
             `).join('');
         }
 
-        function aceptarInvitacion(reqId) {
-            const solicitudes = obtenerSolicitudes();
-            const solicitud = solicitudes.find(s => s.reqId === reqId);
+        window.aceptarInvitacion = async function(reqId) {
+            const solicitud = solicitudesActuales.find(s => s.reqId === reqId);
             if (!solicitud) return;
 
-            // Agregar amistad en ambos sentidos para que ambas cuentas se vean en su lista
-            const amigosMapa = obtenerAmigosMapa();
-            amigosMapa[solicitud.toId] = amigosMapa[solicitud.toId] || [];
-            amigosMapa[solicitud.fromId] = amigosMapa[solicitud.fromId] || [];
+            try {
+                const parKeyVal = parKey(solicitud.fromId, solicitud.toId);
+                const receptorSnap = await getDoc(doc(db, 'usuarios', solicitud.toId));
+                const nombreReceptor = receptorSnap.exists() ? receptorSnap.data().name : (miUsuario.name || 'Usuario');
 
-            if (!amigosMapa[solicitud.toId].some(a => a.id === solicitud.fromId)) {
-                amigosMapa[solicitud.toId].push({ id: solicitud.fromId, name: solicitud.fromName });
+                await setDoc(doc(db, 'amistades', parKeyVal), {
+                    users: [solicitud.fromId, solicitud.toId],
+                    names: {
+                        [solicitud.fromId]: solicitud.fromName,
+                        [solicitud.toId]: nombreReceptor
+                    },
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+
+                await deleteDoc(doc(db, 'solicitudes', reqId));
+
+                window.cerrarBuzon();
+                mostrarNotificacionLocal(`Ahora eres amigo de ${solicitud.fromName}.`);
+            } catch (e) {
+                console.error(e);
+                alert('No se pudo aceptar la solicitud. Intenta de nuevo.');
             }
-            const usuarios = obtenerUsuarios();
-            const usuarioReceptor = usuarios.find(u => u.id === solicitud.toId);
-            const nombreReceptor = usuarioReceptor ? usuarioReceptor.name : 'Usuario';
-            if (!amigosMapa[solicitud.fromId].some(a => a.id === solicitud.toId)) {
-                amigosMapa[solicitud.fromId].push({ id: solicitud.toId, name: nombreReceptor });
+        };
+
+        window.rechazarInvitacion = async function(reqId) {
+            try {
+                await deleteDoc(doc(db, 'solicitudes', reqId));
+            } catch (e) {
+                console.error(e);
             }
-            guardarAmigosMapa(amigosMapa);
-
-            // Quitar la solicitud ya procesada
-            guardarSolicitudes(solicitudes.filter(s => s.reqId !== reqId));
-
-            renderizarBuzon();
-            actualizarBadge();
-            renderizarListaChats();
-            cerrarBuzon();
-            mostrarNotificacionLocal(`Ahora eres amigo de ${solicitud.fromName}.`);
-        }
-
-        function rechazarInvitacion(reqId) {
-            const solicitudes = obtenerSolicitudes().filter(s => s.reqId !== reqId);
-            guardarSolicitudes(solicitudes);
-            renderizarBuzon();
-            actualizarBadge();
-        }
+        };
 
         function actualizarBadge() {
-            const pendientes = obtenerSolicitudes().filter(s => s.toId === miId).length;
+            const pendientes = solicitudesActuales.length;
             const badge = document.getElementById('badgeCount');
             badge.textContent = pendientes;
             badge.style.display = pendientes === 0 ? 'none' : 'inline-block';
         }
 
-        // ---------- Lista de chats / amigos (persistente) ----------
+        // ---------- Lista de amigos (tiempo real) ----------
         function textoPrevioMensaje(m) {
             if (!m) return 'Conectados mediante Wchat ID.';
             const tipo = m.tipo || 'text';
             if (tipo === 'image') return '📷 Imagen';
             if (tipo === 'audio') return '🎤 Mensaje de voz';
-            if (tipo === 'sticker') return `${m.contenido} Sticker`;
-            return m.texto !== undefined ? m.texto : m.contenido;
+            if (tipo === 'sticker') return `${m.contenido || '😀'} Sticker`;
+            return m.contenido !== undefined ? m.contenido : '';
+        }
+
+        function suscribirAmigos() {
+            const q = query(collection(db, 'amistades'), where('users', 'array-contains', miId));
+            onSnapshot(q, (snap) => {
+                amigosActuales = snap.docs.map(d => {
+                    const data = d.data();
+                    const otroId = (data.users || []).find(u => u !== miId);
+                    return {
+                        id: otroId,
+                        name: (data.names && data.names[otroId]) || 'Usuario',
+                        lastMessage: data.lastMessage || null,
+                        parKey: d.id
+                    };
+                });
+                renderizarListaChats();
+
+                if (chatActivoId !== 'soporte' && !amigosActuales.some(a => a.id === chatActivoId)) {
+                    const soporteEl = document.querySelector('.wchat-chat-item[data-chat-id="soporte"]');
+                    if (soporteEl) window.seleccionarChat('soporte', 'Soporte Wchat', soporteEl);
+                }
+            }, (error) => {
+                console.error('Error al escuchar amistades:', error);
+            });
         }
 
         function renderizarListaChats() {
             const listaChats = document.getElementById('chatsList');
-            // Conservar el chat de soporte, quitar el resto para volver a pintarlo
             listaChats.querySelectorAll('.wchat-chat-item[data-chat-id]:not([data-chat-id="soporte"])').forEach(el => el.remove());
 
-            const amigosMapa = obtenerAmigosMapa();
-            const misAmigos = amigosMapa[miId] || [];
-            const mensajesMapa = obtenerMensajesMapa();
-
-            misAmigos.forEach(amigo => {
-                const clave = parKey(miId, amigo.id);
-                const historial = mensajesMapa[clave] || [];
-                const ultimo = historial[historial.length - 1];
-                const previa = textoPrevioMensaje(ultimo);
-                const hora = ultimo ? ultimo.hora : '';
+            amigosActuales.forEach(amigo => {
+                const previa = textoPrevioMensaje(amigo.lastMessage);
+                const hora = amigo.lastMessage ? amigo.lastMessage.hora : '';
 
                 const item = document.createElement('div');
-                item.className = 'wchat-chat-item';
+                item.className = 'wchat-chat-item' + (chatActivoId === amigo.id ? ' active' : '');
                 item.setAttribute('data-chat-id', amigo.id);
-                item.setAttribute('onclick', `seleccionarChat('${amigo.id}', ${JSON.stringify(amigo.name)}, this)`);
                 item.innerHTML = `
                     <div class="wchat-avatar" style="background: linear-gradient(135deg, #10b981, #3b82f6);">
                         ${iniciales(amigo.name)}
@@ -685,35 +732,53 @@
                         <div class="wchat-chat-preview">${escapeHtml(previa)}</div>
                     </div>
                 `;
+                item.addEventListener('click', () => window.seleccionarChat(amigo.id, amigo.name, item));
                 listaChats.appendChild(item);
             });
-
-            // Si el chat activo sigue existiendo, refrescar su vista de mensajes
-            if (chatActivoId !== 'soporte') {
-                const sigueSiendoAmigo = misAmigos.some(a => a.id === chatActivoId);
-                if (!sigueSiendoAmigo) {
-                    // El amigo ya no está (poco común); volver a soporte
-                    const soporteEl = listaChats.querySelector('[data-chat-id="soporte"]');
-                    if (soporteEl) seleccionarChat('soporte', 'Soporte Wchat', soporteEl);
-                }
-            }
         }
 
-        function seleccionarChat(chatId, nombre, elemento) {
+        // ---------- Selección de chat y mensajes en tiempo real ----------
+        window.seleccionarChat = function(chatId, nombre, elemento) {
             document.querySelectorAll('.wchat-chat-item').forEach(item => item.classList.remove('active'));
             if (elemento) elemento.classList.add('active');
 
-            // Si se estaba grabando un audio en el chat anterior, se detiene al cambiar de chat
             if (grabando) detenerGrabacion();
             document.getElementById('stickerPanel').classList.remove('active');
             document.getElementById('typingIndicatorBar').classList.remove('active');
+
+            if (unsubscribeMensajes) { unsubscribeMensajes(); unsubscribeMensajes = null; }
+            if (unsubscribeTyping) { unsubscribeTyping(); unsubscribeTyping = null; }
 
             chatActivoId = chatId;
             document.getElementById('activeChatName').textContent = nombre;
             document.getElementById('activeChatAvatar').textContent = iniciales(nombre);
 
-            renderizarMensajes();
-        }
+            if (chatId === 'soporte') {
+                renderizarMensajesSoporte();
+                return;
+            }
+
+            const parKeyVal = parKey(miId, chatId);
+
+            const msgsQ = query(collection(db, 'mensajes', parKeyVal, 'msgs'), orderBy('timestamp', 'asc'));
+            unsubscribeMensajes = onSnapshot(msgsQ, (snap) => {
+                const historial = snap.docs.map(d => d.data());
+                renderizarMensajes(historial);
+            }, (error) => {
+                console.error('Error al escuchar mensajes:', error);
+            });
+
+            unsubscribeTyping = onSnapshot(doc(db, 'escribiendo', parKeyVal), (snap) => {
+                if (!snap.exists()) return;
+                const data = snap.data();
+                if (data.fromId === chatId && data.ts && data.ts.toMillis) {
+                    if (Date.now() - data.ts.toMillis() < 3000) {
+                        const amigo = amigosActuales.find(a => a.id === chatId);
+                        mostrarIndicadorEscribiendo(amigo ? amigo.name : 'Tu amigo');
+                    }
+                }
+            });
+        };
 
         function renderizarBurbujaMensaje(m) {
             const esMio = m.fromId === miId;
@@ -731,53 +796,45 @@
                 claseTipo = 'msg-sticker';
                 contenidoHtml = m.contenido;
             } else {
-                contenidoHtml = escapeHtml(m.texto !== undefined ? m.texto : m.contenido);
+                contenidoHtml = escapeHtml(m.contenido !== undefined ? m.contenido : '');
             }
 
             return `
                 <div class="wchat-msg ${esMio ? 'outgoing' : 'incoming'} ${claseTipo}">
                     ${contenidoHtml}
-                    <div class="wchat-msg-time">${escapeHtml(m.hora)}</div>
+                    <div class="wchat-msg-time">${escapeHtml(m.hora || '')}</div>
                 </div>
             `;
         }
 
-        function renderizarMensajes() {
+        function renderizarMensajes(historial) {
             const container = document.getElementById('messagesContainer');
-
-            if (chatActivoId === 'soporte') {
-                container.innerHTML = `
-                    <div class="wchat-msg incoming">
-                        ¡Tu ID personal te acompaña a donde vayas dentro del sistema! Las solicitudes de amistad llegan directamente a tu buzón. ✨
-                        <div class="wchat-msg-time">12:00 PM</div>
-                    </div>
-                `;
-                return;
-            }
-
-            const clave = parKey(miId, chatActivoId);
-            const mensajesMapa = obtenerMensajesMapa();
-            const historial = mensajesMapa[clave] || [];
-
-            if (historial.length === 0) {
+            if (!historial || historial.length === 0) {
                 container.innerHTML = `<div class="wchat-msg incoming">Ya son amigos en Wchat. ¡Escribe el primer mensaje! 👋</div>`;
                 return;
             }
-
             container.innerHTML = historial.map(renderizarBurbujaMensaje).join('');
             container.scrollTop = container.scrollHeight;
         }
 
+        function renderizarMensajesSoporte() {
+            const container = document.getElementById('messagesContainer');
+            container.innerHTML = `
+                <div class="wchat-msg incoming">
+                    ¡Tu ID personal te acompaña a donde vayas dentro del sistema! Las solicitudes de amistad llegan directamente a tu buzón. ✨
+                    <div class="wchat-msg-time">12:00 PM</div>
+                </div>
+            `;
+        }
+
         // ---------- Envío unificado de mensajes (texto / imagen / audio / sticker) ----------
-        function agregarMensajeAlChat(tipo, contenido) {
+        async function agregarMensajeAlChat(tipo, contenido) {
             const ahora = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
             if (chatActivoId === 'soporte') {
-                // Chat de soporte: solo se ve localmente, no se guarda como conversación real
                 const container = document.getElementById('messagesContainer');
                 const msgDiv = document.createElement('div');
-                let inner;
-                let claseTipo = '';
+                let inner, claseTipo = '';
                 if (tipo === 'image') { claseTipo = 'msg-image'; inner = `<img src="${contenido}" class="wchat-msg-image-content" onclick="window.open(this.src, '_blank')">`; }
                 else if (tipo === 'audio') { claseTipo = 'msg-audio'; inner = `<audio controls class="wchat-msg-audio-content" src="${contenido}"></audio>`; }
                 else if (tipo === 'sticker') { claseTipo = 'msg-sticker'; inner = contenido; }
@@ -789,40 +846,45 @@
                 return;
             }
 
-            const clave = parKey(miId, chatActivoId);
-            const mensajesMapa = obtenerMensajesMapa();
-            mensajesMapa[clave] = mensajesMapa[clave] || [];
-            mensajesMapa[clave].push({ fromId: miId, tipo: tipo, contenido: contenido, hora: ahora });
-
-            try {
-                guardarMensajesMapa(mensajesMapa);
-            } catch (e) {
-                mensajesMapa[clave].pop();
-                alert('No se pudo enviar: el archivo es demasiado grande para el almacenamiento del navegador. Prueba con uno más pequeño o más corto.');
+            // Límite práctico: Firestore no acepta documentos de más de ~1MB.
+            const tamanoAprox = contenido.length * 0.75;
+            if (tamanoAprox > 700000) {
+                alert('El archivo es demasiado grande para enviarse. Prueba con uno más pequeño, más corto, o de menor calidad.');
                 return;
             }
 
-            // Al enviar, se limpia el propio aviso de "escribiendo..."
-            const mapaTyping = leerJSON(TYPING_KEY, {});
-            delete mapaTyping[clave];
-            guardarJSON(TYPING_KEY, mapaTyping);
+            const parKeyVal = parKey(miId, chatActivoId);
+            try {
+                await addDoc(collection(db, 'mensajes', parKeyVal, 'msgs'), {
+                    fromId: miId,
+                    tipo: tipo,
+                    contenido: contenido,
+                    hora: ahora,
+                    timestamp: serverTimestamp()
+                });
 
-            renderizarMensajes();
-            renderizarListaChats();
-            const item = document.querySelector(`.wchat-chat-item[data-chat-id="${chatActivoId}"]`);
-            if (item) item.classList.add('active');
+                const previewContenido = (tipo === 'image' || tipo === 'audio') ? '' : contenido;
+                await setDoc(doc(db, 'amistades', parKeyVal), {
+                    lastMessage: { tipo, contenido: previewContenido, hora: ahora }
+                }, { merge: true });
+
+                deleteDoc(doc(db, 'escribiendo', parKeyVal)).catch(() => {});
+            } catch (e) {
+                console.error(e);
+                alert('No se pudo enviar el mensaje. Revisa tu conexión e intenta de nuevo.');
+            }
         }
 
-        function enviarMensaje() {
+        window.enviarMensaje = function() {
             const input = document.getElementById('messageInput');
             const texto = input.value.trim();
             if (!texto) return;
             agregarMensajeAlChat('text', texto);
             input.value = '';
-        }
+        };
 
         // ---------- Imágenes ----------
-        function manejarImagenSeleccionada(event) {
+        window.manejarImagenSeleccionada = function(event) {
             const archivo = event.target.files[0];
             event.target.value = '';
             if (!archivo) return;
@@ -841,7 +903,7 @@
                 });
             };
             lector.readAsDataURL(archivo);
-        }
+        };
 
         function comprimirImagen(dataUrl, callback) {
             const img = new Image();
@@ -853,8 +915,7 @@
                     else { w = Math.round(w * (MAX_LADO / h)); h = MAX_LADO; }
                 }
                 const canvas = document.createElement('canvas');
-                canvas.width = w;
-                canvas.height = h;
+                canvas.width = w; canvas.height = h;
                 canvas.getContext('2d').drawImage(img, 0, 0, w, h);
                 callback(canvas.toDataURL('image/jpeg', 0.72));
             };
@@ -869,14 +930,14 @@
             panel.innerHTML = LISTA_STICKERS.map(s => `<div class="sticker-option" onclick="enviarSticker('${s}')">${s}</div>`).join('');
         }
 
-        function alternarPanelStickers() {
+        window.alternarPanelStickers = function() {
             document.getElementById('stickerPanel').classList.toggle('active');
-        }
+        };
 
-        function enviarSticker(emoji) {
+        window.enviarSticker = function(emoji) {
             agregarMensajeAlChat('sticker', emoji);
             document.getElementById('stickerPanel').classList.remove('active');
-        }
+        };
 
         document.addEventListener('click', function(e) {
             const panel = document.getElementById('stickerPanel');
@@ -893,14 +954,14 @@
         let recordingStartTime = 0;
         let recordingTimerInterval = null;
 
-        function alternarGrabacionAudio() {
+        window.alternarGrabacionAudio = function() {
             if (chatActivoId === 'soporte') {
                 alert('Selecciona un chat con un amigo real para enviar audios.');
                 return;
             }
             if (!grabando) iniciarGrabacion();
             else detenerGrabacion();
-        }
+        };
 
         function iniciarGrabacion() {
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === 'undefined') {
@@ -963,21 +1024,18 @@
         }
 
         // ---------- Indicador de "escribiendo..." ----------
-        const TYPING_KEY = 'wchat_escribiendo';
         let ultimoTypingEnviado = 0;
         let typingHideTimeout = null;
 
-        function notificarEscribiendo() {
+        window.notificarEscribiendo = function() {
             if (chatActivoId === 'soporte') return;
             const ahora = Date.now();
             if (ahora - ultimoTypingEnviado < 700) return;
             ultimoTypingEnviado = ahora;
 
-            const clave = parKey(miId, chatActivoId);
-            const mapaTyping = leerJSON(TYPING_KEY, {});
-            mapaTyping[clave] = { fromId: miId, ts: ahora };
-            guardarJSON(TYPING_KEY, mapaTyping);
-        }
+            const parKeyVal = parKey(miId, chatActivoId);
+            setDoc(doc(db, 'escribiendo', parKeyVal), { fromId: miId, ts: serverTimestamp() }, { merge: true }).catch(() => {});
+        };
 
         function mostrarIndicadorEscribiendo(nombre) {
             const bar = document.getElementById('typingIndicatorBar');
@@ -987,18 +1045,6 @@
             typingHideTimeout = setTimeout(function() {
                 bar.classList.remove('active');
             }, 2500);
-        }
-
-        function manejarEventoTyping() {
-            if (chatActivoId === 'soporte') return;
-            const clave = parKey(miId, chatActivoId);
-            const mapaTyping = leerJSON(TYPING_KEY, {});
-            const registro = mapaTyping[clave];
-            if (registro && registro.fromId === chatActivoId && (Date.now() - registro.ts) < 3000) {
-                const amigosMapa = obtenerAmigosMapa();
-                const amigo = (amigosMapa[miId] || []).find(a => a.id === chatActivoId);
-                mostrarIndicadorEscribiendo(amigo ? amigo.name : 'Tu amigo');
-            }
         }
 
         function mostrarNotificacionLocal(mensaje) {
@@ -1017,37 +1063,13 @@
             }, 3000);
         }
 
-        // ---------- Sincronización en vivo entre pestañas (misma cuenta o cuentas distintas) ----------
-        window.addEventListener('storage', function(evento) {
-            if (evento.key === REQUESTS_KEY) {
-                actualizarBadge();
-                if (document.getElementById('mailboxModal').classList.contains('active')) {
-                    renderizarBuzon();
-                }
-                const pendientesAhora = obtenerSolicitudes().filter(s => s.toId === miId);
-                if (pendientesAhora.length > 0) {
-                    mostrarNotificacionLocal('📥 ¡Tienes una nueva solicitud de amistad en tu buzón!');
-                }
-            }
-            if (evento.key === FRIENDS_KEY) {
-                renderizarListaChats();
-            }
-            if (evento.key === MESSAGES_KEY) {
-                renderizarListaChats();
-                if (chatActivoId !== 'soporte') renderizarMensajes();
-            }
-            if (evento.key === TYPING_KEY) {
-                manejarEventoTyping();
-            }
-        });
-
         // ---------- Inicialización ----------
         document.addEventListener('DOMContentLoaded', function() {
             if (!cargarSesion()) return;
-            actualizarBadge();
             poblarPanelStickers();
-            renderizarListaChats();
-            renderizarMensajes();
+            suscribirBuzon();
+            suscribirAmigos();
+            renderizarMensajesSoporte();
         });
     </script>
 </body>

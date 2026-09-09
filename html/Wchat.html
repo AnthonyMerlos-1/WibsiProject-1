@@ -25,6 +25,12 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
+            animation: fadeInBody 0.6s ease-out;
+        }
+
+        @keyframes fadeInBody {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         .wchat-container {
@@ -36,6 +42,12 @@
             box-shadow: 0 20px 50px rgba(0, 0, 0, .6);
             position: relative;
             overflow: hidden;
+            animation: slideUpContainer 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUpContainer {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         @media (min-width: 768px) {
@@ -80,6 +92,10 @@
             font-weight: 800;
             color: #fff;
             font-size: 16px;
+            transition: transform 0.3s ease;
+        }
+        .wchat-logo-icon:hover {
+            transform: rotate(10deg) scale(1.05);
         }
 
         .wchat-logo-text {
@@ -106,12 +122,14 @@
             cursor: pointer;
             font-size: 11px;
             font-weight: 600;
+            transition: all 0.2s ease;
         }
 
         .wchat-action-btn:hover {
             background: rgba(0, 176, 155, .15);
             border-color: #00b09b;
             color: #fff;
+            transform: translateY(-1px);
         }
 
         .badge-count {
@@ -121,41 +139,108 @@
             padding: 2px 5px;
             border-radius: 10px;
             font-weight: bold;
+            animation: pulseBadge 2s infinite;
         }
 
-        .user-id-badge-bar {
-            background: rgba(0, 176, 155, .07);
+        @keyframes pulseBadge {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        .user-profile-summary {
+            background: rgba(0, 176, 155, .05);
             border-bottom: 1px solid rgba(0, 176, 155, .15);
-            padding: 10px 18px;
+            padding: 12px 18px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
+            gap: 10px;
         }
 
-        .user-id-info span {
+        .user-profile-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+            cursor: pointer;
+        }
+
+        .user-profile-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00b09b, #4f46e5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            font-size: 15px;
+            flex-shrink: 0;
+            object-fit: cover;
+            border: 2px solid rgba(0, 176, 155, 0.4);
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+        .user-profile-avatar:hover {
+            transform: scale(1.05);
+        }
+
+        .user-profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-profile-info {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .user-profile-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-profile-desc {
             font-size: 11px;
             color: #9ca3af;
-            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .user-id-info strong {
-            font-size: 12px;
+        .user-profile-id {
+            font-size: 10px;
             color: #00b09b;
             font-family: monospace;
         }
 
-        .copy-id-btn {
-            background: rgba(0, 176, 155, .2);
-            border: none;
-            color: white;
-            padding: 5px 8px;
-            border-radius: 6px;
+        .settings-gear-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #d1d5db;
+            padding: 8px;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 10px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
         }
 
-        .copy-id-btn:hover {
-            background: #00b09b;
+        .settings-gear-btn:hover {
+            background: rgba(0, 176, 155, 0.2);
+            color: white;
+            border-color: #00b09b;
+            transform: rotate(45deg);
         }
 
         .wchat-search-box {
@@ -170,6 +255,7 @@
             border-radius: 12px;
             color: white;
             outline: none;
+            transition: border-color 0.2s;
         }
 
         .wchat-search-input:focus {
@@ -190,10 +276,12 @@
             cursor: pointer;
             border-radius: 12px;
             margin-bottom: 4px;
+            transition: background 0.2s, transform 0.1s;
         }
 
         .wchat-chat-item:hover {
             background: rgba(255, 255, 255, .04);
+            transform: translateX(3px);
         }
 
         .wchat-chat-item.active {
@@ -218,6 +306,13 @@
             font-size: 14px;
             flex-shrink: 0;
             position: relative;
+            overflow: hidden;
+        }
+
+        .wchat-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .wchat-status-dot {
@@ -304,12 +399,19 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
+            scroll-behavior: smooth;
         }
 
         .empty-chat {
             margin: auto;
             text-align: center;
             color: #6b7280;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .wchat-msg {
@@ -319,6 +421,13 @@
             font-size: 14px;
             line-height: 1.5;
             word-break: break-word;
+            animation: messagePop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        @keyframes messagePop {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         .wchat-msg.incoming {
@@ -344,39 +453,90 @@
             background: transparent !important;
             font-size: 55px;
             padding: 0;
+            box-shadow: none;
         }
 
-        .wchat-image {
-            display: block;
-            max-width: 280px;
-            max-height: 300px;
-            width: auto;
-            height: auto;
-            border-radius: 12px;
-            object-fit: contain;
+        .wchat-file-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(0,0,0,0.2);
+            padding: 10px 14px;
+            border-radius: 10px;
+            margin-bottom: 5px;
+            border: 1px solid rgba(255,255,255,0.08);
         }
 
-        .audio-message {
-            width: 280px;
-            max-width: 100%;
+        .wchat-file-icon {
+            font-size: 28px;
         }
 
-        .audio-message audio {
-            width: 100%;
-            height: 42px;
+        .wchat-file-info {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
         }
 
-        .typing-indicator {
-            height: 0;
+        .wchat-file-name {
+            font-weight: 600;
+            font-size: 13px;
+            color: white;
+            white-space: nowrap;
             overflow: hidden;
-            padding: 0 24px;
+            text-overflow: ellipsis;
+        }
+
+        .wchat-file-download {
+            font-size: 11px;
+            color: #00b09b;
+            text-decoration: none;
+            margin-top: 2px;
+            font-weight: 600;
+        }
+
+        .wchat-file-download:hover {
+            text-decoration: underline;
+        }
+
+        .typing-indicator-box {
+            display: none;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
             color: #9ca3af;
             font-size: 12px;
-            transition: .2s;
+            background: rgba(18, 22, 35, 0.5);
+            width: fit-content;
+            border-radius: 12px;
+            margin-left: 24px;
+            margin-bottom: 8px;
+            animation: fadeIn 0.3s;
         }
 
-        .typing-indicator.active {
-            height: 30px;
+        .typing-indicator-box.active {
+            display: flex;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 3px;
+            align-items: center;
+        }
+
+        .typing-dots span {
+            width: 5px;
+            height: 5px;
+            background: #00b09b;
+            border-radius: 50%;
+            animation: typingBounce 1.4s infinite ease-in-out both;
+        }
+
+        .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typingBounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1.0); }
         }
 
         .wchat-input-bar {
@@ -397,6 +557,7 @@
             border-radius: 12px;
             color: white;
             outline: none;
+            transition: border-color 0.2s;
         }
 
         .wchat-text-input:focus {
@@ -411,10 +572,12 @@
             border-radius: 12px;
             font-weight: 600;
             cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
         }
 
         .wchat-send-btn:hover {
             transform: translateY(-1px);
+            opacity: 0.95;
         }
 
         .sticker-panel {
@@ -432,6 +595,13 @@
             max-height: 300px;
             overflow-y: auto;
             z-index: 20;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: popPanel 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes popPanel {
+            from { transform: translateY(10px) scale(0.95); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
         }
 
         .sticker-panel.active {
@@ -444,10 +614,12 @@
             padding: 5px;
             cursor: pointer;
             border-radius: 8px;
+            transition: background 0.15s, transform 0.1s;
         }
 
         .sticker-option:hover {
             background: rgba(255,255,255,.08);
+            transform: scale(1.15);
         }
 
         .tool-btn {
@@ -460,51 +632,16 @@
             cursor: pointer;
             font-size: 17px;
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
         }
 
         .tool-btn:hover {
             background: rgba(0,176,155,.15);
             border-color: #00b09b;
-        }
-
-        .tool-btn.recording {
-            background: rgba(239,68,68,.25);
-            border-color: #ef4444;
-            animation: recordingPulse 1s infinite;
-        }
-
-        @keyframes recordingPulse {
-            0% { opacity: 1; }
-            50% { opacity: .5; }
-            100% { opacity: 1; }
-        }
-
-        .recording-status {
-            position: absolute;
-            bottom: 78px;
-            left: 24px;
-            background: #161b2c;
-            border: 1px solid rgba(239,68,68,.35);
-            border-radius: 10px;
-            padding: 8px 12px;
-            display: none;
-            align-items: center;
-            gap: 8px;
-            color: #fca5a5;
-            font-size: 12px;
-            z-index: 21;
-        }
-
-        .recording-status.active {
-            display: flex;
-        }
-
-        .recording-dot {
-            width: 9px;
-            height: 9px;
-            border-radius: 50%;
-            background: #ef4444;
-            animation: recordingPulse 1s infinite;
+            transform: translateY(-1px);
         }
 
         .modal-overlay {
@@ -517,7 +654,7 @@
             align-items: center;
             opacity: 0;
             pointer-events: none;
-            transition: .3s;
+            transition: opacity 0.3s ease;
             z-index: 100;
         }
 
@@ -533,16 +670,25 @@
             border: 1px solid rgba(255,255,255,.1);
             padding: 24px;
             border-radius: 18px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: scale(1);
         }
 
         .modal-header {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             margin-bottom: 15px;
         }
 
         .modal-header h3 {
             color: white;
+            font-size: 18px;
         }
 
         .modal-close {
@@ -551,6 +697,10 @@
             color: #9ca3af;
             cursor: pointer;
             font-size: 18px;
+            transition: color 0.2s;
+        }
+        .modal-close:hover {
+            color: white;
         }
 
         .modal-body p {
@@ -559,7 +709,7 @@
             margin-bottom: 14px;
         }
 
-        .modal-input {
+        .modal-input, .modal-textarea {
             width: 100%;
             padding: 12px;
             background: rgba(255,255,255,.05);
@@ -567,10 +717,51 @@
             border-radius: 10px;
             color: white;
             outline: none;
+            margin-bottom: 12px;
+            font-family: inherit;
+            transition: border-color 0.2s;
         }
 
-        .modal-input:focus {
+        .modal-input:focus, .modal-textarea:focus {
             border-color: #00b09b;
+        }
+
+        .modal-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .avatar-preview-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            background: rgba(255,255,255,0.02);
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px dashed rgba(255,255,255,0.1);
+        }
+
+        .avatar-preview-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #00b09b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            font-weight: bold;
+            color: white;
+            font-size: 20px;
+            flex-shrink: 0;
+            border: 2px solid #00b09b;
+        }
+
+        .avatar-preview-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .modal-footer {
@@ -585,6 +776,11 @@
             border-radius: 9px;
             cursor: pointer;
             border: none;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+        .modal-btn:hover {
+            opacity: 0.9;
         }
 
         .cancel {
@@ -655,6 +851,11 @@
             text-decoration: none;
             font-size: 12px;
             z-index: 1000;
+            transition: all 0.2s;
+        }
+        .back-home:hover {
+            background: rgba(0,176,155,0.2);
+            border-color: #00b09b;
         }
 
         .toast {
@@ -668,11 +869,16 @@
             border-radius: 10px;
             z-index: 500;
             max-width: 320px;
-            transition: opacity .3s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: toastSlide 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes toastSlide {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         @media(max-width: 750px) {
-
             body {
                 align-items: stretch;
             }
@@ -689,8 +895,8 @@
             .wchat-logo-text,
             .wchat-search-box,
             .wchat-chat-info,
-            .user-id-info span,
-            .copy-id-btn {
+            .user-profile-info,
+            .settings-gear-btn {
                 display: none;
             }
 
@@ -702,12 +908,17 @@
                 flex-direction: column;
             }
 
+            .user-profile-summary {
+                justify-content: center;
+                padding: 10px 5px;
+            }
+
             .wchat-chat-item {
                 justify-content: center;
                 padding: 12px 5px;
             }
 
-            .wchat-avatar {
+            .wchat-avatar, .user-profile-avatar {
                 width: 42px;
                 height: 42px;
             }
@@ -743,11 +954,6 @@
                 right: 10px;
                 bottom: 65px;
                 width: 270px;
-            }
-
-            .recording-status {
-                left: 10px;
-                bottom: 65px;
             }
         }
     </style>
@@ -789,26 +995,21 @@
 
         </div>
 
-        <div class="user-id-badge-bar">
-
-            <div class="user-id-info">
-
-                <span>
-                    Conectado como
-                    <strong id="myUserNameDisplay">Usuario</strong>
-                    · Tu ID:
-                </span>
-
-                <strong id="myUserIdDisplay">---</strong>
-
+        <!-- SECCIÓN DE TU CUENTA (FOTO, NOMBRE, DESCRIPCIÓN, ID Y AJUSTES) -->
+        <div class="user-profile-summary">
+            <div class="user-profile-left" onclick="abrirModalConfiguracion()" title="Ver y editar tu cuenta">
+                <div class="user-profile-avatar" id="myAvatarDisplay">
+                    U
+                </div>
+                <div class="user-profile-info">
+                    <div class="user-profile-name" id="myUserNameDisplay">Usuario</div>
+                    <div class="user-profile-desc" id="myUserDescDisplay">Sin descripción</div>
+                    <div class="user-profile-id" id="myUserIdDisplay">---</div>
+                </div>
             </div>
-
-            <button
-                class="copy-id-btn"
-                onclick="copiarMiId()">
-                Copiar
+            <button class="settings-gear-btn" onclick="abrirModalConfiguracion()" title="Ajustes de cuenta">
+                ⚙️
             </button>
-
         </div>
 
         <div class="wchat-search-box">
@@ -898,12 +1099,15 @@
         </div>
 
         <div
-            class="typing-indicator"
+            class="typing-indicator-box"
             id="typingIndicator">
 
-            <span id="typingText">
-                escribiendo...
-            </span>
+            <span id="typingText">alguien está escribiendo</span>
+            <div class="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
 
         </div>
 
@@ -919,32 +1123,23 @@
 
             <button
                 class="tool-btn"
-                onclick="document.getElementById('imageInput').click()"
-                title="Enviar imagen">
-                🖼️
-            </button>
-
-            <button
-                class="tool-btn"
-                id="recordBtn"
-                onclick="alternarGrabacionAudio()"
-                title="Grabar audio">
-                🎤
+                onclick="document.getElementById('fileInput').click()"
+                title="Enviar documento (hasta 10,000 palabras / archivos permitidos)">
+                📎
             </button>
 
             <input
                 type="file"
-                id="imageInput"
-                accept="image/*"
+                id="fileInput"
                 style="display:none"
-                onchange="enviarImagen(event)"
+                onchange="enviarDocumento(event)"
             >
 
             <input
                 type="text"
                 id="messageInput"
                 class="wchat-text-input"
-                placeholder="Escribe un mensaje..."
+                placeholder="Escribe un mensaje (máx 10,000 palabras)..."
                 autocomplete="off"
             >
 
@@ -959,24 +1154,13 @@
                 id="stickerPanel">
             </div>
 
-            <div
-                class="recording-status"
-                id="recordingStatus">
-
-                <span class="recording-dot"></span>
-
-                <span id="recordingText">
-                    Grabando 00:00
-                </span>
-
-            </div>
-
         </div>
 
     </main>
 
 </div>
 
+<!-- MODAL AGREGAR AMIGO -->
 <div
     class="modal-overlay"
     id="friendModal">
@@ -1032,6 +1216,7 @@
 
 </div>
 
+<!-- MODAL BUZÓN -->
 <div
     class="modal-overlay"
     id="mailboxModal">
@@ -1077,6 +1262,71 @@
 
 </div>
 
+<!-- MODAL AJUSTES DE TU CUENTA -->
+<div
+    class="modal-overlay"
+    id="configModal">
+
+    <div class="modal-card">
+
+        <div class="modal-header">
+
+            <h3>⚙️ Ajustes de tu Cuenta</h3>
+            <button class="modal-close" onclick="cerrarModalConfiguracion()">✕</button>
+
+        </div>
+
+        <div class="modal-body">
+            <div class="avatar-preview-container">
+                <div class="avatar-preview-circle" id="modalAvatarPreview">U</div>
+                <div>
+                    <p style="margin:0; font-size:12px; color:#fff; font-weight:600;">Foto de perfil (URL)</p>
+                    <p style="margin:0; font-size:10px; color:#9ca3af;">Pega el enlace de una imagen pública</p>
+                </div>
+            </div>
+
+            <p>Foto de Perfil (URL de imagen)</p>
+            <input
+                id="configAvatarInput"
+                class="modal-input"
+                placeholder="https://ejemplo.com/mi-foto.jpg"
+                autocomplete="off"
+                oninput="actualizarPrevisualizacionAvatar(this.value)"
+            >
+
+            <p>Nombre de usuario</p>
+            <input
+                id="configNameInput"
+                class="modal-input"
+                placeholder="Tu nombre"
+                autocomplete="off"
+            >
+
+            <p>Descripción / Estado</p>
+            <textarea
+                id="configDescInput"
+                class="modal-textarea"
+                placeholder="Escribe algo sobre ti..."
+            ></textarea>
+
+            <p>Tu WIB-ID (Fijo)</p>
+            <input
+                id="configIdInput"
+                class="modal-input"
+                readonly
+                style="color: #00b09b; font-family: monospace; background: rgba(0,176,155,0.05);"
+            >
+        </div>
+
+        <div class="modal-footer">
+            <button class="modal-btn cancel" onclick="cerrarModalConfiguracion()">Cancelar</button>
+            <button class="modal-btn confirm" onclick="guardarMiConfiguracion()">Guardar cambios</button>
+        </div>
+
+    </div>
+
+</div>
+
 
 <script type="module">
 
@@ -1106,46 +1356,22 @@ import {
     serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
 
-import {
-    getStorage,
-    ref as storageRef,
-    uploadBytes,
-    getDownloadURL
-} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-storage.js";
-
 
 const firebaseConfig = {
-
     apiKey: "AIzaSyAg8n3AcKE-0QDQYcswUBYZwI702TzPZIU",
-
     authDomain: "anthonypg.firebaseapp.com",
-
-    databaseURL:
-        "https://anthonypg-default-rtdb.firebaseio.com",
-
+    databaseURL: "https://anthonypg-default-rtdb.firebaseio.com",
     projectId: "anthonypg",
-
-    storageBucket:
-        "anthonypg.firebasestorage.app",
-
-    messagingSenderId:
-        "620424695699",
-
-    appId:
-        "1:620424695699:web:429c9ace801a5bc75a6266",
-
-    measurementId:
-        "G-YVFYEWDQ98"
+    storageBucket: "anthonypg.firebasestorage.app",
+    messagingSenderId: "620424695699",
+    appId: "1:620424695699:web:429c9ace801a5bc75a6266",
+    measurementId: "G-YVFYEWDQ98"
 };
 
 
 const app = initializeApp(firebaseConfig);
-
 const auth = getAuth(app);
-
 const db = getDatabase(app);
-
-const storage = getStorage(app);
 
 
 /* ============================================================
@@ -1153,49 +1379,26 @@ const storage = getStorage(app);
 ============================================================ */
 
 let miUid = null;
-
 let miId = null;
-
 let miNombre = "Usuario";
+let miDescripcion = "";
+let miAvatarUrl = "";
 
 let chatActivoUid = null;
-
 let chatActivoId = null;
-
 let chatActivoNombre = null;
 
 let unsubscribeMensajes = null;
-
 let unsubscribeAmistades = null;
-
 let unsubscribeSolicitudes = null;
-
 let unsubscribeTyping = null;
-
 let unsubscribePreviews = {};
-
 let unsubscribePresencia = {};
 
 let amigos = {};
-
 let solicitudes = {};
-
 let typingTimer = null;
-
 let restauracionHecha = false;
-
-
-/* AUDIO */
-
-let mediaRecorder = null;
-
-let audioChunks = [];
-
-let audioStream = null;
-
-let recordingStartedAt = 0;
-
-let recordingInterval = null;
 
 
 /* ============================================================
@@ -1203,7 +1406,6 @@ let recordingInterval = null;
 ============================================================ */
 
 function escapeHtml(text) {
-
     return String(text ?? "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
@@ -1214,10 +1416,7 @@ function escapeHtml(text) {
 
 
 function iniciales(nombre) {
-
-    if (!nombre)
-        return "U";
-
+    if (!nombre) return "U";
     return nombre
         .trim()
         .split(/\s+/)
@@ -1229,52 +1428,30 @@ function iniciales(nombre) {
 
 
 function crearChatKey(uid1, uid2) {
-
-    return [uid1, uid2]
-        .sort()
-        .join("_");
+    return [uid1, uid2].sort().join("_");
 }
 
 
 function horaActual() {
-
     return new Date().toLocaleTimeString(
         "es-GT",
-        {
-            hour: "2-digit",
-            minute: "2-digit"
-        }
+        { hour: "2-digit", minute: "2-digit" }
     );
 }
 
 
 function mostrarToast(texto) {
+    const anterior = document.querySelector(".toast");
+    if (anterior) anterior.remove();
 
-    const anterior =
-        document.querySelector(".toast");
-
-    if (anterior)
-        anterior.remove();
-
-    const toast =
-        document.createElement("div");
-
+    const toast = document.createElement("div");
     toast.className = "toast";
-
     toast.textContent = texto;
-
     document.body.appendChild(toast);
 
     setTimeout(() => {
-
         toast.style.opacity = "0";
-
-        setTimeout(() => {
-
-            toast.remove();
-
-        }, 300);
-
+        setTimeout(() => toast.remove(), 300);
     }, 3000);
 }
 
@@ -1284,100 +1461,140 @@ function mostrarToast(texto) {
 ============================================================ */
 
 onAuthStateChanged(auth, async (user) => {
-
     if (!user) {
-
-        alert(
-            "Debes iniciar sesión para utilizar Wchat."
-        );
-
+        alert("Debes iniciar sesión para utilizar Wchat.");
         window.location.href = "cuenta.html";
-
         return;
     }
 
     miUid = user.uid;
-
     await cargarMiPerfil();
 
     if (!miId) {
-
-        alert(
-            "No se encontró tu WIB-ID en Firebase."
-        );
-
+        alert("No se encontró tu WIB-ID en Firebase.");
         return;
     }
 
     await activarPresencia();
-
     escucharSolicitudes();
-
     escucharAmistades();
-
     poblarStickers();
-
 });
 
 
 /* ============================================================
-   PERFIL
+   PERFIL (GUARDADO Y PERSISTENCIA)
 ============================================================ */
 
 async function cargarMiPerfil() {
-
     try {
-
-        const perfilRef =
-            ref(db, "usuarios/" + miUid);
-
-        const snapshot =
-            await get(perfilRef);
+        const perfilRef = ref(db, "usuarios/" + miUid);
+        const snapshot = await get(perfilRef);
 
         if (!snapshot.exists()) {
-
-            console.error(
-                "No existe usuarios/" + miUid
-            );
-
+            console.error("No existe usuarios/" + miUid);
             return;
         }
 
-        const datos =
-            snapshot.val();
+        const datos = snapshot.val();
 
-        miId =
-            datos.id ||
-            datos.wibId ||
-            datos.WIB_ID ||
-            "";
+        miId = datos.id || datos.wibId || datos.WIB_ID || "";
+        miNombre = datos.name || datos.nombre || datos.displayName || auth.currentUser.displayName || "Usuario";
+        miDescripcion = datos.description || datos.descripcion || "";
+        miAvatarUrl = datos.avatar || datos.foto || datos.photoURL || "";
 
-        miNombre =
-            datos.name ||
-            datos.nombre ||
-            datos.displayName ||
-            auth.currentUser.displayName ||
-            "Usuario";
-
-        document.getElementById(
-            "myUserIdDisplay"
-        ).textContent =
-            miId || "---";
-
-        document.getElementById(
-            "myUserNameDisplay"
-        ).textContent =
-            miNombre;
+        renderizarMiPerfilUI();
 
     } catch (error) {
-
         console.error(error);
-
-        mostrarToast(
-            "No se pudo cargar tu perfil."
-        );
+        mostrarToast("No se pudo cargar tu perfil.");
     }
 }
+
+function renderizarMiPerfilUI() {
+    document.getElementById("myUserIdDisplay").textContent = miId || "---";
+    document.getElementById("myUserNameDisplay").textContent = miNombre;
+    document.getElementById("myUserDescDisplay").textContent = miDescripcion || "Sin descripción";
+
+    const avatarContainer = document.getElementById("myAvatarDisplay");
+    if (miAvatarUrl && miAvatarUrl.trim() !== "") {
+        avatarContainer.innerHTML = `<img src="${escapeHtml(miAvatarUrl)}" alt="Avatar" onerror="this.parentElement.innerHTML='${escapeHtml(iniciales(miNombre))}'">`;
+    } else {
+        avatarContainer.textContent = iniciales(miNombre);
+    }
+}
+
+
+window.abrirModalConfiguracion = function() {
+    document.getElementById("configNameInput").value = miNombre;
+    document.getElementById("configDescInput").value = miDescripcion;
+    document.getElementById("configAvatarInput").value = miAvatarUrl;
+    document.getElementById("configIdInput").value = miId || "";
+    actualizarPrevisualizacionAvatar(miAvatarUrl);
+
+    document.getElementById("configModal").classList.add("active");
+};
+
+window.cerrarModalConfiguracion = function() {
+    document.getElementById("configModal").classList.remove("active");
+};
+
+window.actualizarPrevisualizacionAvatar = function(url) {
+    const preview = document.getElementById("modalAvatarPreview");
+    if (url && url.trim() !== "") {
+        preview.innerHTML = `<img src="${escapeHtml(url)}" alt="Preview" onerror="this.innerHTML='${escapeHtml(iniciales(miNombre))}'">`;
+    } else {
+        preview.textContent = iniciales(miNombre);
+    }
+};
+
+window.guardarMiConfiguracion = async function() {
+    const nuevoNombre = document.getElementById("configNameInput").value.trim();
+    const nuevaDesc = document.getElementById("configDescInput").value.trim();
+    const nuevoAvatar = document.getElementById("configAvatarInput").value.trim();
+
+    if (!nuevoNombre) {
+        alert("El nombre no puede estar vacío.");
+        return;
+    }
+
+    try {
+        const perfilRef = ref(db, "usuarios/" + miUid);
+        await update(perfilRef, {
+            name: nuevoNombre,
+            description: nuevaDesc,
+            avatar: nuevoAvatar
+        });
+
+        // Actualizar también en el nodo de amistades para que los demás lo vean actualizado
+        const amigosRef = ref(db, `amistades`);
+        const snapshotAmigos = await get(amigosRef);
+        if (snapshotAmigos.exists()) {
+            const dataAmigos = snapshotAmigos.val();
+            const updates = {};
+            for (const uidAmigo in dataAmigos) {
+                if (dataAmigos[uidAmigo][miUid]) {
+                    updates[`amistades/${uidAmigo}/${miUid}/name`] = nuevoNombre;
+                }
+            }
+            if (Object.keys(updates).length > 0) {
+                await update(ref(db), updates);
+            }
+        }
+
+        miNombre = nuevoNombre;
+        miDescripcion = nuevaDesc;
+        miAvatarUrl = nuevoAvatar;
+
+        renderizarMiPerfilUI();
+        cerrarModalConfiguracion();
+        mostrarToast("¡Perfil actualizado y guardado correctamente!");
+
+    } catch (error) {
+        console.error("Error guardando perfil:", error);
+        alert("No se pudo guardar la configuración.");
+    }
+};
 
 
 /* ============================================================
@@ -1385,1764 +1602,661 @@ async function cargarMiPerfil() {
 ============================================================ */
 
 async function activarPresencia() {
-
-    const presenciaRef =
-        ref(db, "presencia/" + miUid);
-
+    const presenciaRef = ref(db, "presencia/" + miUid);
     try {
-
-        await onDisconnect(presenciaRef)
-            .set({
-                online: false,
-                lastSeen: serverTimestamp()
-            });
-
-        await set(
-            presenciaRef,
-            {
-                online: true,
-                lastSeen: serverTimestamp()
-            }
-        );
-
+        await onDisconnect(presenciaRef).set({
+            online: false,
+            lastSeen: serverTimestamp()
+        });
+        await set(presenciaRef, {
+            online: true,
+            lastSeen: serverTimestamp()
+        });
     } catch (error) {
-
-        console.error(
-            "Error presencia:",
-            error
-        );
+        console.error("Error presencia:", error);
     }
 }
 
 
 /* ============================================================
-   COPIAR ID
-============================================================ */
-
-window.copiarMiId = async function() {
-
-    if (!miId)
-        return;
-
-    try {
-
-        await navigator.clipboard.writeText(miId);
-
-        mostrarToast(
-            "WIB-ID copiado: " + miId
-        );
-
-    } catch {
-
-        alert(
-            "Tu WIB-ID es:\n\n" + miId
-        );
-    }
-};
-
-
-/* ============================================================
-   MODAL
+   MODAL AMIGOS
 ============================================================ */
 
 window.abrirModalId = function() {
-
-    document
-        .getElementById("friendModal")
-        .classList.add("active");
-
-    document
-        .getElementById("targetIdInput")
-        .focus();
+    document.getElementById("friendModal").classList.add("active");
+    document.getElementById("targetIdInput").focus();
 };
-
 
 window.cerrarModalId = function() {
-
-    document
-        .getElementById("friendModal")
-        .classList.remove("active");
-
-    document
-        .getElementById("targetIdInput")
-        .value = "";
+    document.getElementById("friendModal").classList.remove("active");
+    document.getElementById("targetIdInput").value = "";
 };
 
 
-/* ============================================================
-   BUSCAR UID
-============================================================ */
-
 async function buscarUidPorWibId(wibId) {
-
-    const wibRef =
-        ref(
-            db,
-            "wibToUid/" + wibId
-        );
-
-    const snapshot =
-        await get(wibRef);
-
-    if (!snapshot.exists())
-        return null;
-
+    const wibRef = ref(db, "wibToUid/" + wibId);
+    const snapshot = await get(wibRef);
+    if (!snapshot.exists()) return null;
     return snapshot.val();
 }
 
 
-/* ============================================================
-   SOLICITUD
-============================================================ */
-
 window.enviarSolicitud = async function() {
-
-    const input =
-        document.getElementById(
-            "targetIdInput"
-        );
-
-    const targetId =
-        input.value
-            .trim()
-            .toUpperCase();
+    const input = document.getElementById("targetIdInput");
+    const targetId = input.value.trim().toUpperCase();
 
     if (!targetId) {
-
-        alert(
-            "Escribe un WIB-ID."
-        );
-
+        alert("Escribe un WIB-ID.");
         return;
     }
-
     if (!miId) {
-
-        alert(
-            "Tu cuenta todavía no está cargada."
-        );
-
+        alert("Tu cuenta todavía no está cargada.");
         return;
     }
-
     if (targetId === miId.toUpperCase()) {
-
-        alert(
-            "No puedes agregarte a ti mismo."
-        );
-
+        alert("No puedes agregarte a ti mismo.");
         return;
     }
 
     try {
-
-        const destinoUid =
-            await buscarUidPorWibId(targetId);
-
+        const destinoUid = await buscarUidPorWibId(targetId);
         if (!destinoUid) {
-
-            alert(
-                "No existe ningún usuario con ese WIB-ID."
-            );
-
+            alert("No existe ningún usuario con ese WIB-ID.");
             return;
         }
-
         if (destinoUid === miUid) {
-
-            alert(
-                "Ese WIB-ID pertenece a tu propia cuenta."
-            );
-
+            alert("Ese WIB-ID pertenece a tu propia cuenta.");
             return;
         }
 
-        const amistadRef =
-            ref(
-                db,
-                `amistades/${miUid}/${destinoUid}`
-            );
-
-        const amistad =
-            await get(amistadRef);
-
+        const amistadRef = ref(db, `amistades/${miUid}/${destinoUid}`);
+        const amistad = await get(amistadRef);
         if (amistad.exists()) {
-
-            alert(
-                "Ya tienes agregado a este usuario."
-            );
-
+            alert("Ya tienes agregado a este usuario.");
             cerrarModalId();
-
             return;
         }
 
-        const solicitudRef =
-            ref(
-                db,
-                `solicitudes/${destinoUid}/${miUid}`
-            );
-
-        const solicitud =
-            await get(solicitudRef);
-
+        const solicitudRef = ref(db, `solicitudes/${destinoUid}/${miUid}`);
+        const solicitud = await get(solicitudRef);
         if (solicitud.exists()) {
-
-            alert(
-                "Ya enviaste una solicitud a este usuario."
-            );
-
+            alert("Ya enviaste una solicitud a este usuario.");
             cerrarModalId();
-
             return;
         }
 
-        await set(
-            solicitudRef,
-            {
-                fromUid: miUid,
-                fromId: miId,
-                fromName: miNombre,
-                toUid: destinoUid,
-                toId: targetId,
-                createdAt: Date.now()
-            }
-        );
+        await set(solicitudRef, {
+            fromUid: miUid,
+            fromId: miId,
+            fromName: miNombre,
+            toUid: destinoUid,
+            toId: targetId,
+            createdAt: Date.now()
+        });
 
-        mostrarToast(
-            "Solicitud enviada correctamente."
-        );
-
+        mostrarToast("Solicitud enviada correctamente.");
         cerrarModalId();
 
     } catch (error) {
-
-        console.error(
-            "Error solicitud:",
-            error
-        );
-
-        alert(
-            "No se pudo enviar la solicitud.\n\n" +
-            error.message
-        );
+        console.error("Error solicitud:", error);
+        alert("No se pudo enviar la solicitud.\n\n" + error.message);
     }
 };
 
 
-/* ============================================================
-   SOLICITUDES
-============================================================ */
-
 function escucharSolicitudes() {
+    if (unsubscribeSolicitudes) unsubscribeSolicitudes();
+    const solicitudesRef = ref(db, "solicitudes/" + miUid);
 
-    if (unsubscribeSolicitudes)
-        unsubscribeSolicitudes();
-
-    const solicitudesRef =
-        ref(
-            db,
-            "solicitudes/" + miUid
-        );
-
-    unsubscribeSolicitudes =
-        onValue(
-            solicitudesRef,
-            snapshot => {
-
-                solicitudes =
-                    snapshot.val() || {};
-
-                actualizarBadge();
-
-                renderizarBuzon();
-            },
-            error => {
-
-                console.error(
-                    "Error solicitudes:",
-                    error
-                );
-            }
-        );
+    unsubscribeSolicitudes = onValue(solicitudesRef, snapshot => {
+        solicitudes = snapshot.val() || {};
+        actualizarBadge();
+        renderizarBuzon();
+    });
 }
 
 
 function actualizarBadge() {
-
-    const cantidad =
-        Object.keys(solicitudes).length;
-
-    const badge =
-        document.getElementById(
-            "badgeCount"
-        );
-
-    badge.textContent =
-        cantidad;
-
-    badge.style.display =
-        cantidad > 0
-            ? "inline-block"
-            : "none";
+    const cantidad = Object.keys(solicitudes).length;
+    const badge = document.getElementById("badgeCount");
+    badge.textContent = cantidad;
+    badge.style.display = cantidad > 0 ? "inline-block" : "none";
 }
 
 
-/* ============================================================
-   BUZÓN
-============================================================ */
-
 window.abrirBuzon = function() {
-
     renderizarBuzon();
-
-    document
-        .getElementById("mailboxModal")
-        .classList.add("active");
+    document.getElementById("mailboxModal").classList.add("active");
 };
 
-
 window.cerrarBuzon = function() {
-
-    document
-        .getElementById("mailboxModal")
-        .classList.remove("active");
+    document.getElementById("mailboxModal").classList.remove("active");
 };
 
 
 function renderizarBuzon() {
-
-    const contenedor =
-        document.getElementById(
-            "mailboxContent"
-        );
-
-    const lista =
-        Object.entries(solicitudes);
+    const contenedor = document.getElementById("mailboxContent");
+    const lista = Object.entries(solicitudes);
 
     if (lista.length === 0) {
-
-        contenedor.innerHTML = `
-            <p style="
-                text-align:center;
-                color:#6b7280;
-                padding:20px 0;
-            ">
-                No tienes solicitudes pendientes.
-            </p>
-        `;
-
+        contenedor.innerHTML = `<p style="text-align:center;color:#6b7280;padding:20px 0;">No tienes solicitudes pendientes.</p>`;
         return;
     }
 
-    contenedor.innerHTML =
-        lista.map(
-            ([uid, solicitud]) => {
-
-                return `
-                    <div class="invite">
-
-                        <div class="invite-name">
-                            ${escapeHtml(
-                                solicitud.fromName ||
-                                "Usuario"
-                            )}
-                        </div>
-
-                        <div class="invite-id">
-                            ID:
-                            ${escapeHtml(
-                                solicitud.fromId ||
-                                "---"
-                            )}
-                        </div>
-
-                        <div class="invite-buttons">
-
-                            <button
-                                class="accept"
-                                onclick="aceptarSolicitud('${uid}')">
-                                Aceptar
-                            </button>
-
-                            <button
-                                class="reject"
-                                onclick="rechazarSolicitud('${uid}')">
-                                Rechazar
-                            </button>
-
-                        </div>
-
-                    </div>
-                `;
-
-            }
-        ).join("");
+    contenedor.innerHTML = lista.map(([uid, solicitud]) => {
+        return `
+            <div class="invite">
+                <div class="invite-name">${escapeHtml(solicitud.fromName || "Usuario")}</div>
+                <div class="invite-id">ID: ${escapeHtml(solicitud.fromId || "---")}</div>
+                <div class="invite-buttons">
+                    <button class="accept" onclick="aceptarSolicitud('${uid}')">Aceptar</button>
+                    <button class="reject" onclick="rechazarSolicitud('${uid}')">Rechazar</button>
+                </div>
+            </div>
+        `;
+    }).join("");
 }
 
 
-/* ============================================================
-   ACEPTAR
-============================================================ */
-
 window.aceptarSolicitud = async function(uidAmigo) {
-
-    const solicitud =
-        solicitudes[uidAmigo];
-
-    if (!solicitud)
-        return;
+    const solicitud = solicitudes[uidAmigo];
+    if (!solicitud) return;
 
     try {
-
         const updates = {};
-
-        updates[
-            `amistades/${miUid}/${uidAmigo}`
-        ] = {
+        updates[`amistades/${miUid}/${uidAmigo}`] = {
             uid: uidAmigo,
             id: solicitud.fromId,
             name: solicitud.fromName || "Usuario",
             addedAt: Date.now()
         };
-
-        updates[
-            `amistades/${uidAmigo}/${miUid}`
-        ] = {
+        updates[`amistades/${uidAmigo}/${miUid}`] = {
             uid: miUid,
             id: miId,
             name: miNombre,
             addedAt: Date.now()
         };
+        updates[`solicitudes/${miUid}/${uidAmigo}`] = null;
 
-        updates[
-            `solicitudes/${miUid}/${uidAmigo}`
-        ] = null;
+        await update(ref(db), updates);
 
-        await update(
-            ref(db),
-            updates
-        );
-
-        /*
-         * Preparar el chat.
-         */
-        const key =
-            crearChatKey(
-                miUid,
-                uidAmigo
-            );
-
-        await update(
-            ref(db),
-            {
-                [`chats/${key}/users/${miUid}`]:
-                    true,
-
-                [`chats/${key}/users/${uidAmigo}`]:
-                    true
-            }
-        );
+        const key = crearChatKey(miUid, uidAmigo);
+        await update(ref(db), {
+            [`chats/${key}/users/${miUid}`]: true,
+            [`chats/${key}/users/${uidAmigo}`]: true
+        });
 
         cerrarBuzon();
-
-        mostrarToast(
-            "Ahora son amigos en Wchat."
-        );
+        mostrarToast("Ahora son amigos en Wchat.");
 
     } catch (error) {
-
         console.error(error);
-
-        alert(
-            "No se pudo aceptar la solicitud.\n\n" +
-            error.message
-        );
+        alert("No se pudo aceptar la solicitud.\n\n" + error.message);
     }
 };
 
-
-/* ============================================================
-   RECHAZAR
-============================================================ */
 
 window.rechazarSolicitud = async function(uidAmigo) {
-
     try {
-
-        await remove(
-            ref(
-                db,
-                `solicitudes/${miUid}/${uidAmigo}`
-            )
-        );
-
-        mostrarToast(
-            "Solicitud rechazada."
-        );
-
+        await remove(ref(db, `solicitudes/${miUid}/${uidAmigo}`));
+        mostrarToast("Solicitud rechazada.");
     } catch (error) {
-
         console.error(error);
-
-        alert(
-            "No se pudo rechazar la solicitud."
-        );
+        alert("No se pudo rechazar la solicitud.");
     }
 };
 
 
-/* ============================================================
-   AMISTADES
-============================================================ */
-
 function escucharAmistades() {
+    if (unsubscribeAmistades) unsubscribeAmistades();
+    const amigosRef = ref(db, `amistades/${miUid}`);
 
-    if (unsubscribeAmistades)
-        unsubscribeAmistades();
-
-    const amigosRef =
-        ref(
-            db,
-            `amistades/${miUid}`
-        );
-
-    unsubscribeAmistades =
-        onValue(
-            amigosRef,
-            snapshot => {
-
-                amigos =
-                    snapshot.val() || {};
-
-                renderizarAmigos();
-            },
-            error => {
-
-                console.error(
-                    "Error amigos:",
-                    error
-                );
-            }
-        );
+    unsubscribeAmistades = onValue(amigosRef, snapshot => {
+        amigos = snapshot.val() || {};
+        renderizarAmigos();
+    });
 }
 
 
-/* ============================================================
-   RENDERIZAR AMIGOS
-============================================================ */
-
 function renderizarAmigos() {
-
-    Object.values(unsubscribePreviews)
-        .forEach(fn => {
-
-            if (typeof fn === "function")
-                fn();
-
-        });
-
-    Object.values(unsubscribePresencia)
-        .forEach(fn => {
-
-            if (typeof fn === "function")
-                fn();
-
-        });
-
+    Object.values(unsubscribePreviews).forEach(fn => fn && fn());
+    Object.values(unsubscribePresencia).forEach(fn => fn && fn());
     unsubscribePreviews = {};
-
     unsubscribePresencia = {};
 
-    const lista =
-        document.getElementById(
-            "chatsList"
-        );
-
-    const soporte =
-        document.getElementById(
-            "supportChat"
-        );
-
+    const lista = document.getElementById("chatsList");
+    const soporte = document.getElementById("supportChat");
     lista.innerHTML = "";
-
     lista.appendChild(soporte);
 
+    Object.entries(amigos).forEach(([uid, amigo]) => {
+        const item = document.createElement("div");
+        item.className = "wchat-chat-item";
+        if (chatActivoUid === uid) item.classList.add("active");
+        item.dataset.chatId = uid;
 
-    Object.entries(amigos)
-        .forEach(
-            ([uid, amigo]) => {
+        item.innerHTML = `
+            <div class="wchat-avatar">
+                ${escapeHtml(iniciales(amigo.name))}
+                <div class="wchat-status-dot offline" id="status-${uid}"></div>
+            </div>
+            <div class="wchat-chat-info">
+                <div class="wchat-chat-name-row">
+                    <span class="wchat-chat-name">${escapeHtml(amigo.name || "Usuario")}</span>
+                    <span class="wchat-chat-time" id="time-${uid}"></span>
+                </div>
+                <div class="wchat-chat-preview" id="preview-${uid}">ID: ${escapeHtml(amigo.id || "---")}</div>
+            </div>
+        `;
 
-                const item =
-                    document.createElement(
-                        "div"
-                    );
+        item.onclick = () => seleccionarChat(uid, amigo.name || "Usuario", item);
+        lista.appendChild(item);
 
-                item.className =
-                    "wchat-chat-item";
-
-                if (chatActivoUid === uid)
-                    item.classList.add("active");
-
-                item.dataset.chatId =
-                    uid;
-
-                item.innerHTML = `
-
-                    <div class="wchat-avatar">
-
-                        ${escapeHtml(
-                            iniciales(
-                                amigo.name
-                            )
-                        )}
-
-                        <div
-                            class="wchat-status-dot offline"
-                            id="status-${uid}">
-                        </div>
-
-                    </div>
-
-                    <div class="wchat-chat-info">
-
-                        <div class="wchat-chat-name-row">
-
-                            <span class="wchat-chat-name">
-                                ${escapeHtml(
-                                    amigo.name ||
-                                    "Usuario"
-                                )}
-                            </span>
-
-                            <span
-                                class="wchat-chat-time"
-                                id="time-${uid}">
-                            </span>
-
-                        </div>
-
-                        <div
-                            class="wchat-chat-preview"
-                            id="preview-${uid}">
-
-                            ID:
-                            ${escapeHtml(
-                                amigo.id ||
-                                "---"
-                            )}
-
-                        </div>
-
-                    </div>
-                `;
-
-                item.onclick = () => {
-
-                    seleccionarChat(
-                        uid,
-                        amigo.name || "Usuario",
-                        item
-                    );
-
-                };
-
-                lista.appendChild(item);
-
-                unsubscribePresencia[uid] =
-                    escucharEstadoAmigo(uid);
-
-                unsubscribePreviews[uid] =
-                    escucharUltimoMensaje(
-                        uid
-                    );
-
-            }
-        );
-
+        unsubscribePresencia[uid] = escucharEstadoAmigo(uid);
+        unsubscribePreviews[uid] = escucharUltimoMensaje(uid);
+    });
 
     filtrarChats();
-
     restaurarChatGuardado();
 }
 
 
-/* ============================================================
-   ESTADO AMIGO
-============================================================ */
-
 function escucharEstadoAmigo(uid) {
-
-    const presenciaRef =
-        ref(
-            db,
-            `presencia/${uid}`
-        );
-
-    return onValue(
-        presenciaRef,
-        snapshot => {
-
-            const estado =
-                snapshot.val();
-
-            const elemento =
-                document.getElementById(
-                    `status-${uid}`
-                );
-
-            if (!elemento)
-                return;
-
-            if (
-                estado &&
-                estado.online === true
-            ) {
-
-                elemento.classList.remove(
-                    "offline"
-                );
-
-            } else {
-
-                elemento.classList.add(
-                    "offline"
-                );
-            }
+    const presenciaRef = ref(db, `presencia/${uid}`);
+    return onValue(presenciaRef, snapshot => {
+        const estado = snapshot.val();
+        const elemento = document.getElementById(`status-${uid}`);
+        if (!elemento) return;
+        if (estado && estado.online === true) {
+            elemento.classList.remove("offline");
+        } else {
+            elemento.classList.add("offline");
         }
-    );
+    });
 }
 
-
-/* ============================================================
-   ÚLTIMO MENSAJE
-============================================================ */
 
 function escucharUltimoMensaje(uid) {
+    const key = crearChatKey(miUid, uid);
+    const lastMessageRef = ref(db, `chats/${key}`);
 
-    const key =
-        crearChatKey(
-            miUid,
-            uid
-        );
+    return onValue(lastMessageRef, snapshot => {
+        const chat = snapshot.val() || {};
+        const preview = document.getElementById(`preview-${uid}`);
+        const time = document.getElementById(`time-${uid}`);
+        if (!preview) return;
 
-    const lastMessageRef =
-        ref(
-            db,
-            `chats/${key}`
-        );
-
-    return onValue(
-        lastMessageRef,
-        snapshot => {
-
-            const chat =
-                snapshot.val() || {};
-
-            const preview =
-                document.getElementById(
-                    `preview-${uid}`
-                );
-
-            const time =
-                document.getElementById(
-                    `time-${uid}`
-                );
-
-            if (!preview)
-                return;
-
-            if (chat.lastMessage) {
-
-                preview.textContent =
-                    chat.lastMessage;
-
-            } else {
-
-                const amigo =
-                    amigos[uid];
-
-                preview.textContent =
-                    "ID: " +
-                    (amigo?.id || "---");
-            }
-
-            if (
-                chat.updatedAt
-            ) {
-
-                const fecha =
-                    new Date(
-                        chat.updatedAt
-                    );
-
-                time.textContent =
-                    fecha.toLocaleTimeString(
-                        "es-GT",
-                        {
-                            hour: "2-digit",
-                            minute: "2-digit"
-                        }
-                    );
-            }
-
+        if (chat.lastMessage) {
+            preview.textContent = chat.lastMessage;
+        } else {
+            const amigo = amigos[uid];
+            preview.textContent = "ID: " + (amigo?.id || "---");
         }
-    );
+
+        if (chat.updatedAt) {
+            const fecha = new Date(chat.updatedAt);
+            time.textContent = fecha.toLocaleTimeString("es-GT", { hour: "2-digit", minute: "2-digit" });
+        }
+    });
 }
 
 
-/* ============================================================
-   BUSCADOR
-============================================================ */
-
-document
-    .getElementById("searchChats")
-    .addEventListener(
-        "input",
-        filtrarChats
-    );
-
+document.getElementById("searchChats").addEventListener("input", filtrarChats);
 
 function filtrarChats() {
-
-    const texto =
-        document
-            .getElementById("searchChats")
-            .value
-            .toLowerCase()
-            .trim();
-
-    document
-        .querySelectorAll(
-            ".wchat-chat-item"
-        )
-        .forEach(
-            item => {
-
-                const nombre =
-                    item
-                        .querySelector(
-                            ".wchat-chat-name"
-                        )
-                        ?.textContent
-                        .toLowerCase() || "";
-
-                if (
-                    !texto ||
-                    nombre.includes(texto)
-                ) {
-
-                    item.style.display =
-                        "flex";
-
-                } else {
-
-                    item.style.display =
-                        "none";
-                }
-            }
-        );
+    const texto = document.getElementById("searchChats").value.toLowerCase().trim();
+    document.querySelectorAll(".wchat-chat-item").forEach(item => {
+        const nombre = item.querySelector(".wchat-chat-name")?.textContent.toLowerCase() || "";
+        if (!texto || nombre.includes(texto)) {
+            item.style.display = "flex";
+        } else {
+            item.style.display = "none";
+        }
+    });
 }
 
-
-/* ============================================================
-   PREPARAR CHAT
-============================================================ */
 
 async function asegurarUsuariosChat(uid) {
-
-    if (!miUid || !uid)
-        return false;
-
-    const key =
-        crearChatKey(
-            miUid,
-            uid
-        );
-
+    if (!miUid || !uid) return false;
+    const key = crearChatKey(miUid, uid);
     try {
-
-        await update(
-            ref(db),
-            {
-                [`chats/${key}/users/${miUid}`]:
-                    true,
-
-                [`chats/${key}/users/${uid}`]:
-                    true
-            }
-        );
-
+        await update(ref(db), {
+            [`chats/${key}/users/${miUid}`]: true,
+            [`chats/${key}/users/${uid}`]: true
+        });
         return true;
-
     } catch (error) {
-
-        console.error(
-            "Error preparando chat:",
-            error
-        );
-
+        console.error("Error preparando chat:", error);
         return false;
     }
 }
 
 
-/* ============================================================
-   SELECCIONAR CHAT
-============================================================ */
-
-window.seleccionarChat =
-async function(
-    uid,
-    nombre,
-    elemento
-) {
-
+window.seleccionarChat = async function(uid, nombre, elemento) {
     detenerTyping();
-
     detenerEscuchasChat();
 
-    document
-        .querySelectorAll(
-            ".wchat-chat-item"
-        )
-        .forEach(
-            el =>
-                el.classList.remove(
-                    "active"
-                )
-        );
+    document.querySelectorAll(".wchat-chat-item").forEach(el => el.classList.remove("active"));
+    if (elemento) elemento.classList.add("active");
 
-    if (elemento)
-        elemento.classList.add("active");
+    chatActivoUid = uid === "soporte" ? null : uid;
+    chatActivoNombre = nombre;
+    chatActivoId = chatActivoUid ? (amigos[chatActivoUid]?.id || "---") : null;
 
-
-    chatActivoUid =
-        uid === "soporte"
-            ? null
-            : uid;
-
-    chatActivoNombre =
-        nombre;
-
-    chatActivoId =
-        chatActivoUid
-            ? (
-                amigos[chatActivoUid]?.id ||
-                "---"
-            )
-            : null;
-
-
-    document.getElementById(
-        "activeChatName"
-    ).textContent =
-        nombre;
-
-
-    document.getElementById(
-        "activeChatAvatar"
-    ).textContent =
-        iniciales(nombre);
-
+    document.getElementById("activeChatName").textContent = nombre;
+    document.getElementById("activeChatAvatar").textContent = iniciales(nombre);
 
     if (uid === "soporte") {
-
-        localStorage.setItem(
-            `wchat_chat_activo_${miUid}`,
-            "soporte"
-        );
-
-        document.getElementById(
-            "activeChatStatus"
-        ).textContent =
-            "● En línea";
-
+        localStorage.setItem(`wchat_chat_activo_${miUid}`, "soporte");
+        document.getElementById("activeChatStatus").textContent = "● En línea";
         mostrarSoporte();
-
         return;
     }
 
+    localStorage.setItem(`wchat_chat_activo_${miUid}`, uid);
+    document.getElementById("activeChatStatus").textContent = "● Conectando...";
 
-    localStorage.setItem(
-        `wchat_chat_activo_${miUid}`,
-        uid
-    );
-
-
-    document.getElementById(
-        "activeChatStatus"
-    ).textContent =
-        "● Conectando...";
-
-
-    const preparado =
-        await asegurarUsuariosChat(
-            uid
-        );
-
-    if (
-        chatActivoUid !== uid
-    )
-        return;
-
+    const preparado = await asegurarUsuariosChat(uid);
+    if (chatActivoUid !== uid) return;
 
     if (!preparado) {
-
-        document.getElementById(
-            "activeChatStatus"
-        ).textContent =
-            "● No disponible";
-
-        mostrarToast(
-            "No se pudo preparar el chat."
-        );
-
+        document.getElementById("activeChatStatus").textContent = "● No disponible";
+        mostrarToast("No se pudo preparar el chat.");
         return;
     }
 
-
-    document.getElementById(
-        "activeChatStatus"
-    ).textContent =
-        "● En línea";
-
-
+    document.getElementById("activeChatStatus").textContent = "● En línea";
     escucharMensajes();
-
     escucharTyping();
 };
 
 
-/* ============================================================
-   RESTAURAR CHAT
-============================================================ */
-
 function restaurarChatGuardado() {
-
-    if (
-        restauracionHecha ||
-        !miUid
-    )
-        return;
-
-    const guardado =
-        localStorage.getItem(
-            `wchat_chat_activo_${miUid}`
-        );
-
+    if (restauracionHecha || !miUid) return;
+    const guardado = localStorage.getItem(`wchat_chat_activo_${miUid}`);
     restauracionHecha = true;
 
-    if (
-        guardado &&
-        guardado !== "soporte" &&
-        amigos[guardado]
-    ) {
-
-        const elemento =
-            document.querySelector(
-                `[data-chat-id="${guardado}"]`
-            );
-
-        seleccionarChat(
-            guardado,
-            amigos[guardado].name ||
-                "Usuario",
-            elemento
-        );
-
+    if (guardado && guardado !== "soporte" && amigos[guardado]) {
+        const elemento = document.querySelector(`[data-chat-id="${guardado}"]`);
+        seleccionarChat(guardado, amigos[guardado].name || "Usuario", elemento);
         return;
     }
 
-
-    const soporte =
-        document.getElementById(
-            "supportChat"
-        );
-
-    seleccionarChat(
-        "soporte",
-        "Soporte Wchat",
-        soporte
-    );
+    const soporte = document.getElementById("supportChat");
+    seleccionarChat("soporte", "Soporte Wchat", soporte);
 }
 
 
-/* ============================================================
-   SOPORTE
-============================================================ */
-
 function mostrarSoporte() {
-
-    document.getElementById(
-        "messagesContainer"
-    ).innerHTML = `
-
+    document.getElementById("messagesContainer").innerHTML = `
         <div class="wchat-msg incoming">
-
             👋 Bienvenido a Wchat.
-
             <br><br>
-
-            Tu WIB-ID es:
-
-            <strong style="color:#00b09b;">
-                ${escapeHtml(miId)}
-            </strong>
-
+            Tu WIB-ID es: <strong style="color:#00b09b;">${escapeHtml(miId)}</strong>
             <br><br>
-
-            Usa el botón
-            <strong>➕ ID</strong>
-            para agregar a otros usuarios.
-
+            Usa el botón <strong>➕ ID</strong> para agregar a otros usuarios.
             <br><br>
-
-            Cuando acepten tu solicitud,
-            aparecerán automáticamente
-            en tu lista de chats.
-
-            <div class="wchat-msg-time">
-                ${horaActual()}
-            </div>
-
+            ¡Ya puedes chatear mediante texto, emojis y mandar documentos/archivos de forma segura!
+            <div class="wchat-msg-time">${horaActual()}</div>
         </div>
     `;
 }
 
 
-/* ============================================================
-   DETENER ESCUCHAS
-============================================================ */
-
 function detenerEscuchasChat() {
-
-    if (unsubscribeMensajes) {
-
-        unsubscribeMensajes();
-
-        unsubscribeMensajes = null;
-    }
-
-    if (unsubscribeTyping) {
-
-        unsubscribeTyping();
-
-        unsubscribeTyping = null;
-    }
-
-    document
-        .getElementById(
-            "typingIndicator"
-        )
-        .classList.remove(
-            "active"
-        );
+    if (unsubscribeMensajes) { unsubscribeMensajes(); unsubscribeMensajes = null; }
+    if (unsubscribeTyping) { unsubscribeTyping(); unsubscribeTyping = null; }
+    document.getElementById("typingIndicator").classList.remove("active");
 }
 
-
-/* ============================================================
-   MENSAJES
-============================================================ */
 
 function escucharMensajes() {
+    if (!chatActivoUid) return;
+    const key = crearChatKey(miUid, chatActivoUid);
+    const mensajesRef = ref(db, `chats/${key}/messages`);
 
-    if (!chatActivoUid)
-        return;
-
-    const key =
-        crearChatKey(
-            miUid,
-            chatActivoUid
-        );
-
-    const mensajesRef =
-        ref(
-            db,
-            `chats/${key}/messages`
-        );
-
-    unsubscribeMensajes =
-        onValue(
-            mensajesRef,
-            snapshot => {
-
-                const datos =
-                    snapshot.val() || {};
-
-                renderizarMensajes(
-                    datos
-                );
-            },
-            error => {
-
-                console.error(
-                    "Error mensajes:",
-                    error
-                );
-            }
-        );
+    unsubscribeMensajes = onValue(mensajesRef, snapshot => {
+        const datos = snapshot.val() || {};
+        renderizarMensajes(datos);
+    });
 }
 
 
-/* ============================================================
-   RENDER MENSAJES
-============================================================ */
-
 function renderizarMensajes(datos) {
-
-    const container =
-        document.getElementById(
-            "messagesContainer"
-        );
-
-    const mensajes =
-        Object.entries(datos)
-            .sort(
-                (a, b) =>
-                    (a[1].timestamp || 0) -
-                    (b[1].timestamp || 0)
-            );
-
+    const container = document.getElementById("messagesContainer");
+    const mensajes = Object.entries(datos).sort((a, b) => (a[1].timestamp || 0) - (b[1].timestamp || 0));
 
     if (mensajes.length === 0) {
-
         container.innerHTML = `
-
             <div class="empty-chat">
-
-                👋
-
-                <br><br>
-
-                Todavía no hay mensajes.
-
-                <br>
-
-                ¡Escribe el primero!
-
+                👋<br><br>Todavía no hay mensajes.<br>¡Escribe el primero!
             </div>
-
         `;
-
         return;
     }
-
 
     container.innerHTML = "";
 
+    mensajes.forEach(([id, mensaje]) => {
+        const div = document.createElement("div");
+        const mio = mensaje.fromUid === miUid;
+        div.className = "wchat-msg " + (mio ? "outgoing" : "incoming");
 
-    mensajes.forEach(
-        ([id, mensaje]) => {
-
-            const div =
-                document.createElement(
-                    "div"
-                );
-
-            const mio =
-                mensaje.fromUid === miUid;
-
-
-            div.className =
-                "wchat-msg " +
-                (
-                    mio
-                        ? "outgoing"
-                        : "incoming"
-                );
-
-
-            /* =========================
-               STICKER / EMOJI GRANDE
-            ========================= */
-
-            if (
-                mensaje.type ===
-                "sticker"
-            ) {
-
-                div.classList.add(
-                    "sticker"
-                );
-
-                const contenido =
-                    document.createElement(
-                        "div"
-                    );
-
-                contenido.textContent =
-                    mensaje.text || "";
-
-                div.appendChild(
-                    contenido
-                );
-
-            }
-
-
-            /* =========================
-               IMAGEN
-            ========================= */
-
-            else if (
-                mensaje.type ===
-                "image"
-            ) {
-
-                if (
-                    typeof mensaje.image ===
-                    "string" &&
-                    (
-                        mensaje.image.startsWith(
-                            "https://"
-                        ) ||
-                        mensaje.image.startsWith(
-                            "http://"
-                        )
-                    )
-                ) {
-
-                    const img =
-                        document.createElement(
-                            "img"
-                        );
-
-                    img.className =
-                        "wchat-image";
-
-                    img.src =
-                        mensaje.image;
-
-                    img.alt =
-                        "Imagen enviada";
-
-                    img.loading =
-                        "lazy";
-
-                    img.onerror =
-                        () => {
-
-                            img.replaceWith(
-                                document.createTextNode(
-                                    "⚠️ No se pudo cargar la imagen."
-                                )
-                            );
-
-                        };
-
-                    div.appendChild(img);
-
-                } else {
-
-                    const texto =
-                        document.createTextNode(
-                            "⚠️ Imagen no disponible."
-                        );
-
-                    div.appendChild(
-                        texto
-                    );
-                }
-            }
-
-
-            /* =========================
-               AUDIO
-            ========================= */
-
-            else if (
-                mensaje.type ===
-                "audio"
-            ) {
-
-                if (
-                    typeof mensaje.audio ===
-                    "string" &&
-                    (
-                        mensaje.audio.startsWith(
-                            "https://"
-                        ) ||
-                        mensaje.audio.startsWith(
-                            "http://"
-                        )
-                    )
-                ) {
-
-                    const wrapper =
-                        document.createElement(
-                            "div"
-                        );
-
-                    wrapper.className =
-                        "audio-message";
-
-                    const audio =
-                        document.createElement(
-                            "audio"
-                        );
-
-                    audio.controls =
-                        true;
-
-                    audio.preload =
-                        "metadata";
-
-                    audio.src =
-                        mensaje.audio;
-
-                    wrapper.appendChild(
-                        audio
-                    );
-
-                    div.appendChild(
-                        wrapper
-                    );
-
-                } else {
-
-                    div.appendChild(
-                        document.createTextNode(
-                            "⚠️ Audio no disponible."
-                        )
-                    );
-                }
-            }
-
-
-            /* =========================
-               TEXTO
-            ========================= */
-
-            else {
-
-                const texto =
-                    document.createTextNode(
-                        mensaje.text || ""
-                    );
-
-                div.appendChild(
-                    texto
-                );
-            }
-
-
-            /* =========================
-               HORA
-            ========================= */
-
-            const time =
-                document.createElement(
-                    "div"
-                );
-
-            time.className =
-                "wchat-msg-time";
-
-            time.textContent =
-                mensaje.hora || "";
-
-            div.appendChild(
-                time
-            );
-
-
-            container.appendChild(
-                div
-            );
+        if (mensaje.type === "sticker") {
+            div.classList.add("sticker");
+            const contenido = document.createElement("div");
+            contenido.textContent = mensaje.text || "";
+            div.appendChild(contenido);
+        } else if (mensaje.type === "file") {
+            const fileCard = document.createElement("div");
+            fileCard.className = "wchat-file-card";
+            fileCard.innerHTML = `
+                <div class="wchat-file-icon">📄</div>
+                <div class="wchat-file-info">
+                    <span class="wchat-file-name">${escapeHtml(mensaje.fileName || "Archivo")}</span>
+                    <a href="${escapeHtml(mensaje.fileData)}" download="${escapeHtml(mensaje.fileName || "archivo")}" class="wchat-file-download" target="_blank">📥 Descargar / Ver archivo</a>
+                </div>
+            `;
+            div.appendChild(fileCard);
+        } else {
+            const texto = document.createTextNode(mensaje.text || "");
+            div.appendChild(texto);
         }
-    );
 
+        const time = document.createElement("div");
+        time.className = "wchat-msg-time";
+        time.textContent = mensaje.hora || "";
+        div.appendChild(time);
 
-    container.scrollTop =
-        container.scrollHeight;
+        container.appendChild(div);
+    });
+
+    container.scrollTop = container.scrollHeight;
 }
 
 
-/* ============================================================
-   ENVIAR MENSAJE
-============================================================ */
-
-window.enviarMensaje =
-async function() {
-
+window.enviarMensaje = async function() {
     if (!chatActivoUid) {
-
-        mostrarToast(
-            "Selecciona un amigo primero."
-        );
-
+        mostrarToast("Selecciona un amigo primero.");
         return;
     }
 
+    const input = document.getElementById("messageInput");
+    const texto = input.value.trim();
 
-    const input =
-        document.getElementById(
-            "messageInput"
-        );
+    if (!texto) return;
 
-    const texto =
-        input.value.trim();
-
-
-    if (!texto)
+    // Validación de límite máximo de 10,000 palabras
+    const cantidadPalabras = texto.split(/\s+/).length;
+    if (cantidadPalabras > 10000) {
+        alert("El mensaje supera el límite permitido de 10,000 palabras.");
         return;
+    }
 
-
-    const preparado =
-        await asegurarUsuariosChat(
-            chatActivoUid
-        );
-
+    const preparado = await asegurarUsuariosChat(chatActivoUid);
     if (!preparado) {
-
-        mostrarToast(
-            "No se pudo preparar el chat."
-        );
-
+        mostrarToast("No se pudo preparar el chat.");
         return;
     }
 
-
-    const key =
-        crearChatKey(
-            miUid,
-            chatActivoUid
-        );
-
+    const key = crearChatKey(miUid, chatActivoUid);
 
     try {
+        const mensajesRef = ref(db, `chats/${key}/messages`);
+        const nuevoMensaje = push(mensajesRef);
 
-        const mensajesRef =
-            ref(
-                db,
-                `chats/${key}/messages`
-            );
+        await set(nuevoMensaje, {
+            fromUid: miUid,
+            fromName: miNombre,
+            toUid: chatActivoUid,
+            text: texto,
+            type: "text",
+            hora: horaActual(),
+            timestamp: Date.now()
+        });
 
-        const nuevoMensaje =
-            push(mensajesRef);
-
-
-        await set(
-            nuevoMensaje,
-            {
-                fromUid: miUid,
-                fromName: miNombre,
-                toUid: chatActivoUid,
-                text: texto,
-                type: "text",
-                hora: horaActual(),
-                timestamp: Date.now()
-            }
-        );
-
-
-        await update(
-            ref(db),
-            {
-                [`chats/${key}/lastMessage`]:
-                    texto,
-
-                [`chats/${key}/lastSender`]:
-                    miUid,
-
-                [`chats/${key}/updatedAt`]:
-                    Date.now()
-            }
-        );
-
+        await update(ref(db), {
+            [`chats/${key}/lastMessage`]: texto,
+            [`chats/${key}/lastSender`]: miUid,
+            [`chats/${key}/updatedAt`]: Date.now()
+        });
 
         input.value = "";
-
         detenerTyping();
 
     } catch (error) {
-
         console.error(error);
-
-        alert(
-            "No se pudo enviar el mensaje.\n\n" +
-            error.message
-        );
+        alert("No se pudo enviar el mensaje.\n\n" + error.message);
     }
 };
 
 
-/* ============================================================
-   ENTER
-============================================================ */
-
-document
-    .getElementById("messageInput")
-    .addEventListener(
-        "keydown",
-        event => {
-
-            if (
-                event.key === "Enter" &&
-                !event.shiftKey
-            ) {
-
-                event.preventDefault();
-
-                enviarMensaje();
-            }
-        }
-    );
+document.getElementById("messageInput").addEventListener("keydown", event => {
+    if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        enviarMensaje();
+    }
+});
 
 
-/* ============================================================
-   TYPING
-============================================================ */
-
-document
-    .getElementById("messageInput")
-    .addEventListener(
-        "input",
-        notificarEscribiendo
-    );
-
+document.getElementById("messageInput").addEventListener("input", notificarEscribiendo);
 
 function notificarEscribiendo() {
+    if (!chatActivoUid) return;
+    const key = crearChatKey(miUid, chatActivoUid);
 
-    if (!chatActivoUid)
-        return;
+    set(ref(db, `escribiendo/${key}/${miUid}`), {
+        name: miNombre,
+        timestamp: Date.now()
+    }).catch(() => {});
 
-    const key =
-        crearChatKey(
-            miUid,
-            chatActivoUid
-        );
-
-
-    set(
-        ref(
-            db,
-            `escribiendo/${key}/${miUid}`
-        ),
-        {
-            name: miNombre,
-            timestamp: Date.now()
-        }
-    ).catch(() => {});
-
-
-    clearTimeout(
-        typingTimer
-    );
-
-
-    typingTimer =
-        setTimeout(
-            detenerTyping,
-            2000
-        );
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(detenerTyping, 2000);
 }
 
 
 function detenerTyping() {
-
-    clearTimeout(
-        typingTimer
-    );
-
-    if (!chatActivoUid)
-        return;
-
-
-    const key =
-        crearChatKey(
-            miUid,
-            chatActivoUid
-        );
-
-
-    remove(
-        ref(
-            db,
-            `escribiendo/${key}/${miUid}`
-        )
-    ).catch(() => {});
+    clearTimeout(typingTimer);
+    if (!chatActivoUid) return;
+    const key = crearChatKey(miUid, chatActivoUid);
+    remove(ref(db, `escribiendo/${key}/${miUid}`)).catch(() => {});
 }
 
-
-/* ============================================================
-   ESCUCHAR TYPING
-============================================================ */
 
 function escucharTyping() {
+    if (!chatActivoUid) return;
+    const key = crearChatKey(miUid, chatActivoUid);
+    const typingRef = ref(db, `escribiendo/${key}/${chatActivoUid}`);
 
-    if (!chatActivoUid)
-        return;
-
-
-    const key =
-        crearChatKey(
-            miUid,
-            chatActivoUid
-        );
-
-
-    const typingRef =
-        ref(
-            db,
-            `escribiendo/${key}/${chatActivoUid}`
-        );
-
-
-    unsubscribeTyping =
-        onValue(
-            typingRef,
-            snapshot => {
-
-                const data =
-                    snapshot.val();
-
-
-                if (
-                    data &&
-                    Date.now() -
-                    data.timestamp <
-                    4000
-                ) {
-
-                    document
-                        .getElementById(
-                            "typingText"
-                        )
-                        .textContent =
-                        `${chatActivoNombre} está escribiendo...`;
-
-
-                    document
-                        .getElementById(
-                            "typingIndicator"
-                        )
-                        .classList.add(
-                            "active"
-                        );
-
-                } else {
-
-                    document
-                        .getElementById(
-                            "typingIndicator"
-                        )
-                        .classList.remove(
-                            "active"
-                        );
-                }
-            }
-        );
+    unsubscribeTyping = onValue(typingRef, snapshot => {
+        const data = snapshot.val();
+        if (data && Date.now() - data.timestamp < 4000) {
+            document.getElementById("typingText").textContent = `${chatActivoNombre || "Alguien"} está escribiendo`;
+            document.getElementById("typingIndicator").classList.add("active");
+        } else {
+            document.getElementById("typingIndicator").classList.remove("active");
+        }
+    });
 }
 
 
 /* ============================================================
-   EMOJIS
+   ENVIAR DOCUMENTOS / ARCHIVOS (MÁX 10,000 PALABRAS O PESO ADECUADO)
+============================================================ */
+
+window.enviarDocumento = async function(event) {
+    if (!chatActivoUid) {
+        mostrarToast("Selecciona un amigo primero.");
+        event.target.value = "";
+        return;
+    }
+
+    const archivo = event.target.files[0];
+    event.target.value = "";
+    if (!archivo) return;
+
+    // Límite de tamaño de archivo (por ejemplo, 5MB para mantener agilidad en RTDB)
+    if (archivo.size > 5 * 1024 * 1024) {
+        alert("El archivo es demasiado pesado (máximo 5MB).");
+        return;
+    }
+
+    const preparado = await asegurarUsuariosChat(chatActivoUid);
+    if (!preparado) {
+        mostrarToast("No se pudo preparar el chat.");
+        return;
+    }
+
+    mostrarToast("Leyendo archivo...");
+
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        const base64Data = e.target.result;
+        const key = crearChatKey(miUid, chatActivoUid);
+
+        try {
+            const mensajesRef = ref(db, `chats/${key}/messages`);
+            const nuevo = push(mensajesRef);
+            const previewText = `📁 Archivo: ${archivo.name}`;
+
+            await set(nuevo, {
+                fromUid: miUid,
+                fromName: miNombre,
+                toUid: chatActivoUid,
+                text: previewText,
+                type: "file",
+                fileName: archivo.name,
+                fileData: base64Data,
+                hora: horaActual(),
+                timestamp: Date.now()
+            });
+
+            await update(ref(db), {
+                [`chats/${key}/lastMessage`]: previewText,
+                [`chats/${key}/lastSender`]: miUid,
+                [`chats/${key}/updatedAt`]: Date.now()
+            });
+
+            mostrarToast("Archivo enviado con éxito.");
+        } catch (err) {
+            console.error(err);
+            alert("No se pudo enviar el archivo.");
+        }
+    };
+
+    reader.onerror = function() {
+        alert("Error al leer el archivo.");
+    };
+
+    reader.readAsDataURL(archivo);
+};
+
+
+/* ============================================================
+   EMOJIS / STICKERS
 ============================================================ */
 
 const stickers = [
-
     "😀","😃","😄","😁","😆","😅",
     "😂","🤣","😊","😇","🙂","🙃",
     "😉","😌","😍","🥰","😘","😗",
@@ -3158,900 +2272,86 @@ const stickers = [
 
 
 function poblarStickers() {
-
-    const panel =
-        document.getElementById(
-            "stickerPanel"
-        );
-
-
-    panel.innerHTML =
-        stickers.map(
-            emoji => {
-
-                const div =
-                    document.createElement(
-                        "div"
-                    );
-
-                div.className =
-                    "sticker-option";
-
-                div.textContent =
-                    emoji;
-
-                div.onclick =
-                    () => insertarEmoji(
-                        emoji
-                    );
-
-                return div;
-
-            }
-        );
+    const panel = document.getElementById("stickerPanel");
+    panel.innerHTML = stickers.map(emoji => {
+        const div = document.createElement("div");
+        div.className = "sticker-option";
+        div.textContent = emoji;
+        div.onclick = () => enviarStickerDirecto(emoji);
+        return div;
+    }).join("");
 }
 
-
-function insertarEmoji(emoji) {
-
-    const input =
-        document.getElementById(
-            "messageInput"
-        );
-
-    const inicio =
-        input.selectionStart ??
-        input.value.length;
-
-    const fin =
-        input.selectionEnd ??
-        input.value.length;
-
-    input.value =
-        input.value.slice(
-            0,
-            inicio
-        ) +
-        emoji +
-        input.value.slice(
-            fin
-        );
-
-    input.focus();
-
-    const nuevaPosicion =
-        inicio + emoji.length;
-
-    input.setSelectionRange(
-        nuevaPosicion,
-        nuevaPosicion
-    );
-
-    document
-        .getElementById(
-            "stickerPanel"
-        )
-        .classList.remove(
-            "active"
-        );
-
-    notificarEscribiendo();
-}
-
-
-window.alternarPanelStickers =
-function() {
-
-    document
-        .getElementById(
-            "stickerPanel"
-        )
-        .classList.toggle(
-            "active"
-        );
+window.alternarPanelStickers = function() {
+    document.getElementById("stickerPanel").classList.toggle("active");
 };
 
-
-window.enviarSticker =
-async function(emoji) {
-
-    /*
-     * Compatibilidad con código anterior.
-     * Ahora los emojis se insertan en el mensaje.
-     */
-    insertarEmoji(emoji);
-};
-
-
-/* ============================================================
-   IMÁGENES
-============================================================ */
-
-window.enviarImagen =
-async function(event) {
-
+async function enviarStickerDirecto(emoji) {
+    document.getElementById("stickerPanel").classList.remove("active");
     if (!chatActivoUid) {
-
-        mostrarToast(
-            "Selecciona un amigo primero."
-        );
-
-        event.target.value = "";
-
+        mostrarToast("Selecciona un amigo primero.");
         return;
     }
 
+    const preparado = await asegurarUsuariosChat(chatActivoUid);
+    if (!preparado) return;
 
-    const archivo =
-        event.target.files[0];
-
-
-    event.target.value = "";
-
-
-    if (!archivo)
-        return;
-
-
-    if (!archivo.type.startsWith("image/")) {
-
-        mostrarToast(
-            "Selecciona una imagen válida."
-        );
-
-        return;
-    }
-
-
-    /*
-     * Límite de 5 MB.
-     */
-    if (archivo.size > 5 * 1024 * 1024) {
-
-        mostrarToast(
-            "La imagen no puede superar 5 MB."
-        );
-
-        return;
-    }
-
-
-    const preparado =
-        await asegurarUsuariosChat(
-            chatActivoUid
-        );
-
-    if (!preparado) {
-
-        mostrarToast(
-            "No se pudo preparar el chat."
-        );
-
-        return;
-    }
-
+    const key = crearChatKey(miUid, chatActivoUid);
 
     try {
-
-        mostrarToast(
-            "Subiendo imagen..."
-        );
-
-
-        const nombreSeguro =
-            archivo.name
-                .replace(
-                    /[^a-zA-Z0-9._-]/g,
-                    "_"
-                );
-
-
-        const ruta =
-            `chat-images/${miUid}/${Date.now()}_${nombreSeguro}`;
-
-
-        const archivoRef =
-            storageRef(
-                storage,
-                ruta
-            );
-
-
-        await uploadBytes(
-            archivoRef,
-            archivo,
-            {
-                contentType:
-                    archivo.type
-            }
-        );
-
-
-        const url =
-            await getDownloadURL(
-                archivoRef
-            );
-
-
-        const key =
-            crearChatKey(
-                miUid,
-                chatActivoUid
-            );
-
-
-        const mensajesRef =
-            ref(
-                db,
-                `chats/${key}/messages`
-            );
-
-
-        const nuevo =
-            push(mensajesRef);
-
-
-        await set(
-            nuevo,
-            {
-                fromUid: miUid,
-                fromName: miNombre,
-                toUid: chatActivoUid,
-                text: "🖼️ Imagen enviada",
-                type: "image",
-                image: url,
-                hora: horaActual(),
-                timestamp: Date.now()
-            }
-        );
-
-
-        await update(
-            ref(db),
-            {
-                [`chats/${key}/lastMessage`]:
-                    "🖼️ Imagen enviada",
-
-                [`chats/${key}/lastSender`]:
-                    miUid,
-
-                [`chats/${key}/updatedAt`]:
-                    Date.now()
-            }
-        );
-
-
-        mostrarToast(
-            "Imagen enviada."
-        );
-
-    } catch (error) {
-
-        console.error(
-            "Error imagen:",
-            error
-        );
-
-        alert(
-            "No se pudo enviar la imagen.\n\n" +
-            error.message
-        );
-    }
-};
-
-
-/* ============================================================
-   AUDIO
-============================================================ */
-
-window.alternarGrabacionAudio =
-async function() {
-
-    if (!chatActivoUid) {
-
-        mostrarToast(
-            "Selecciona un amigo primero."
-        );
-
-        return;
-    }
-
-
-    if (
-        mediaRecorder &&
-        mediaRecorder.state === "recording"
-    ) {
-
-        mediaRecorder.stop();
-
-        return;
-    }
-
-
-    if (
-        !navigator.mediaDevices ||
-        !navigator.mediaDevices.getUserMedia
-    ) {
-
-        alert(
-            "Tu navegador no permite grabar audio aquí.\n\n" +
-            "Abre Wchat mediante HTTPS o localhost."
-        );
-
-        return;
-    }
-
-
-    if (
-        typeof MediaRecorder ===
-        "undefined"
-    ) {
-
-        alert(
-            "Tu navegador no soporta grabación de audio."
-        );
-
-        return;
-    }
-
-
-    const preparado =
-        await asegurarUsuariosChat(
-            chatActivoUid
-        );
-
-    if (!preparado) {
-
-        mostrarToast(
-            "No se pudo preparar el chat."
-        );
-
-        return;
-    }
-
-
-    try {
-
-        audioStream =
-            await navigator.mediaDevices
-                .getUserMedia({
-                    audio: true
-                });
-
-
-        audioChunks = [];
-
-
-        const candidatos = [
-            "audio/webm;codecs=opus",
-            "audio/webm",
-            "audio/ogg;codecs=opus"
-        ];
-
-
-        const mimeType =
-            candidatos.find(
-                tipo =>
-                    MediaRecorder.isTypeSupported(
-                        tipo
-                    )
-            ) || "";
-
-
-        mediaRecorder =
-            mimeType
-                ? new MediaRecorder(
-                    audioStream,
-                    {
-                        mimeType,
-                        audioBitsPerSecond:
-                            32000
-                    }
-                )
-                : new MediaRecorder(
-                    audioStream,
-                    {
-                        audioBitsPerSecond:
-                            32000
-                    }
-                );
-
-
-        mediaRecorder.ondataavailable =
-            event => {
-
-                if (
-                    event.data &&
-                    event.data.size > 0
-                ) {
-
-                    audioChunks.push(
-                        event.data
-                    );
-                }
-            };
-
-
-        mediaRecorder.onstop =
-            async () => {
-
-                detenerInterfazGrabacion();
-
-                const blob =
-                    new Blob(
-                        audioChunks,
-                        {
-                            type:
-                                mediaRecorder.mimeType ||
-                                "audio/webm"
-                        }
-                    );
-
-
-                if (
-                    audioStream
-                ) {
-
-                    audioStream
-                        .getTracks()
-                        .forEach(
-                            track =>
-                                track.stop()
-                        );
-
-                    audioStream =
-                        null;
-                }
-
-
-                if (
-                    blob.size === 0
-                ) {
-
-                    mostrarToast(
-                        "No se grabó ningún audio."
-                    );
-
-                    return;
-                }
-
-
-                /*
-                 * Máximo aproximado de 2 MB.
-                 */
-                if (
-                    blob.size >
-                    2 * 1024 * 1024
-                ) {
-
-                    mostrarToast(
-                        "El audio es demasiado grande."
-                    );
-
-                    return;
-                }
-
-
-                await subirAudio(
-                    blob
-                );
-            };
-
-
-        mediaRecorder.onerror =
-            error => {
-
-                console.error(
-                    "MediaRecorder:",
-                    error
-                );
-
-                detenerInterfazGrabacion();
-
-                mostrarToast(
-                    "Ocurrió un error grabando."
-                );
-            };
-
-
-        mediaRecorder.start();
-
-        iniciarInterfazGrabacion();
-
-
-    } catch (error) {
-
-        console.error(
-            "Micrófono:",
-            error
-        );
-
-        detenerInterfazGrabacion();
-
-        if (
-            audioStream
-        ) {
-
-            audioStream
-                .getTracks()
-                .forEach(
-                    track =>
-                        track.stop()
-                );
-
-            audioStream = null;
-        }
-
-
-        if (
-            error.name ===
-            "NotAllowedError"
-        ) {
-
-            alert(
-                "No se permitió el acceso al micrófono.\n\n" +
-                "Debes permitir el micrófono en tu navegador."
-            );
-
-        } else {
-
-            alert(
-                "No se pudo iniciar la grabación.\n\n" +
-                error.message
-            );
-        }
-    }
-};
-
-
-/* ============================================================
-   INTERFAZ AUDIO
-============================================================ */
-
-function iniciarInterfazGrabacion() {
-
-    const boton =
-        document.getElementById(
-            "recordBtn"
-        );
-
-    const status =
-        document.getElementById(
-            "recordingStatus"
-        );
-
-    boton.classList.add(
-        "recording"
-    );
-
-    status.classList.add(
-        "active"
-    );
-
-
-    recordingStartedAt =
-        Date.now();
-
-
-    actualizarTiempoGrabacion();
-
-
-    recordingInterval =
-        setInterval(
-            actualizarTiempoGrabacion,
-            1000
-        );
-}
-
-
-function actualizarTiempoGrabacion() {
-
-    const segundos =
-        Math.floor(
-            (
-                Date.now() -
-                recordingStartedAt
-            ) / 1000
-        );
-
-
-    const minutos =
-        String(
-            Math.floor(
-                segundos / 60
-            )
-        ).padStart(
-            2,
-            "0"
-        );
-
-
-    const seg =
-        String(
-            segundos % 60
-        ).padStart(
-            2,
-            "0"
-        );
-
-
-    document.getElementById(
-        "recordingText"
-    ).textContent =
-        `Grabando ${minutos}:${seg}`;
-
-
-    /*
-     * Máximo 60 segundos.
-     */
-    if (
-        segundos >= 60 &&
-        mediaRecorder &&
-        mediaRecorder.state ===
-        "recording"
-    ) {
-
-        mediaRecorder.stop();
-    }
-}
-
-
-function detenerInterfazGrabacion() {
-
-    const boton =
-        document.getElementById(
-            "recordBtn"
-        );
-
-    const status =
-        document.getElementById(
-            "recordingStatus"
-        );
-
-
-    boton.classList.remove(
-        "recording"
-    );
-
-    status.classList.remove(
-        "active"
-    );
-
-
-    clearInterval(
-        recordingInterval
-    );
-
-    recordingInterval =
-        null;
-}
-
-
-/* ============================================================
-   SUBIR AUDIO
-============================================================ */
-
-async function subirAudio(blob) {
-
-    if (!chatActivoUid)
-        return;
-
-
-    try {
-
-        mostrarToast(
-            "Subiendo audio..."
-        );
-
-
-        const extension =
-            blob.type.includes("ogg")
-                ? "ogg"
-                : "webm";
-
-
-        const ruta =
-            `chat-audios/${miUid}/${Date.now()}.${extension}`;
-
-
-        const archivoRef =
-            storageRef(
-                storage,
-                ruta
-            );
-
-
-        await uploadBytes(
-            archivoRef,
-            blob,
-            {
-                contentType:
-                    blob.type ||
-                    "audio/webm"
-            }
-        );
-
-
-        const url =
-            await getDownloadURL(
-                archivoRef
-            );
-
-
-        const key =
-            crearChatKey(
-                miUid,
-                chatActivoUid
-            );
-
-
-        const mensajesRef =
-            ref(
-                db,
-                `chats/${key}/messages`
-            );
-
-
-        const nuevo =
-            push(mensajesRef);
-
-
-        await set(
-            nuevo,
-            {
-                fromUid: miUid,
-                fromName: miNombre,
-                toUid: chatActivoUid,
-                text: "🎤 Audio",
-                type: "audio",
-                audio: url,
-                hora: horaActual(),
-                timestamp: Date.now()
-            }
-        );
-
-
-        await update(
-            ref(db),
-            {
-                [`chats/${key}/lastMessage`]:
-                    "🎤 Audio",
-
-                [`chats/${key}/lastSender`]:
-                    miUid,
-
-                [`chats/${key}/updatedAt`]:
-                    Date.now()
-            }
-        );
-
-
-        mostrarToast(
-            "Audio enviado."
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            "Error audio:",
-            error
-        );
-
-        alert(
-            "No se pudo enviar el audio.\n\n" +
-            error.message
-        );
+        const mensajesRef = ref(db, `chats/${key}/messages`);
+        const nuevo = push(mensajesRef);
+
+        await set(nuevo, {
+            fromUid: miUid,
+            fromName: miNombre,
+            toUid: chatActivoUid,
+            text: emoji,
+            type: "sticker",
+            hora: horaActual(),
+            timestamp: Date.now()
+        });
+
+        await update(ref(db), {
+            [`chats/${key}/lastMessage`]: "Sticker " + emoji,
+            [`chats/${key}/lastSender`]: miUid,
+            [`chats/${key}/updatedAt`]: Date.now()
+        });
+    } catch (e) {
+        console.error(e);
     }
 }
 
 
 /* ============================================================
-   CLICK AFUERA EMOJIS
+   CIERRES Y CLICS FUERA
 ============================================================ */
 
-document.addEventListener(
-    "click",
-    event => {
+document.addEventListener("click", event => {
+    const panel = document.getElementById("stickerPanel");
+    const boton = document.getElementById("emojiBtn");
+    if (!panel || !boton) return;
 
-        const panel =
-            document.getElementById(
-                "stickerPanel"
-            );
-
-        const boton =
-            document.getElementById(
-                "emojiBtn"
-            );
-
-        if (!panel || !boton)
-            return;
-
-
-        if (
-            panel.classList.contains("active") &&
-            !panel.contains(event.target) &&
-            event.target !== boton
-        ) {
-
-            panel.classList.remove(
-                "active"
-            );
-        }
+    if (panel.classList.contains("active") && !panel.contains(event.target) && event.target !== boton) {
+        panel.classList.remove("active");
     }
-);
+});
 
+document.getElementById("friendModal").addEventListener("click", event => {
+    if (event.target.id === "friendModal") cerrarModalId();
+});
 
-/* ============================================================
-   MODALES CLICK AFUERA
-============================================================ */
+document.getElementById("mailboxModal").addEventListener("click", event => {
+    if (event.target.id === "mailboxModal") cerrarBuzon();
+});
 
-document
-    .getElementById("friendModal")
-    .addEventListener(
-        "click",
-        event => {
+document.getElementById("configModal").addEventListener("click", event => {
+    if (event.target.id === "configModal") cerrarModalConfiguracion();
+});
 
-            if (
-                event.target.id ===
-                "friendModal"
-            ) {
-
-                cerrarModalId();
-            }
-        }
-    );
-
-
-document
-    .getElementById("mailboxModal")
-    .addEventListener(
-        "click",
-        event => {
-
-            if (
-                event.target.id ===
-                "mailboxModal"
-            ) {
-
-                cerrarBuzon();
-            }
-        }
-    );
-
-
-/* ============================================================
-   LIMPIAR AUDIO SI SE CIERRA / CAMBIA
-============================================================ */
-
-window.addEventListener(
-    "beforeunload",
-    () => {
-
-        if (
-            mediaRecorder &&
-            mediaRecorder.state ===
-            "recording"
-        ) {
-
-            mediaRecorder.stop();
-        }
-
-
-        if (audioStream) {
-
-            audioStream
-                .getTracks()
-                .forEach(
-                    track =>
-                        track.stop()
-                );
-        }
-
-
-        detenerTyping();
-    }
-);
+window.addEventListener("beforeunload", () => {
+    detenerTyping();
+});
 
 </script>
 

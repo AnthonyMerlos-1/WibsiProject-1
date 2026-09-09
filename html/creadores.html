@@ -1,751 +1,3180 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creadores y Filosofía - WIBSIPROJECT</title>
-    <link rel="icon" href="../assets/img/creadores.jpg" type="image/png">
+    <title>Mi Cuenta - WIBSIPROJECT</title>
+    <link rel="icon" href="../assets/img/cuenta.png" type="image/png">
+
+    <!-- SDK de Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <!-- SDK de Google reCAPTCHA -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
     <style>
-        * {
+        body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background-color: #050508;
-            color: #f0f0f0;
-            overflow-x: hidden;
+            background-color: #0b0b10;
+            color: #f3f4f6;
             min-height: 100vh;
-        }
-
-        .bg-animation {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -2;
-            background: linear-gradient(135deg, #050508, #11111d, #1a0b2e);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-        }
-
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        #canvas3d {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        .back-home-container {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 1000;
-        }
-
-        .btn-home {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.6rem;
-            padding: 0.7rem 1.4rem;
-            background: linear-gradient(135deg, #00d2ff, #9b51e0, #ff007f);
-            background-size: 200% 200%;
-            color: #ffffff;
-            font-weight: bold;
-            text-decoration: none;
-            border-radius: 50px;
-            box-shadow: 0 5px 20px rgba(0, 210, 255, 0.4);
-            animation: colorShift 5s ease infinite, pulseGlow 2s infinite alternate;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
-        }
-
-        @keyframes colorShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        @keyframes pulseGlow {
-            from { box-shadow: 0 0 10px rgba(0, 210, 255, 0.3); }
-            to { box-shadow: 0 0 25px rgba(255, 0, 127, 0.7); }
-        }
-
-        .btn-home:hover {
-            transform: scale(1.08) translateY(-2px);
-            box-shadow: 0 8px 30px rgba(155, 81, 224, 0.8);
-        }
-
-        header {
-            text-align: center;
-            padding: 4rem 1rem 2rem 1rem;
-            position: relative;
-            z-index: 2;
-        }
-
-        header h1 {
-            font-size: 3.5rem;
-            background: linear-gradient(45deg, #00d2ff, #9b51e0, #ff007f);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 1rem;
-            cursor: pointer;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.4s ease;
-            animation: glow 3s ease-in-out infinite alternate;
-        }
-
-        header h1:hover {
-            transform: scale(1.06) rotate(-1deg);
-            filter: drop-shadow(0 0 30px rgba(0, 210, 255, 0.9));
-        }
-
-        @keyframes glow {
-            from { filter: drop-shadow(0 0 10px rgba(0, 210, 255, 0.4)); }
-            to { filter: drop-shadow(0 0 25px rgba(155, 81, 224, 0.8)); }
-        }
-
-        header p {
-            font-size: 1.2rem;
-            color: #a0a0c0;
-            max-width: 650px;
-            margin: 0 auto;
-        }
-
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 2rem 1rem;
-            position: relative;
-            z-index: 2;
-        }
-
-        .card {
-            background: rgba(18, 18, 30, 0.75);
-            backdrop-filter: blur(14px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 20px;
-            padding: 2.5rem;
-            margin-bottom: 2.5rem;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.4s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-8px);
-            border-color: rgba(0, 210, 255, 0.4);
-        }
-
-        .card h2 {
-            font-size: 2rem;
-            margin-bottom: 1.2rem;
-            color: #ffffff;
             display: flex;
             align-items: center;
-            gap: 0.8rem;
+            justify-content: center;
+            overflow-x: hidden;
+            position: relative;
+            perspective: 1500px;
         }
 
-        .card p, .card li {
-            font-size: 1.1rem;
-            line-height: 1.8;
-            color: #d0d0e0;
-            margin-bottom: 1.2rem;
+        .animated-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            background: radial-gradient(circle at 50% 50%, #121218 0%, #07070a 100%);
         }
 
-        .benefits-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1.5rem;
+        .floating-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.45;
+            animation: moveBlob 15s infinite alternate ease-in-out;
         }
 
-        .benefit-item {
-            background: rgba(25, 25, 45, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 1.5rem;
-            border-radius: 12px;
+        .blob-1 {
+            width: 450px;
+            height: 450px;
+            background: #6366f1;
+            top: -10%;
+            left: -10%;
+            animation-duration: 18s;
+        }
+
+        .blob-2 {
+            width: 400px;
+            height: 400px;
+            background: #a855f7;
+            bottom: -15%;
+            right: -10%;
+            animation-duration: 22s;
+            animation-delay: -5s;
+        }
+
+        @keyframes moveBlob {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            50% {
+                transform: translate(60px, 40px) scale(1.1);
+            }
+
+            100% {
+                transform: translate(-40px, 80px) scale(0.95);
+            }
+        }
+
+        .book-container {
+            position: relative;
+            width: 100%;
+            max-width: 440px;
+            background: rgba(18, 18, 24, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+            z-index: 10;
+            overflow: hidden;
+            box-sizing: border-box;
+            transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes bubbleEntrance {
+            0% {
+                transform: scale(0.4) translateY(60px) rotateX(15deg);
+                opacity: 0;
+            }
+
+            70% {
+                transform: scale(1.02) translateY(-10px) rotateX(-5deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1) translateY(0) rotateX(0);
+                opacity: 1;
+            }
+        }
+
+        .bubble-effect {
+            animation: bubbleEntrance 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            transform-origin: bottom center;
+        }
+
+        .book-pages-wrapper {
+            display: flex;
+            width: 200%;
+            transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+
+        .book-page {
+            width: 50%;
+            padding: 35px;
+            box-sizing: border-box;
+            flex-shrink: 0;
+        }
+
+        .hub-logo-container {
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            transition: background 0.3s ease, transform 0.3s ease;
-        }
-
-        .benefit-item:hover {
-            background: rgba(35, 35, 65, 0.8);
-            transform: translateY(-4px);
-        }
-
-        .benefit-item h3 {
-            color: #00d2ff;
-            margin-bottom: 0.8rem;
-            font-size: 1.25rem;
-            display: flex;
             align-items: center;
-            gap: 0.5rem;
-        }
-
-        .ver-mas-btn {
-            background: linear-gradient(135deg, #00d2ff, #9b51e0);
-            border: none;
-            color: white;
-            padding: 0.6rem 1.2rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            margin-top: 1rem;
-            align-self: flex-start;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3);
-        }
-
-        .ver-mas-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(155, 81, 224, 0.6);
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(5, 5, 8, 0.85);
-            backdrop-filter: blur(12px);
-            z-index: 2000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.4s ease;
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .modal-content {
-            background: rgba(18, 18, 32, 0.95);
-            border: 1px solid rgba(0, 210, 255, 0.4);
-            border-radius: 20px;
-            width: 90%;
-            max-width: 800px;
-            max-height: 85vh;
-            overflow-y: auto;
-            padding: 2.5rem;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
-            transform: scale(0.95) translateY(20px);
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-        }
-
-        .modal-overlay.active .modal-content {
-            transform: scale(1) translateY(0);
-        }
-
-        .close-modal {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            font-size: 1.2rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.3s ease;
-        }
-
-        .close-modal:hover {
-            background: #ff007f;
-        }
-
-        .modal-title {
-            font-size: 2rem;
-            color: #00d2ff;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-        }
-
-        .interactive-widget {
-            background: rgba(10, 10, 18, 0.9);
-            border: 1px solid rgba(155, 81, 224, 0.4);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-top: 1.5rem;
-        }
-
-        .widget-controls {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .widget-btn {
-            background: linear-gradient(45deg, #00d2ff, #9b51e0);
-            border: none;
-            color: white;
-            padding: 0.6rem 1.2rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: transform 0.2s ease;
-        }
-
-        .widget-btn:hover {
-            transform: scale(1.05);
-        }
-
-        .widget-output {
-            margin-top: 1rem;
-            padding: 1rem;
-            background: #020205;
-            border-radius: 8px;
-            color: #00ffcc;
-            font-family: monospace;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        footer {
+            margin-bottom: 25px;
             text-align: center;
-            padding: 3rem 1rem;
-            color: #707090;
-            font-size: 0.9rem;
-            position: relative;
-            z-index: 2;
         }
 
-        @media (max-width: 768px) {
-            header h1 { font-size: 2.3rem; }
-            .card { padding: 1.5rem; }
-            .modal-content { padding: 1.5rem; width: 95%; }
+        .hub-logo-ring {
+            position: relative;
+            width: 85px;
+            height: 85px;
+            background: linear-gradient(
+                135deg,
+                rgba(79, 70, 229, 0.2) 0%,
+                rgba(147, 51, 234, 0.2) 50%,
+                rgba(219, 39, 119, 0.2) 100%
+            );
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(147, 51, 234, 0.3);
+            margin-bottom: 12px;
+            animation: pulseLogo 3s infinite ease-in-out;
+            overflow: hidden;
+            border: 2px solid rgba(139, 92, 246, 0.4);
+        }
+
+        @keyframes pulseLogo {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 10px 30px rgba(147, 51, 234, 0.3);
+            }
+
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 15px 35px rgba(219, 39, 119, 0.5);
+            }
+        }
+
+        .hub-logo-graphic {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000000;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+        .hub-logo-graphic img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .hub-logo-title {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: #ffffff;
+        }
+
+        .hub-logo-title span {
+            color: #818cf8;
+        }
+
+        .hub-logo-subtitle {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 2px;
+        }
+
+        .page-navigation {
+            display: flex;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .page-nav-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #9ca3af;
+            padding: 10px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            border-radius: 9px;
+            transition: all 0.3s ease;
+        }
+
+        .page-nav-btn.active {
+            background: #6366f1;
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 18px 0;
+            color: #6b7280;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .auth-divider:not(:empty)::before {
+            margin-right: .75em;
+        }
+
+        .auth-divider:not(:empty)::after {
+            margin-left: .75em;
+        }
+
+        .google-btn-wrapper {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            color: #9ca3af;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+        }
+
+        .recaptcha-wrapper {
+            display: flex;
+            justify-content: center;
+            margin: 12px 0;
+            transform: scale(0.9);
+            transform-origin: 0 0;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 8px;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .auth-btn:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+
+        .auth-btn:active {
+            transform: scale(0.98);
+        }
+
+        .auth-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .forgot-pass-link {
+            display: block;
+            text-align: right;
+            margin-top: -8px;
+            margin-bottom: 14px;
+            font-size: 12px;
+            color: #818cf8;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .forgot-pass-link:hover {
+            text-decoration: underline;
+        }
+
+        .profile-view {
+            text-align: center;
+        }
+
+        .profile-avatar-wrapper {
+            position: relative;
+            width: 85px;
+            height: 85px;
+            margin: 0 auto 15px auto;
+            cursor: pointer;
+        }
+
+        .profile-avatar-large {
+            width: 85px;
+            height: 85px;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+            background-size: cover;
+            background-position: center;
+            overflow: hidden;
+        }
+
+        .profile-avatar-wrapper::after {
+            content: '📷';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: #121218;
+            border: 1px solid rgba(255,255,255,0.2);
+            font-size: 11px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+
+        .profile-email {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-bottom: 8px;
+        }
+
+        .profile-id-badge {
+            font-size: 11px;
+            color: #818cf8;
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px dashed rgba(99, 102, 241, 0.4);
+            padding: 4px 10px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-bottom: 15px;
+            font-family: monospace;
+            letter-spacing: 0.5px;
+        }
+
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-item span {
+            display: block;
+        }
+
+        .stat-value {
+            font-size: 14px;
+            font-weight: bold;
+            color: #f3f4f6;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: #9ca3af;
+            margin-top: 2px;
+        }
+
+        .admin-badge {
+            background: rgba(99, 102, 241, 0.2);
+            color: #818cf8;
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .back-home-link {
+            display: inline-block;
+            margin-top: 15px;
+            color: #9ca3af;
+            text-decoration: none;
+            font-size: 12px;
+            transition: color 0.2s;
+        }
+
+        .back-home-link:hover {
+            color: #6366f1;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .auth-warning-banner {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            font-weight: 600;
+            font-size: 13px;
+            animation: dropDownAlert 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        @keyframes dropDownAlert {
+            0% {
+                transform: translate(-50%, -40px);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translate(-50%, 0);
+                opacity: 1;
+            }
+        }
+
+        .account-toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #121218;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            padding: 12px 18px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            animation: slideInToast 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 13px;
+        }
+
+        @keyframes slideInToast {
+            from {
+                transform: translateY(80px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* ============ MODAL RECUPERAR CONTRASEÑA ============ */
+
+        .modal-overlay-recuperar {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 16px;
+        }
+
+        .modal-overlay-recuperar.show {
+            display: flex;
+        }
+
+        .modal-box-recuperar {
+            width: 100%;
+            max-width: 380px;
+            background: rgba(18, 18, 24, 0.97);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+            position: relative;
+            animation: bubbleEntrance 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .modal-close-recuperar {
+            position: absolute;
+            top: 14px;
+            right: 16px;
+            cursor: pointer;
+            color: #9ca3af;
+            font-size: 18px;
+            line-height: 1;
+            background: none;
+            border: none;
+        }
+
+        .modal-close-recuperar:hover {
+            color: #fff;
+        }
+
+        .modal-icon-recuperar {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            background: rgba(99,102,241,0.16);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 14px;
+            font-size: 22px;
+        }
+
+        .modal-box-recuperar h3 {
+            margin: 0 0 6px 0;
+            font-size: 17px;
+            color: #fff;
+        }
+
+        .modal-box-recuperar p.sub {
+            margin: 0 0 16px 0;
+            font-size: 12.5px;
+            color: #9ca3af;
+            line-height: 1.5;
+        }
+
+        .recuperar-error-msg {
+            display: none;
+            color: #f87171;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 6px 0 0;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .recuperar-exito-box {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .recuperar-exito-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: rgba(16, 185, 129, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            font-size: 24px;
         }
     </style>
 </head>
+
 <body>
 
+    <div class="animated-background">
+        <div class="floating-blob blob-1"></div>
+        <div class="floating-blob blob-2"></div>
+    </div>
 
+    <!-- Contenedor principal -->
+    <div class="book-container bubble-effect" id="bookContainer">
 
-    
-   <div class="back-home-container">
-       <a href="../index.html" class="btn-home" id="homeBtn">
-           <span>←</span> Volver al inicio
-       </a>
-   </div>
+        <!-- PÁGINAS DE AUTENTICACIÓN -->
+        <div id="authSection">
 
+            <div class="book-pages-wrapper" id="pagesWrapper">
 
+                <!-- PÁGINA 1: INICIAR SESIÓN -->
+                <div class="book-page">
 
+                    <div class="hub-logo-container"
+                        onclick="window.location.reload()"
+                        style="cursor: pointer;"
+                        title="Recargar página">
 
-    
+                        <div class="hub-logo-ring">
+                            <div class="hub-logo-graphic">
+                                <img src="../assets/img/logwiti.png" alt="Logo Wibsitihub">
+                            </div>
+                        </div>
 
-    <div class="bg-animation"></div>
-    <canvas id="canvas3d"></canvas>
+                        <div class="hub-logo-title">
+                            WIBSI<span>PROJECT</span>
+                        </div>
 
-    <header>
-        <h1>WIBSIPROJECT - Creadores y Filosofía</h1>
-        <p>El origen detrás de la marca, la magia de dar vida al código y la evolución de un ecosistema digital interactivo.</p>
-    </header>
-
-    <main class="container">
-        
-        <section class="card">
-            <h2>💻 ¿Quién Soy y Por Qué Creé Esta Página?</h2>
-            <p>Detrás de cada línea de código, estructura y animación de <strong>WIBSIPROJECT</strong> se encuentra <strong>Anthony</strong>[cite: 4]. Este espacio digital nació de una profunda fascinación por la tecnología, la programación web avanzada y el desarrollo de interfaces inmersivas.</p>
-            <p><strong>¿Por qué creé páginas web?</strong> La respuesta radica en esa inigualable <em>sensación de creación</em>: transformar una pantalla en blanco y líneas de sintaxis en un entorno funcional, interactivo, con movimiento tridimensional, vida propia y lógica integrada. Ver que un diseño cobre movimiento y que los usuarios puedan interactuar fluidamente con él es lo que impulsa esta pasión día a día.</p>
-            <p><strong>El Origen del Nombre:</strong> El nombre <strong>WIBSI</strong> surge de una combinación conceptual orientada a reflejar innovación, ingeniería web y modernidad, fusionando la esencia de estructurar plataformas interconectadas con una identidad propia y memorable en el mundo digital.</p>
-        </section>
-
-        <!-- Módulos Principales -->
-        <section class="card">
-            <h2>⚙️ Módulos Principales de WIBSIPROJECT</h2>
-            <p>Selecciona un apartado para abrir su panel detallado de información avanzada, funciones activas y herramientas interactivas.</p>
-            
-            <div class="benefits-grid">
-                
-                <!-- Apartado 1 -->
-                <div class="benefit-item">
-                    <div>
-                        <h3>🎨 Animaciones y Gráficos</h3>
-                        <p>Renderizado 3D en tiempo real con Three.js, fondos con degradados fluidos y adaptación al cursor.</p>
+                        <div class="hub-logo-subtitle">
+                            Acceso de Cuentas
+                        </div>
                     </div>
-                    <button class="ver-mas-btn" onclick="abrirModal('modalAnimaciones')">Ver más...</button>
-                </div>
 
-                <!-- Apartado 2 -->
-                <div class="benefit-item">
-                    <div>
-                        <h3>⚙️ Funciones e Interactividad</h3>
-                        <p>Controles de estado inteligentes, reproductores multimedia integrados y gestión de visibilidad.</p>
+                    <div class="page-navigation">
+                        <button class="page-nav-btn active" type="button">
+                            Iniciar Sesión
+                        </button>
+
+                        <button class="page-nav-btn"
+                            type="button"
+                            onclick="pasarPagina('register')">
+                            Registrarse →
+                        </button>
                     </div>
-                    <button class="ver-mas-btn" onclick="abrirModal('modalFunciones')">Ver más...</button>
-                </div>
 
-                <!-- Apartado 3 -->
-                <div class="benefit-item">
-                    <div>
-                        <h3>🛡️ Estructura y Rendimiento</h3>
-                        <p>Arquitectura modular limpia, diseño Glassmorphism avanzado y optimización de recursos fluidos.</p>
+                    <div class="google-btn-wrapper">
+
+                        <div id="g_id_onload"
+                            data-client_id="913264385243-5niaqo5la6q46o1t65qs7jaufr753euh.apps.googleusercontent.com"
+                            data-callback="handleGoogleSignIn"
+                            data-auto_prompt="false">
+                        </div>
+
+                        <div class="g_id_signin"
+                            data-type="standard"
+                            data-shape="pill"
+                            data-theme="filled_black"
+                            data-text="signin_with"
+                            data-size="large"
+                            data-logo_alignment="left">
+                        </div>
+
                     </div>
-                    <button class="ver-mas-btn" onclick="abrirModal('modalEstructura')">Ver más...</button>
+
+                    <div class="auth-divider">
+                        o correo electrónico
+                    </div>
+
+                    <form id="loginForm" onsubmit="ejecutarLogin(event)">
+
+                        <div class="form-group">
+                            <label>Correo electrónico</label>
+
+                            <input type="email"
+                                id="loginEmail"
+                                placeholder="tu@gmail.com"
+                                required
+                                autocomplete="email">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Contraseña</label>
+
+                            <input type="password"
+                                id="loginPassword"
+                                placeholder="••••••••"
+                                required
+                                autocomplete="current-password">
+                        </div>
+
+                        <a href="#"
+                            class="forgot-pass-link"
+                            onclick="abrirModalRecuperacion(event)">
+                            ¿Olvidaste tu contraseña?
+                        </a>
+
+                        <!-- reCAPTCHA para administrador -->
+                        <div id="recaptchaContainer"
+                            class="form-group hidden">
+
+                            <label style="margin-bottom: 6px; color: #818cf8; font-weight: 600;">
+                                Verificación de seguridad (Semáforos / Pasos)
+                            </label>
+
+                            <div class="recaptcha-wrapper">
+                                <div class="g-recaptcha"
+                                    data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI">
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <button type="submit"
+                            class="auth-btn"
+                            id="btnLogin">
+                            Iniciar Sesión ✦
+                        </button>
+
+                    </form>
+
+                    <div style="text-align: center;">
+                        <a href="../index.html"
+                            class="back-home-link">
+                            ← Volver al inicio
+                        </a>
+                    </div>
+
+                </div>
+
+                <!-- PÁGINA 2: REGISTRARSE -->
+                <div class="book-page">
+
+                    <div class="hub-logo-container"
+                        onclick="window.location.reload()"
+                        style="cursor: pointer;"
+                        title="Recargar página">
+
+                        <div class="hub-logo-ring">
+                            <div class="hub-logo-graphic">
+                                <img src="../assets/img/logwiti.png"
+                                    alt="Logo WIBSIPROJECT">
+                            </div>
+                        </div>
+
+                        <div class="hub-logo-title">
+                            WIBSI<span>PROJECT</span>
+                        </div>
+
+                        <div class="hub-logo-subtitle">
+                            Registro de Nuevo Miembro
+                        </div>
+                    </div>
+
+                    <div class="page-navigation">
+
+                        <button class="page-nav-btn"
+                            type="button"
+                            onclick="pasarPagina('login')">
+                            ← Iniciar Sesión
+                        </button>
+
+                        <button class="page-nav-btn active"
+                            type="button">
+                            Registrarse
+                        </button>
+
+                    </div>
+
+                    <form id="registerForm"
+                        onsubmit="ejecutarRegistro(event)"
+                        style="margin-top: 15px;">
+
+                        <div class="form-group">
+                            <label>Nombre de Usuario</label>
+
+                            <input type="text"
+                                id="regName"
+                                placeholder="Tu Nombre"
+                                required
+                                autocomplete="name">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Correo electrónico</label>
+
+                            <input type="email"
+                                id="regEmail"
+                                placeholder="tu@gmail.com"
+                                required
+                                autocomplete="email">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Contraseña</label>
+
+                            <input type="password"
+                                id="regPassword"
+                                placeholder="••••••••"
+                                required
+                                minlength="6"
+                                autocomplete="new-password">
+                        </div>
+
+                        <button type="submit"
+                            class="auth-btn"
+                            id="btnRegister">
+                            Crear Cuenta ✦
+                        </button>
+
+                    </form>
+
+                    <div style="text-align: center;">
+                        <a href="../index.html"
+                            class="back-home-link">
+                            ← Volver al inicio
+                        </a>
+                    </div>
+
                 </div>
 
             </div>
-        </section>
+        </div>
 
-        <!-- Comparativa Profunda -->
-        <section class="card">
-            <h2>📊 Comparativa Profunda: Páginas Web Tradicionales vs. El Programa WIBSIPROJECT</h2>
-            <p>Aquí se detallan de forma masiva todas las diferencias estructurales, lógicas, de software y de procesamiento entre lo que comúnmente ofrece internet y lo que ejecuta este proyecto avanzado:</p>
-            
-            <div style="margin-top: 1.5rem;">
-                <h3 style="color: #00d2ff; margin-bottom: 0.6rem;">🧠 1. Procesamiento Lógico y Gestión del Sistema</h3>
-                <p><strong>Páginas Web Comunes:</strong> Funcionan meramente como documentos estáticos de lectura. No poseen un núcleo lógico interno; dependen de recargas completas del navegador para mostrar datos nuevos y carecen de automatización de estados.</p>
-                <p><strong>WIBSIPROJECT:</strong> Opera como un auténtico software interactivo. Implementa clases de control orientadas a objetos, monitoreo de eventos en tiempo real, validaciones lógicas internas y la capacidad de ejecutar rutinas de diagnóstico directamente en la interfaz.</p>
-            </div>
+        <!-- VISTA DE PERFIL -->
+        <div id="profileSection"
+            class="profile-view hidden"
+            style="padding: 35px;">
 
-            <div style="margin-top: 1.5rem;">
-                <h3 style="color: #00d2ff; margin-bottom: 0.6rem;">⚡ 2. Optimización de Hardware y Rendimiento de la GPU</h3>
-                <p><strong>Páginas Web Comunes:</strong> Suelen sobrecargar la memoria RAM con scripts externos innecesarios, banners publicitarios pesados y animaciones GIF o CSS mal optimizadas que ralentizan los equipos de gama baja.</p>
-                <p><strong>WIBSIPROJECT:</strong> Utiliza aceleración por hardware a través de WebGL, ajusta dinámicamente el `setPixelRatio` de la pantalla para no perder fotogramas por segundo (FPS) y libera recursos de forma inteligente cuando el usuario minimiza o cambia de pestaña.</p>
-            </div>
+            <div class="hub-logo-container"
+                style="margin-bottom: 20px;">
 
-            <div style="margin-top: 1.5rem;">
-                <h3 style="color: #00d2ff; margin-bottom: 0.6rem;">🌐 3. Conectividad, Redes y Arquitectura de Datos</h3>
-                <p><strong>Páginas Web Comunes:</strong> Dependen de servidores lentos, generan constantes solicitudes HTTP redundantes y sufren caídas de rendimiento notables ante variaciones mínimas en la red.</p>
-                <p><strong>WIBSIPROJECT:</strong> Posee una arquitectura modular sumamente limpia, diseñada para simular flujos de paquetes de red locales de alta velocidad, estructurando la información en bloques independientes y seguros.</p>
-            </div>
+                <div class="hub-logo-ring"
+                    style="width: 50px; height: 50px;">
 
-            <div style="margin-top: 1.5rem;">
-                <h3 style="color: #00d2ff; margin-bottom: 0.6rem;">🎨 4. Experiencia Visual y Diseño de Interfaces (UI/UX)</h3>
-                <p><strong>Páginas Web Comunes:</strong> Diseños planos, tipografías estándar y estructuras predecibles que aburren al usuario debido a la falta de innovación visual.</p>
-                <p><strong>WIBSIPROJECT:</strong> Implementa Glassmorphism avanzado (efectos de cristal esmerilado con desenfoque dinámico), fondos con degradados animados por keyframes y un motor 3D interactivo que gira siguiendo los movimientos del cursor del usuario.</p>
-            </div>
-        </section>
+                    <div class="hub-logo-graphic">
+                        <img src="../assets/img/logwiti.png"
+                            alt="Logo WIBSIPROJECT">
+                    </div>
 
-    </main>
-
-    <!-- MODAL 1: ANIMACIONES Y GRÁFICOS -->
-    <div class="modal-overlay" id="modalAnimaciones">
-        <div class="modal-content">
-            <button class="close-modal" onclick="cerrarModal('modalAnimaciones')">✕</button>
-            <h2 class="modal-title">🎨 Panel Avanzado: Animaciones y Gráficos 3D</h2>
-            <p>Este módulo explora profundamente cómo se implementa la tridimensionalidad en la web moderna:</p>
-            
-            <ul style="list-style-type: none; margin-bottom: 1.5rem;">
-                <li style="position: relative; padding-left: 1.8rem; margin-bottom: 0.8rem;">⚡ <strong>Three.js Core:</strong> Manejo de mallas geométricas (Icosaedros) con propiedades de wireframe y materiales metálicos.</li>
-                <li style="position: relative; padding-left: 1.8rem; margin-bottom: 0.8rem;">⚡ <strong>Efecto Parallax:</strong> Sincronización de coordenadas del cursor del usuario para rotar los objetos 3D de forma fluida.</li>
-            </ul>
-
-            <div class="interactive-widget">
-                <h3>🧪 Simulador de Estado Gráfico</h3>
-                <p>Prueba cambiar las propiedades de renderizado en tiempo real:</p>
-                <div class="widget-controls">
-                    <button class="widget-btn" onclick="cambiarColorObjeto('#00d2ff')">Color Neón Cyan</button>
-                    <button class="widget-btn" onclick="cambiarColorObjeto('#ff007f')" style="background: linear-gradient(45deg, #ff007f, #9b51e0);">Color Fucsia</button>
-                    <button class="widget-btn" onclick="cambiarColorObjeto('#00ffcc')">Color Esmeralda</button>
                 </div>
-                <div class="widget-output" id="outputAnim">Estado actual: Objeto 3D sincronizado y activo.</div>
             </div>
+
+            <input type="file"
+                id="fileInputAvatar"
+                accept="image/*"
+                style="display: none;"
+                onchange="cambiarFotoPerfil(event)">
+
+            <div class="profile-avatar-wrapper"
+                onclick="document.getElementById('fileInputAvatar').click()"
+                title="Haz clic para cambiar tu foto de perfil">
+
+                <div class="profile-avatar-large"
+                    id="profileInitials">
+                    AM
+                </div>
+
+            </div>
+
+            <div class="profile-name"
+                id="profileDisplayName">
+                Usuario
+            </div>
+
+            <div class="profile-email"
+                id="profileDisplayEmail">
+                tu@gmail.com
+            </div>
+
+            <div>
+                <span class="profile-id-badge"
+                    id="profileDisplayId">
+                    ID: --
+                </span>
+            </div>
+
+            <div id="adminBadgeContainer"
+                class="hidden">
+
+                <span class="admin-badge">
+                    ⚡ ACCESO ADMINISTRADOR
+                </span>
+
+            </div>
+
+            <div class="profile-stats">
+
+                <div class="stat-item"
+                    id="statRangoBox">
+
+                    <span class="stat-value"
+                        id="statRango">
+                        Usuario
+                    </span>
+
+                    <span class="stat-label">
+                        Rango
+                    </span>
+
+                </div>
+
+                <div class="stat-item">
+
+                    <span class="stat-value"
+                        id="statEstado">
+                        Activo
+                    </span>
+
+                    <span class="stat-label">
+                        Estado
+                    </span>
+
+                </div>
+
+                <div class="stat-item">
+
+                    <span class="stat-value"
+                        id="statTiempoActivo">
+                        0s
+                    </span>
+
+                    <span class="stat-label">
+                        Tiempo Activo
+                    </span>
+
+                </div>
+
+            </div>
+
+            <button class="auth-btn"
+                style="background: linear-gradient(135deg, #00b09b, #00897b); box-shadow: 0 4px 15px rgba(0,176,155,0.4);"
+                onclick="irAlChat()">
+
+                💬 Ir a Wchat
+
+            </button>
+
+            <button class="auth-btn"
+                style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); margin-top: 10px;"
+                onclick="cerrarSesion()">
+
+                Cerrar Sesión ✕
+
+            </button>
+
+            <div style="text-align: center;">
+                <a href="../index.html"
+                    class="back-home-link">
+                    ← Volver al inicio de WIBSIPROJECT
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- MODAL RECUPERAR CONTRASEÑA -->
+    <div class="modal-overlay-recuperar"
+        id="modalRecuperar">
+
+        <div class="modal-box-recuperar">
+
+            <button type="button"
+                class="modal-close-recuperar"
+                onclick="cerrarModalRecuperacion()">
+                ✕
+            </button>
+
+            <div id="recuperarFormWrap">
+
+                <div class="modal-icon-recuperar">
+                    🔑
+                </div>
+
+                <h3>
+                    Recuperar contraseña
+                </h3>
+
+                <p class="sub">
+                    Ingresa el correo con el que te registraste y te
+                    enviaremos un enlace para restablecer tu contraseña.
+                </p>
+
+                <div class="form-group">
+
+                    <label>
+                        Correo electrónico
+                    </label>
+
+                    <input type="email"
+                        id="recuperarEmailInput"
+                        placeholder="tu@gmail.com"
+                        style="width:100%; padding:12px 14px; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:#fff; font-size:14px; box-sizing:border-box;"
+                        onkeypress="if(event.key==='Enter') enviarRecuperacionPassword()">
+
+                </div>
+
+                <p class="recuperar-error-msg"
+                    id="recuperarErrorMsg">
+
+                    <span>⚠️</span>
+
+                    <span id="recuperarErrorTexto"></span>
+
+                </p>
+
+                <button type="button"
+                    class="auth-btn"
+                    id="btnEnviarRecuperacion"
+                    style="margin-top:14px;"
+                    onclick="enviarRecuperacionPassword()">
+
+                    Enviar enlace de recuperación
+
+                </button>
+
+            </div>
+
+            <div class="recuperar-exito-box"
+                id="recuperarExitoBox">
+
+                <div class="recuperar-exito-icon">
+                    ✅
+                </div>
+
+                <h3>
+                    Revisa tu correo
+                </h3>
+
+                <p class="sub">
+                    Te enviamos un enlace a
+                    <b id="recuperarEmailMostrado"
+                        style="color:#fff;"></b>
+                    para restablecer tu contraseña.
+                    Revisa también la carpeta de spam.
+                </p>
+
+                <button type="button"
+                    class="auth-btn"
+                    style="background: rgba(255,255,255,0.08); box-shadow:none;"
+                    onclick="cerrarModalRecuperacion()">
+
+                    Entendido
+
+                </button>
+
+            </div>
+
         </div>
     </div>
 
-    <!-- MODAL 2: FUNCIONES E INTERACTIVIDAD -->
-    <div class="modal-overlay" id="modalFunciones">
-        <div class="modal-content">
-            <button class="close-modal" onclick="cerrarModal('modalFunciones')">✕</button>
-            <h2 class="modal-title">⚙️ Panel Avanzado: Funciones e Interactividad</h2>
-            <p>La interactividad va más allá de un simple clic. Este panel administra sistemas en tiempo real y secuencias multimedia:</p>
-            
-            <ul style="list-style-type: none; margin-bottom: 1.5rem;">
-                <li style="position: relative; padding-left: 1.8rem; margin-bottom: 0.8rem;">⚡ <strong>Gestión de Visibilidad:</strong> Pausa automática de recursos y audio cuando el usuario cambia de pestaña.</li>
-                <li style="position: relative; padding-left: 1.8rem; margin-bottom: 0.8rem;">⚡ <strong>Controles Dinámicos:</strong> Paneles flotantes con transiciones de entrada y salida basadas en curvas Bézier.</li>
-            </ul>
 
-            <div class="interactive-widget">
-                <h3>🎵 Reproductor Multimedia & Diagnóstico</h3>
-                <p>Gestiona el flujo de audio interactivo del sistema:</p>
-                <div class="widget-controls">
-                    <button class="widget-btn" onclick="ejecutarAccionWidget('play')">Reproducir Audio Witsi</button>
-                    <button class="widget-btn" onclick="ejecutarAccionWidget('pause')" style="background: linear-gradient(45deg, #ef4444, #dc2626);">Pausar Audio</button>
-                </div>
-                <div class="widget-output" id="outputFunc">Estado de audio: En espera de comandos.</div>
-            </div>
-        </div>
-    </div>
+    <!-- ========================================================= -->
+    <!-- FIREBASE -->
+    <!-- ========================================================= -->
 
-    <!-- MODAL 3: ESTRUCTURA Y RENDIMIENTO -->
-    <div class="modal-overlay" id="modalEstructura">
-        <div class="modal-content">
-            <button class="close-modal" onclick="cerrarModal('modalEstructura')">✕</button>
-            <h2 class="modal-title">🛡️ Panel Avanzado: Estructura y Rendimiento</h2>
-            <p>La base de un software robusto reside en su arquitectura y diseño modular limpio:</p>
-            
-            <ul style="list-style-type: none; margin-bottom: 1.5rem;">
-                <li style="position: relative; padding-left: 1.8rem; margin-bottom: 0.8rem;">⚡ <strong>Glassmorphism Avanzado:</strong> Uso de efectos de desenfoque de fondo (`backdrop-filter`) combinados con bordes translúcidos.</li>
-                <li style="position: relative; padding-left: 1.8rem; margin-bottom: 0.8rem;">⚡ <strong>Modularidad Limpia:</strong> Separación estricta entre estilos CSS, lógica JavaScript y estructura DOM.</li>
-            </ul>
+    <script type="module">
 
-            <div class="interactive-widget">
-                <h3>📊 Monitor de Recursos del Sistema</h3>
-                <p>Verifica el estado operativo y la estabilidad del entorno:</p>
-                <div class="widget-controls">
-                    <button class="widget-btn" onclick="ejecutarDiagnostico()">Ejecutar Diagnóstico</button>
-                </div>
-                <div class="widget-output" id="outputEst">Diagnóstico pendiente. Haz clic en el botón superior.</div>
-            </div>
-        </div>
-    </div>
+        import {
+            initializeApp
+        } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
 
-    <!-- Botón flotante de contacto y panel deslizante para reportar al administrador -->
-    <div id="contactoAdminContainer">
-        <button id="btnConsultarAdmin" onclick="togglePanelContacto()">💬 Consultar al administrador</button>
-        
-        <div id="panelContactoAdmin" class="panel-admin-flotante">
-            <button class="cerrar-panel-admin" onclick="togglePanelContacto()">✕</button>
-            <h3 style="color: #00d2ff; margin-bottom: 0.8rem; font-size: 1.2rem;">Reportar al Administrador</h3>
-            <p style="font-size: 0.85rem; color: #a0a0c0; margin-bottom: 1rem;">Selecciona los detalles del caso para enviarlos al panel.</p>
-            
-            <form id="formAdminData" onsubmit="enviarAlPanelAdministrador(event)">
-                
-                <div style="margin-bottom: 0.8rem;">
-                    <label style="display: block; font-size: 0.8rem; margin-bottom: 0.2rem; color: #d0d0e0;">Usuario Problemático:</label>
-                    <select id="adminUsuario" required style="width: 100%; padding: 0.6rem; background: rgba(10, 10, 18, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white;">
-                        <option value="" disabled selected>Selecciona un usuario...</option>
-                        <option value="Usuario_Alpha">Usuario Alpha</option>
-                        <option value="Usuario_Beta">Usuario Beta</option>
-                        <option value="Usuario_Gamma">Usuario Gamma</option>
-                        <option value="Usuario_Delta">Usuario Delta</option>
-                    </select>
-                </div>
+        import {
+            getAuth,
+            signInWithEmailAndPassword,
+            createUserWithEmailAndPassword,
+            sendPasswordResetEmail,
+            GoogleAuthProvider,
+            signInWithCredential,
+            signOut,
+            onAuthStateChanged,
+            updateProfile
+        } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 
-                <div style="margin-bottom: 0.8rem;">
-                    <label style="display: block; font-size: 0.8rem; margin-bottom: 0.2rem; color: #d0d0e0;">Video Relacionado (Index):</label>
-                    <select id="adminVideo" required style="width: 100%; padding: 0.6rem; background: rgba(10, 10, 18, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white;">
-                        <option value="" disabled selected>Selecciona un video...</option>
-                        <option value="Video_Animacion_3D.mp4">Video: Animación y Gráficos 3D</option>
-                        <option value="Video_Interactivo_Witsi.mp4">Video: Funciones e Interactividad</option>
-                        <option value="Video_Tutorial_Glass.mp4">Video: Estructura y Rendimiento</option>
-                    </select>
-                </div>
+        import {
+            getDatabase,
+            ref,
+            get,
+            set,
+            update
+        } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
 
-                <div style="margin-bottom: 0.8rem;">
-                    <label style="display: block; font-size: 0.8rem; margin-bottom: 0.2rem; color: #d0d0e0;">¿Cuál es el problema?</label>
-                    <textarea id="adminProblema" required rows="2" placeholder="Explica el inconveniente..." style="width: 100%; padding: 0.6rem; background: rgba(10, 10, 18, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; resize: none;"></textarea>
-                </div>
 
-                <div style="margin-bottom: 0.8rem;">
-                    <label style="display: block; font-size: 0.8rem; margin-bottom: 0.2rem; color: #d0d0e0;">¿Por qué lo desea / solicita?</label>
-                    <textarea id="adminDeseo" required rows="2" placeholder="Motivo de la solicitud..." style="width: 100%; padding: 0.6rem; background: rgba(10, 10, 18, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; resize: none;"></textarea>
-                </div>
+        /* =========================================================
+           CONFIGURACIÓN FIREBASE
+        ========================================================= */
 
-                <div style="margin-bottom: 1rem;">
-                    <label style="display: block; font-size: 0.8rem; margin-bottom: 0.2rem; color: #d0d0e0;">Tu Correo:</label>
-                    <input type="email" id="adminEmail" required placeholder="correo@ejemplo.com" style="width: 100%; padding: 0.6rem; background: rgba(10, 10, 18, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white;">
-                </div>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAg8n3AcKE-0QDQYcswUBYZwI702TzPZIU",
+            authDomain: "anthonypg.firebaseapp.com",
+            databaseURL: "https://anthonypg-default-rtdb.firebaseio.com/",
+            projectId: "anthonypg",
+            storageBucket: "anthonypg.firebasestorage.app",
+            messagingSenderId: "620424695699",
+            appId: "1:620424695699:web:429c9ace801a5bc75a6266",
+            measurementId: "G-YVFYEWDQ98"
+        };
 
-                <button type="submit" style="width: 100%; background: linear-gradient(135deg, #00d2ff, #9b51e0); border: none; color: white; padding: 0.7rem; border-radius: 8px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3);">Enviar al Panel Admin</button>
-            </form>
-        </div>
-    </div>
 
-    <style>
-        #contactoAdminContainer {
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            z-index: 9999;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        #btnConsultarAdmin {
-            background: linear-gradient(135deg, #00d2ff, #ff007f);
-            color: white;
-            border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 50px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 5px 20px rgba(255, 0, 127, 0.4);
-            transition: transform 0.3s ease;
-        }
-        #btnConsultarAdmin:hover {
-            transform: scale(1.05);
-        }
-        .panel-admin-flotante {
-            position: absolute;
-            bottom: 60px;
-            right: 0;
-            width: 340px;
-            background: rgba(15, 15, 25, 0.96);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(0, 210, 255, 0.3);
-            border-radius: 16px;
-            padding: 1.5rem;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
-            display: none;
-            transform-origin: bottom right;
-            animation: abrirPanel 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-        @keyframes abrirPanel {
-            from { opacity: 0; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        .cerrar-panel-admin {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: rgba(255,255,255,0.1);
-            border: none;
-            color: white;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .cerrar-panel-admin:hover {
-            background: #ff007f;
-        }
-    </style>
+        const app = initializeApp(firebaseConfig);
 
-    <footer>
-        <p>&copy; 2026 WIBSIPROJECT - Desarrollado por Anthony. Todos los derechos reservados.</p>
-    </footer>
+        const auth = getAuth(app);
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script>
-        function abrirModal(modalId) {
-            document.getElementById(modalId).classList.add('active');
+        const db = getDatabase(app);
+
+
+        /* =========================================================
+           CONFIGURACIÓN
+        ========================================================= */
+
+        const CORREO_ADMIN = "admin_administrador@gmail.com";
+
+        const SESSION_KEY = "wibsitihub_sesion_activa";
+
+        let timerActivoInterval = null;
+
+        let inactivityTimeout = null;
+
+
+        /* =========================================================
+           FUNCIONES GLOBALES
+        ========================================================= */
+
+        window.pasarPagina = pasarPagina;
+
+        window.ejecutarLogin = ejecutarLogin;
+
+        window.ejecutarRegistro = ejecutarRegistro;
+
+        window.cerrarSesion = cerrarSesion;
+
+        window.cambiarFotoPerfil = cambiarFotoPerfil;
+
+        window.abrirModalRecuperacion = abrirModalRecuperacion;
+
+        window.cerrarModalRecuperacion = cerrarModalRecuperacion;
+
+        window.enviarRecuperacionPassword = enviarRecuperacionPassword;
+
+        window.handleGoogleSignIn = handleGoogleSignIn;
+
+        window.irAlChat = irAlChat;
+
+
+        /* =========================================================
+           IR A WCHAT
+        ========================================================= */
+
+        function irAlChat() {
+
+            window.location.href = "Wchat.html";
+
         }
 
-        function cerrarModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
+
+        /* =========================================================
+           GENERAR WIB-ID
+        ========================================================= */
+
+        function generarIdUnico() {
+
+            return "WIB-" +
+                Math.random()
+                    .toString(36)
+                    .substring(2, 8)
+                    .toUpperCase() +
+                "-" +
+                Date.now()
+                    .toString()
+                    .slice(-4);
+
         }
 
-        document.querySelectorAll('.modal-overlay').forEach(modal => {
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.classList.remove('active');
-                }
-            });
-        });
 
-        let materialGlobal = null;
+        /* =========================================================
+           OBTENER PERFIL FIREBASE
+        ========================================================= */
 
-        function cambiarColorObjeto(colorHex) {
-            if (materialGlobal) {
-                materialGlobal.color.set(colorHex);
-                document.getElementById('outputAnim').textContent = `Éxito: Color del objeto 3D cambiado a ${colorHex}`;
+        async function obtenerPerfil(uid) {
+
+            const perfilRef = ref(db, "usuarios/" + uid);
+
+            const snapshot = await get(perfilRef);
+
+            if (snapshot.exists()) {
+                return snapshot.val();
             }
+
+            return null;
         }
 
-        function ejecutarAccionWidget(accion) {
-            const out = document.getElementById('outputFunc');
-            if (accion === 'play') {
-                out.textContent = "Audio activado correctamente. Frecuencia sincronizada.";
+
+        /* =========================================================
+           CREAR / ACTUALIZAR PERFIL
+        ========================================================= */
+
+        async function guardarPerfilFirebase(user, datosExtra = {}) {
+
+            if (!user) {
+                throw new Error("Usuario Firebase no válido.");
+            }
+
+            const uid = user.uid;
+
+            const perfilRef = ref(db, "usuarios/" + uid);
+
+            const snapshot = await get(perfilRef);
+
+            let perfilActual = snapshot.exists()
+                ? snapshot.val()
+                : null;
+
+
+            /*
+             * IMPORTANTE:
+             * Si el usuario ya tiene WIB-ID NO SE CAMBIA.
+             */
+
+            const wibIdExistente =
+                perfilActual &&
+                perfilActual.id
+                    ? perfilActual.id
+                    : generarIdUnico();
+
+
+            const nombre =
+                datosExtra.name ||
+                perfilActual?.name ||
+                user.displayName ||
+                (user.email ? user.email.split("@")[0] : "Usuario");
+
+
+            const avatar =
+                datosExtra.avatar !== undefined
+                    ? datosExtra.avatar
+                    : (
+                        perfilActual?.avatar ||
+                        user.photoURL ||
+                        null
+                    );
+
+
+            const esAdmin =
+                user.email &&
+                user.email.toLowerCase() === CORREO_ADMIN.toLowerCase();
+
+
+            const perfil = {
+
+                uid: uid,
+
+                id: wibIdExistente,
+
+                name: nombre,
+
+                email: user.email || perfilActual?.email || "",
+
+                avatar: avatar,
+
+                isAdmin: esAdmin,
+
+                createdAt:
+                    perfilActual?.createdAt ||
+                    Date.now(),
+
+                updatedAt: Date.now(),
+
+                totalActiveSeconds:
+                    perfilActual?.totalActiveSeconds ||
+                    0
+
+            };
+
+
+            await set(perfilRef, perfil);
+
+
+            /*
+             * Mantener el índice WIB-ID → UID.
+             *
+             * Esto conserva:
+             *
+             * wibToUid
+             *   WIB-H4AUEA-6378
+             *      → HJRGiQ4Ybka2XNL8JKzIXFWnPjF3
+             */
+
+            const indiceRef =
+                ref(db, "wibToUid/" + wibIdExistente);
+
+            const indiceSnapshot =
+                await get(indiceRef);
+
+
+            if (!indiceSnapshot.exists()) {
+
+                await set(
+                    indiceRef,
+                    uid
+                );
+
             } else {
-                out.textContent = "Audio pausado por el usuario.";
+
+                const uidActual =
+                    indiceSnapshot.val();
+
+                /*
+                 * NO sobrescribir un índice que ya pertenece
+                 * a otro UID.
+                 */
+
+                if (uidActual !== uid) {
+
+                    console.warn(
+                        "El WIB-ID ya pertenece a otro usuario:",
+                        wibIdExistente
+                    );
+
+                }
+
             }
+
+
+            return perfil;
+
         }
 
-        function ejecutarDiagnostico() {
-            const out = document.getElementById('outputEst');
-            out.textContent = "Analizando memoria... [OK] Latencia: 12ms. [OK] Estructura modular óptima.";
+
+        /* =========================================================
+           GUARDAR SESIÓN LOCAL
+        ========================================================= */
+
+        function guardarSesionActiva(usuario) {
+
+            if (!usuario) return;
+
+            sessionStorage.setItem(
+                SESSION_KEY,
+                JSON.stringify(usuario)
+            );
+
         }
 
-        function togglePanelContacto() {
-            const panel = document.getElementById('panelContactoAdmin');
-            panel.style.display = (panel.style.display === 'block') ? 'none' : 'block';
+
+        /* =========================================================
+           OBTENER SESIÓN LOCAL
+        ========================================================= */
+
+        function obtenerSesionActiva() {
+
+            const sesion =
+                sessionStorage.getItem(SESSION_KEY);
+
+            if (!sesion) {
+                return null;
+            }
+
+            try {
+
+                return JSON.parse(sesion);
+
+            } catch (error) {
+
+                sessionStorage.removeItem(SESSION_KEY);
+
+                return null;
+
+            }
+
         }
 
-        function enviarAlPanelAdministrador(event) {
+
+        /* =========================================================
+           ELIMINAR SESIÓN
+        ========================================================= */
+
+        function eliminarSesionActiva() {
+
+            sessionStorage.removeItem(SESSION_KEY);
+
+        }
+
+
+        /* =========================================================
+           PASAR PÁGINA
+        ========================================================= */
+
+        function pasarPagina(destino) {
+
+            const wrapper =
+                document.getElementById("pagesWrapper");
+
+            const botones =
+                document.querySelectorAll(".page-nav-btn");
+
+
+            if (destino === "register") {
+
+                wrapper.style.transform =
+                    "translateX(-50%)";
+
+                botones.forEach(btn => {
+
+                    btn.classList.remove("active");
+
+                });
+
+                if (botones[1]) {
+                    botones[1].classList.add("active");
+                }
+
+            } else {
+
+                wrapper.style.transform =
+                    "translateX(0)";
+
+                botones.forEach(btn => {
+
+                    btn.classList.remove("active");
+
+                });
+
+                if (botones[0]) {
+                    botones[0].classList.add("active");
+                }
+
+            }
+
+        }
+
+
+        /* =========================================================
+           LOGIN CON FIREBASE
+        ========================================================= */
+
+        async function ejecutarLogin(event) {
+
             event.preventDefault();
-            
-            const params = new URLSearchParams({
-                usuario: document.getElementById('adminUsuario').value,
-                video: document.getElementById('adminVideo').value,
-                problema: document.getElementById('adminProblema').value,
-                deseo: document.getElementById('adminDeseo').value,
-                email: document.getElementById('adminEmail').value,
-                fecha: new Date().toLocaleString()
-            });
 
-            window.location.href = `html/panel_administrador.html?${params.toString()}`;
+
+            const email =
+                document.getElementById("loginEmail")
+                    .value
+                    .trim();
+
+            const password =
+                document.getElementById("loginPassword")
+                    .value;
+
+
+            if (!email || !password) {
+
+                mostrarAdvertenciaSesion(
+                    "Completa tu correo y contraseña."
+                );
+
+                return;
+
+            }
+
+
+            const btn =
+                document.getElementById("btnLogin");
+
+            btn.disabled = true;
+
+            const textoOriginal =
+                btn.textContent;
+
+            btn.textContent =
+                "Iniciando sesión...";
+
+
+            try {
+
+                /*
+                 * LOGIN REAL EN FIREBASE
+                 */
+
+                const resultado =
+                    await signInWithEmailAndPassword(
+                        auth,
+                        email,
+                        password
+                    );
+
+
+                const user =
+                    resultado.user;
+
+
+                /*
+                 * Crear/obtener perfil
+                 */
+
+                const perfil =
+                    await guardarPerfilFirebase(user);
+
+
+                const esAdmin =
+                    user.email &&
+                    user.email.toLowerCase() ===
+                    CORREO_ADMIN.toLowerCase();
+
+
+                const usuarioSesion = {
+
+                    uid: user.uid,
+
+                    id: perfil.id,
+
+                    name: perfil.name,
+
+                    email: user.email,
+
+                    isAdmin: esAdmin,
+
+                    avatar: perfil.avatar || null,
+
+                    loginTime: Date.now(),
+
+                    totalActiveSeconds:
+                        perfil.totalActiveSeconds || 0
+
+                };
+
+
+                guardarSesionActiva(
+                    usuarioSesion
+                );
+
+
+                mostrarToast(
+                    "¡Inicio de sesión exitoso!"
+                );
+
+
+                /*
+                 * Administrador
+                 */
+
+                if (esAdmin) {
+
+                    setTimeout(() => {
+
+                        window.location.href =
+                            "panel_administrador.html";
+
+                    }, 700);
+
+                    return;
+
+                }
+
+
+                /*
+                 * Usuario normal
+                 */
+
+                setTimeout(() => {
+
+                    verificarEstadoSesion();
+
+                }, 500);
+
+
+            } catch (error) {
+
+                console.error(
+                    "Error de inicio de sesión:",
+                    error
+                );
+
+
+                mostrarErrorFirebase(error);
+
+            } finally {
+
+                btn.disabled = false;
+
+                btn.textContent =
+                    textoOriginal;
+
+            }
+
         }
 
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#canvas3d'), alpha: true, antialias: true });
 
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        /* =========================================================
+           REGISTRO REAL EN FIREBASE
+        ========================================================= */
 
-        const geometry = new THREE.IcosahedronGeometry(2, 0);
-        const material = new THREE.MeshStandardMaterial({
-            color: 0x00d2ff,
-            wireframe: true,
-            roughness: 0.4,
-            metalness: 0.8
-        });
-        materialGlobal = material;
+        async function ejecutarRegistro(event) {
 
-        const icosahedron = new THREE.Mesh(geometry, material);
-        scene.add(icosahedron);
+            event.preventDefault();
 
-        const pointLight = new THREE.PointLight(0x9b51e0, 3, 50);
-        pointLight.position.set(5, 5, 5);
-        scene.add(pointLight);
 
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-        scene.add(ambientLight);
+            const nombre =
+                document.getElementById("regName")
+                    .value
+                    .trim();
 
-        camera.position.z = 6;
+            const email =
+                document.getElementById("regEmail")
+                    .value
+                    .trim();
 
-        let mouseX = 0;
-        let mouseY = 0;
+            const password =
+                document.getElementById("regPassword")
+                    .value;
 
-        document.addEventListener('mousemove', (event) => {
-            mouseX = (event.clientX / window.innerWidth) - 0.5;
-            mouseY = (event.clientY / window.innerHeight) - 0.5;
-        });
 
-        const clock = new THREE.Clock();
-        function animate() {
-            requestAnimationFrame(animate);
-            const elapsedTime = clock.getElapsedTime();
-            icosahedron.rotation.x = elapsedTime * 0.3 + mouseY * 0.6;
-            icosahedron.rotation.y = elapsedTime * 0.4 + mouseX * 0.6;
-            renderer.render(scene, camera);
+            if (!nombre) {
+
+                mostrarAdvertenciaSesion(
+                    "Ingresa tu nombre de usuario."
+                );
+
+                return;
+
+            }
+
+
+            if (password.length < 6) {
+
+                mostrarAdvertenciaSesion(
+                    "La contraseña debe tener al menos 6 caracteres."
+                );
+
+                return;
+
+            }
+
+
+            const btn =
+                document.getElementById("btnRegister");
+
+            btn.disabled = true;
+
+            const textoOriginal =
+                btn.textContent;
+
+            btn.textContent =
+                "Creando cuenta...";
+
+
+            try {
+
+                /*
+                 * Crear usuario REAL en Firebase Auth
+                 */
+
+                const resultado =
+                    await createUserWithEmailAndPassword(
+                        auth,
+                        email,
+                        password
+                    );
+
+
+                const user =
+                    resultado.user;
+
+
+                /*
+                 * Guardar nombre en Firebase Auth
+                 */
+
+                await updateProfile(
+                    user,
+                    {
+                        displayName: nombre
+                    }
+                );
+
+
+                /*
+                 * Crear perfil en RTDB
+                 */
+
+                const perfil =
+                    await guardarPerfilFirebase(
+                        user,
+                        {
+                            name: nombre
+                        }
+                    );
+
+
+                const esAdmin =
+                    email.toLowerCase() ===
+                    CORREO_ADMIN.toLowerCase();
+
+
+                const usuarioSesion = {
+
+                    uid: user.uid,
+
+                    id: perfil.id,
+
+                    name: nombre,
+
+                    email: email,
+
+                    isAdmin: esAdmin,
+
+                    avatar: null,
+
+                    loginTime: Date.now(),
+
+                    totalActiveSeconds: 0
+
+                };
+
+
+                guardarSesionActiva(
+                    usuarioSesion
+                );
+
+
+                document
+                    .getElementById("registerForm")
+                    .reset();
+
+
+                mostrarToast(
+                    "¡Cuenta creada y sesión iniciada con éxito!"
+                );
+
+
+                if (esAdmin) {
+
+                    setTimeout(() => {
+
+                        window.location.href =
+                            "panel_administrador.html";
+
+                    }, 700);
+
+                } else {
+
+                    setTimeout(() => {
+
+                        verificarEstadoSesion();
+
+                    }, 500);
+
+                }
+
+
+            } catch (error) {
+
+                console.error(
+                    "Error al registrar:",
+                    error
+                );
+
+
+                mostrarErrorFirebase(error);
+
+            } finally {
+
+                btn.disabled = false;
+
+                btn.textContent =
+                    textoOriginal;
+
+            }
+
         }
 
-        animate();
 
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+        /* =========================================================
+           GOOGLE LOGIN
+        ========================================================= */
+
+        async function handleGoogleSignIn(response) {
+
+            try {
+
+                if (!response || !response.credential) {
+
+                    throw new Error(
+                        "Google no devolvió las credenciales."
+                    );
+
+                }
+
+
+                /*
+                 * Convertir credencial de Google
+                 * a credencial Firebase
+                 */
+
+                const credential =
+                    GoogleAuthProvider.credential(
+                        response.credential
+                    );
+
+
+                const resultado =
+                    await signInWithCredential(
+                        auth,
+                        credential
+                    );
+
+
+                const user =
+                    resultado.user;
+
+
+                /*
+                 * Crear o actualizar perfil
+                 */
+
+                const perfil =
+                    await guardarPerfilFirebase(
+                        user,
+                        {
+                            name:
+                                user.displayName ||
+                                "Usuario",
+
+                            avatar:
+                                user.photoURL || null
+                        }
+                    );
+
+
+                const esAdmin =
+                    user.email &&
+                    user.email.toLowerCase() ===
+                    CORREO_ADMIN.toLowerCase();
+
+
+                const usuarioSesion = {
+
+                    uid: user.uid,
+
+                    id: perfil.id,
+
+                    name: perfil.name,
+
+                    email: user.email,
+
+                    isAdmin: esAdmin,
+
+                    avatar: perfil.avatar,
+
+                    loginTime: Date.now(),
+
+                    totalActiveSeconds:
+                        perfil.totalActiveSeconds || 0
+
+                };
+
+
+                guardarSesionActiva(
+                    usuarioSesion
+                );
+
+
+                mostrarToast(
+                    `¡Bienvenido, ${perfil.name}!`
+                );
+
+
+                if (esAdmin) {
+
+                    setTimeout(() => {
+
+                        window.location.href =
+                            "panel_administrador.html";
+
+                    }, 700);
+
+                } else {
+
+                    setTimeout(() => {
+
+                        verificarEstadoSesion();
+
+                    }, 500);
+
+                }
+
+
+            } catch (error) {
+
+                console.error(
+                    "Error Google/Firebase:",
+                    error
+                );
+
+
+                mostrarErrorFirebase(error);
+
+            }
+
+        }
+
+
+        /* =========================================================
+           ESTADO DE SESIÓN
+        ========================================================= */
+
+        async function verificarEstadoSesion() {
+
+            const user =
+                auth.currentUser;
+
+
+            if (!user) {
+
+                document
+                    .getElementById("authSection")
+                    .classList.remove("hidden");
+
+                document
+                    .getElementById("profileSection")
+                    .classList.add("hidden");
+
+                return;
+
+            }
+
+
+            try {
+
+                const perfil =
+                    await guardarPerfilFirebase(user);
+
+
+                const esAdmin =
+                    user.email &&
+                    user.email.toLowerCase() ===
+                    CORREO_ADMIN.toLowerCase();
+
+
+                /*
+                 * Si es administrador y está en cuenta,
+                 * mandarlo al panel.
+                 */
+
+                if (
+                    esAdmin &&
+                    window.location.pathname
+                        .toLowerCase()
+                        .includes("cuenta")
+                ) {
+
+                    window.location.href =
+                        "panel_administrador.html";
+
+                    return;
+
+                }
+
+
+                const usuarioSesion = {
+
+                    uid: user.uid,
+
+                    id: perfil.id,
+
+                    name: perfil.name,
+
+                    email: user.email,
+
+                    isAdmin: esAdmin,
+
+                    avatar: perfil.avatar || null,
+
+                    loginTime:
+                        obtenerSesionActiva()?.loginTime ||
+                        Date.now(),
+
+                    totalActiveSeconds:
+                        perfil.totalActiveSeconds || 0
+
+                };
+
+
+                guardarSesionActiva(
+                    usuarioSesion
+                );
+
+
+                mostrarPerfil(
+                    usuarioSesion
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Error cargando perfil:",
+                    error
+                );
+
+                mostrarErrorFirebase(error);
+
+            }
+
+        }
+
+
+        /* =========================================================
+           MOSTRAR PERFIL
+        ========================================================= */
+
+        function mostrarPerfil(usuario) {
+
+            document
+                .getElementById("authSection")
+                .classList.add("hidden");
+
+
+            document
+                .getElementById("profileSection")
+                .classList.remove("hidden");
+
+
+            document
+                .getElementById("profileDisplayName")
+                .textContent =
+                usuario.name || "Usuario";
+
+
+            document
+                .getElementById("profileDisplayEmail")
+                .textContent =
+                usuario.email || "";
+
+
+            document
+                .getElementById("profileDisplayId")
+                .textContent =
+                "ID: " + (usuario.id || "--");
+
+
+            const avatarDiv =
+                document.getElementById(
+                    "profileInitials"
+                );
+
+
+            if (usuario.avatar) {
+
+                avatarDiv.style.backgroundImage =
+                    `url("${usuario.avatar}")`;
+
+                avatarDiv.textContent = "";
+
+            } else {
+
+                avatarDiv.style.backgroundImage =
+                    "none";
+
+
+                const nombre =
+                    usuario.name || "W";
+
+
+                const initials =
+                    nombre
+                        .split(" ")
+                        .filter(Boolean)
+                        .map(n => n[0])
+                        .join("")
+                        .substring(0, 2)
+                        .toUpperCase();
+
+
+                avatarDiv.textContent =
+                    initials || "W";
+
+            }
+
+
+            if (usuario.isAdmin) {
+
+                document
+                    .getElementById("adminBadgeContainer")
+                    .classList.remove("hidden");
+
+
+                document
+                    .getElementById("statRango")
+                    .textContent =
+                    "VIP";
+
+            } else {
+
+                document
+                    .getElementById("adminBadgeContainer")
+                    .classList.add("hidden");
+
+
+                document
+                    .getElementById("statRango")
+                    .textContent =
+                    "Usuario";
+
+            }
+
+
+            document
+                .getElementById("statTiempoActivo")
+                .textContent =
+                formatearTiempo(
+                    usuario.totalActiveSeconds || 0
+                );
+
+
+            iniciarContadorActivo(
+                usuario
+            );
+
+        }
+
+
+        /* =========================================================
+           CONTADOR DE TIEMPO
+        ========================================================= */
+
+        function iniciarContadorActivo(usuario) {
+
+            if (timerActivoInterval) {
+
+                clearInterval(
+                    timerActivoInterval
+                );
+
+            }
+
+
+            if (!usuario.totalActiveSeconds) {
+
+                usuario.totalActiveSeconds = 0;
+
+            }
+
+
+            timerActivoInterval =
+                setInterval(async () => {
+
+                    usuario.totalActiveSeconds++;
+
+
+                    const lblTiempo =
+                        document.getElementById(
+                            "statTiempoActivo"
+                        );
+
+
+                    if (lblTiempo) {
+
+                        lblTiempo.textContent =
+                            formatearTiempo(
+                                usuario.totalActiveSeconds
+                            );
+
+                    }
+
+
+                    /*
+                     * Guardar cada 10 segundos en Firebase
+                     */
+
+                    if (
+                        usuario.totalActiveSeconds % 10 === 0 &&
+                        usuario.uid
+                    ) {
+
+                        try {
+
+                            await update(
+                                ref(
+                                    db,
+                                    "usuarios/" +
+                                    usuario.uid
+                                ),
+                                {
+                                    totalActiveSeconds:
+                                        usuario.totalActiveSeconds,
+
+                                    updatedAt:
+                                        Date.now()
+                                }
+                            );
+
+                        } catch (error) {
+
+                            console.warn(
+                                "No se pudo actualizar el tiempo:",
+                                error
+                            );
+
+                        }
+
+                    }
+
+
+                    guardarSesionActiva(
+                        usuario
+                    );
+
+
+                }, 1000);
+
+        }
+
+
+        /* =========================================================
+           FORMATEAR TIEMPO
+        ========================================================= */
+
+        function formatearTiempo(segundos) {
+
+            segundos =
+                Number(segundos) || 0;
+
+
+            if (segundos < 60) {
+
+                return segundos + "s";
+
+            }
+
+
+            if (segundos < 3600) {
+
+                const mins =
+                    Math.floor(
+                        segundos / 60
+                    );
+
+                const secs =
+                    segundos % 60;
+
+
+                return mins +
+                    "m " +
+                    secs +
+                    "s";
+
+            }
+
+
+            const horas =
+                Math.floor(
+                    segundos / 3600
+                );
+
+
+            const mins =
+                Math.floor(
+                    (segundos % 3600) / 60
+                );
+
+
+            return horas +
+                "h " +
+                mins +
+                "m";
+
+        }
+
+
+        /* =========================================================
+           CAMBIAR FOTO
+        ========================================================= */
+
+        function cambiarFotoPerfil(event) {
+
+            const archivo =
+                event.target.files[0];
+
+
+            if (!archivo) {
+                return;
+            }
+
+
+            /*
+             * Evitar imágenes demasiado grandes
+             */
+
+            if (archivo.size > 700000) {
+
+                mostrarAdvertenciaSesion(
+                    "La imagen es demasiado grande. Máximo 700 KB."
+                );
+
+                event.target.value = "";
+
+                return;
+
+            }
+
+
+            const lector =
+                new FileReader();
+
+
+            lector.onload =
+                async function(e) {
+
+                    const base64Image =
+                        e.target.result;
+
+
+                    const avatarDiv =
+                        document.getElementById(
+                            "profileInitials"
+                        );
+
+
+                    if (avatarDiv) {
+
+                        avatarDiv.style.backgroundImage =
+                            `url("${base64Image}")`;
+
+                        avatarDiv.textContent = "";
+
+                    }
+
+
+                    const user =
+                        auth.currentUser;
+
+
+                    if (!user) {
+
+                        return;
+
+                    }
+
+
+                    try {
+
+                        await update(
+                            ref(
+                                db,
+                                "usuarios/" +
+                                user.uid
+                            ),
+                            {
+                                avatar:
+                                    base64Image,
+
+                                updatedAt:
+                                    Date.now()
+                            }
+                        );
+
+
+                        const sesion =
+                            obtenerSesionActiva();
+
+
+                        if (sesion) {
+
+                            sesion.avatar =
+                                base64Image;
+
+                            guardarSesionActiva(
+                                sesion
+                            );
+
+                        }
+
+
+                        mostrarToast(
+                            "¡Foto de perfil actualizada con éxito!"
+                        );
+
+
+                    } catch (error) {
+
+                        console.error(
+                            error
+                        );
+
+                        mostrarAdvertenciaSesion(
+                            "No se pudo guardar la foto."
+                        );
+
+                    }
+
+                };
+
+
+            lector.readAsDataURL(
+                archivo
+            );
+
+        }
+
+
+        /* =========================================================
+           CERRAR SESIÓN
+        ========================================================= */
+
+        async function cerrarSesion() {
+
+            if (timerActivoInterval) {
+
+                clearInterval(
+                    timerActivoInterval
+                );
+
+                timerActivoInterval = null;
+
+            }
+
+
+            if (inactivityTimeout) {
+
+                clearTimeout(
+                    inactivityTimeout
+                );
+
+                inactivityTimeout = null;
+
+            }
+
+
+            try {
+
+                await signOut(auth);
+
+            } catch (error) {
+
+                console.error(
+                    "Error cerrando Firebase:",
+                    error
+                );
+
+            }
+
+
+            eliminarSesionActiva();
+
+
+            document
+                .getElementById("loginEmail")
+                .value = "";
+
+
+            document
+                .getElementById("loginPassword")
+                .value = "";
+
+
+            document
+                .getElementById("recaptchaContainer")
+                .classList.add("hidden");
+
+
+            if (
+                window.grecaptcha &&
+                typeof grecaptcha.reset === "function"
+            ) {
+
+                try {
+                    grecaptcha.reset();
+                } catch (e) {}
+
+            }
+
+
+            document
+                .getElementById("authSection")
+                .classList.remove("hidden");
+
+
+            document
+                .getElementById("profileSection")
+                .classList.add("hidden");
+
+
+            document
+                .getElementById("loginForm")
+                .reset();
+
+
+            document
+                .getElementById("registerForm")
+                .reset();
+
+
+            pasarPagina("login");
+
+
+            mostrarAdvertenciaSesion(
+                "¡Sesión cerrada correctamente!"
+            );
+
+        }
+
+
+        /* =========================================================
+           MODAL RECUPERACIÓN
+        ========================================================= */
+
+        function abrirModalRecuperacion(event) {
+
+            if (event) {
+                event.preventDefault();
+            }
+
+
+            document
+                .getElementById("recuperarFormWrap")
+                .style.display = "block";
+
+
+            document
+                .getElementById("recuperarExitoBox")
+                .style.display = "none";
+
+
+            document
+                .getElementById("recuperarErrorMsg")
+                .style.display = "none";
+
+
+            const input =
+                document.getElementById(
+                    "recuperarEmailInput"
+                );
+
+
+            input.value =
+                document.getElementById(
+                    "loginEmail"
+                ).value || "";
+
+
+            document
+                .getElementById("modalRecuperar")
+                .classList.add("show");
+
+
+            setTimeout(() => {
+
+                input.focus();
+
+            }, 100);
+
+        }
+
+
+        function cerrarModalRecuperacion() {
+
+            document
+                .getElementById("modalRecuperar")
+                .classList.remove("show");
+
+        }
+
+
+        /* =========================================================
+           RECUPERAR CONTRASEÑA
+        ========================================================= */
+
+        async function enviarRecuperacionPassword() {
+
+            const input =
+                document.getElementById(
+                    "recuperarEmailInput"
+                );
+
+
+            const email =
+                input.value
+                    .trim();
+
+
+            const btn =
+                document.getElementById(
+                    "btnEnviarRecuperacion"
+                );
+
+
+            const errorBox =
+                document.getElementById(
+                    "recuperarErrorMsg"
+                );
+
+
+            const errorTexto =
+                document.getElementById(
+                    "recuperarErrorTexto"
+                );
+
+
+            errorBox.style.display =
+                "none";
+
+
+            if (
+                !email ||
+                !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+            ) {
+
+                errorTexto.textContent =
+                    "Ingresa un correo electrónico válido.";
+
+
+                errorBox.style.display =
+                    "flex";
+
+
+                input.focus();
+
+                return;
+
+            }
+
+
+            btn.disabled = true;
+
+            const textoOriginal =
+                btn.textContent;
+
+            btn.textContent =
+                "Enviando...";
+
+
+            try {
+
+                await sendPasswordResetEmail(
+                    auth,
+                    email
+                );
+
+
+                document
+                    .getElementById(
+                        "recuperarEmailMostrado"
+                    )
+                    .textContent =
+                    email;
+
+
+                document
+                    .getElementById(
+                        "recuperarFormWrap"
+                    )
+                    .style.display =
+                    "none";
+
+
+                document
+                    .getElementById(
+                        "recuperarExitoBox"
+                    )
+                    .style.display =
+                    "flex";
+
+
+            } catch (error) {
+
+                console.error(
+                    "Error recuperación:",
+                    error
+                );
+
+
+                let msg =
+                    "No se pudo enviar el correo. Inténtalo de nuevo.";
+
+
+                if (
+                    error.code ===
+                    "auth/invalid-email"
+                ) {
+
+                    msg =
+                        "Ese correo no tiene un formato válido.";
+
+                } else if (
+                    error.code ===
+                    "auth/user-not-found"
+                ) {
+
+                    msg =
+                        "No existe ninguna cuenta con ese correo.";
+
+                } else if (
+                    error.code ===
+                    "auth/too-many-requests"
+                ) {
+
+                    msg =
+                        "Demasiados intentos. Espera unos minutos.";
+
+                } else if (
+                    error.code ===
+                    "auth/network-request-failed"
+                ) {
+
+                    msg =
+                        "No hay conexión con Firebase. Revisa tu Internet.";
+
+                }
+
+
+                errorTexto.textContent =
+                    msg;
+
+
+                errorBox.style.display =
+                    "flex";
+
+            } finally {
+
+                btn.disabled = false;
+
+                btn.textContent =
+                    textoOriginal;
+
+            }
+
+        }
+
+
+        /* =========================================================
+           MENSAJES DE FIREBASE
+        ========================================================= */
+
+        function mostrarErrorFirebase(error) {
+
+            let mensaje =
+                "Ocurrió un error. Inténtalo nuevamente.";
+
+
+            switch (error.code) {
+
+                case "auth/invalid-credential":
+
+                case "auth/wrong-password":
+
+                    mensaje =
+                        "El correo o la contraseña son incorrectos.";
+
+                    break;
+
+
+                case "auth/user-not-found":
+
+                    mensaje =
+                        "No existe una cuenta con este correo.";
+
+                    break;
+
+
+                case "auth/invalid-email":
+
+                    mensaje =
+                        "El correo electrónico no es válido.";
+
+                    break;
+
+
+                case "auth/email-already-in-use":
+
+                    mensaje =
+                        "Este correo ya está registrado. Inicia sesión.";
+
+                    pasarPagina("login");
+
+                    break;
+
+
+                case "auth/weak-password":
+
+                    mensaje =
+                        "La contraseña debe tener al menos 6 caracteres.";
+
+                    break;
+
+
+                case "auth/operation-not-allowed":
+
+                    mensaje =
+                        "El inicio de sesión por correo no está activado en Firebase.";
+
+                    break;
+
+
+                case "auth/network-request-failed":
+
+                    mensaje =
+                        "No hay conexión con Firebase.";
+
+                    break;
+
+
+                case "auth/too-many-requests":
+
+                    mensaje =
+                        "Demasiados intentos. Espera unos minutos.";
+
+                    break;
+
+
+                default:
+
+                    console.error(
+                        "Código Firebase:",
+                        error.code
+                    );
+
+                    break;
+
+            }
+
+
+            mostrarAdvertenciaSesion(
+                mensaje
+            );
+
+        }
+
+
+        /* =========================================================
+           ADVERTENCIA
+        ========================================================= */
+
+        function mostrarAdvertenciaSesion(mensaje) {
+
+            const alertaExistente =
+                document.querySelector(
+                    ".auth-warning-banner"
+                );
+
+
+            if (alertaExistente) {
+                alertaExistente.remove();
+            }
+
+
+            const banner =
+                document.createElement(
+                    "div"
+                );
+
+
+            banner.className =
+                "auth-warning-banner";
+
+
+            banner.innerHTML =
+                `<span style="font-size: 16px;">⚠️</span>
+                 <span>${mensaje}</span>`;
+
+
+            document.body.appendChild(
+                banner
+            );
+
+
+            setTimeout(() => {
+
+                banner.style.transition =
+                    "opacity 0.4s ease";
+
+                banner.style.opacity =
+                    "0";
+
+
+                setTimeout(() => {
+
+                    banner.remove();
+
+                }, 400);
+
+            }, 4000);
+
+        }
+
+
+        /* =========================================================
+           TOAST
+        ========================================================= */
+
+        function mostrarToast(mensaje) {
+
+            const existingToast =
+                document.querySelector(
+                    ".account-toast"
+                );
+
+
+            if (existingToast) {
+                existingToast.remove();
+            }
+
+
+            const toast =
+                document.createElement(
+                    "div"
+                );
+
+
+            toast.className =
+                "account-toast";
+
+
+            toast.innerHTML =
+                `<span>✓</span>
+                 <p style="margin:0;">${mensaje}</p>`;
+
+
+            document.body.appendChild(
+                toast
+            );
+
+
+            setTimeout(() => {
+
+                toast.style.opacity =
+                    "0";
+
+
+                setTimeout(() => {
+
+                    toast.remove();
+
+                }, 300);
+
+            }, 2000);
+
+        }
+
+
+        /* =========================================================
+           INACTIVIDAD
+        ========================================================= */
+
+        function configurarEventosInactividad() {
+
+            const marcarActivo = () => {
+
+                const lblEstado =
+                    document.getElementById(
+                        "statEstado"
+                    );
+
+
+                if (lblEstado) {
+
+                    lblEstado.textContent =
+                        "Activo";
+
+                }
+
+
+                if (inactivityTimeout) {
+
+                    clearTimeout(
+                        inactivityTimeout
+                    );
+
+                }
+
+
+                inactivityTimeout =
+                    setTimeout(() => {
+
+                        const lblEstadoInactivo =
+                            document.getElementById(
+                                "statEstado"
+                            );
+
+
+                        if (lblEstadoInactivo) {
+
+                            lblEstadoInactivo.textContent =
+                                "Inactivo";
+
+                        }
+
+                    }, 30000);
+
+            };
+
+
+            window.addEventListener(
+                "mousemove",
+                marcarActivo
+            );
+
+
+            window.addEventListener(
+                "keypress",
+                marcarActivo
+            );
+
+
+            window.addEventListener(
+                "click",
+                marcarActivo
+            );
+
+
+            window.addEventListener(
+                "scroll",
+                marcarActivo
+            );
+
+
+            marcarActivo();
+
+        }
+
+
+        /* =========================================================
+           CAMBIO DEL EMAIL DEL LOGIN
+        ========================================================= */
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function() {
+
+                const loginEmail =
+                    document.getElementById(
+                        "loginEmail"
+                    );
+
+
+                loginEmail.addEventListener(
+                    "input",
+                    function(e) {
+
+                        const emailIngresado =
+                            e.target.value
+                                .trim()
+                                .toLowerCase();
+
+
+                        const recaptchaDiv =
+                            document.getElementById(
+                                "recaptchaContainer"
+                            );
+
+
+                        if (
+                            emailIngresado ===
+                            CORREO_ADMIN.toLowerCase()
+                        ) {
+
+                            recaptchaDiv
+                                .classList
+                                .remove("hidden");
+
+                        } else {
+
+                            recaptchaDiv
+                                .classList
+                                .add("hidden");
+
+                        }
+
+                    }
+                );
+
+
+                configurarEventosInactividad();
+
+            }
+        );
+
+
+        /* =========================================================
+           ESCUCHAR FIREBASE AUTH
+        ========================================================= */
+
+        onAuthStateChanged(
+            auth,
+            async (user) => {
+
+                if (user) {
+
+                    await verificarEstadoSesion();
+
+                } else {
+
+                    const sesion =
+                        obtenerSesionActiva();
+
+
+                    /*
+                     * Si Firebase dice que no hay usuario,
+                     * no mostramos una sesión falsa.
+                     */
+
+                    if (!sesion) {
+
+                        document
+                            .getElementById(
+                                "authSection"
+                            )
+                            .classList
+                            .remove("hidden");
+
+
+                        document
+                            .getElementById(
+                                "profileSection"
+                            )
+                            .classList
+                            .add("hidden");
+
+                    }
+
+                }
+
+            }
+        );
+
     </script>
+
 </body>
+
 </html>

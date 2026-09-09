@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Cuenta - WIBSIPROJECT</title>
-    <link rel="icon" type="image/png" href="../assets/img/cuenta.png">
+    <link rel="icon" href="../assets/img/cuenta.png" type="image/png">
     <!-- SDK de Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <!-- SDK de Google reCAPTCHA -->
@@ -579,7 +579,7 @@
                         <button type="submit" class="auth-btn">Iniciar Sesión ✦</button>
                     </form>
 
-                     <div style="text-align: center;">
+                    <div style="text-align: center;">
                         <a href="../index.html" class="back-home-link">← Volver al inicio</a>
                     </div>
                 </div>
@@ -667,16 +667,16 @@
                 </div>
             </div>
 
-           <button class="auth-btn" style="background: linear-gradient(135deg, #00b09b, #00897b); box-shadow: 0 4px 15px rgba(0,176,155,0.4);" onclick="window.location.href='Wchat.html'">
-    💬 Ir a Wchat
-</button>
+            <button class="auth-btn" style="background: linear-gradient(135deg, #00b09b, #00897b); box-shadow: 0 4px 15px rgba(0,176,155,0.4);" onclick="window.location.href='Wchat.html'">
+                💬 Ir a Wchat
+            </button>
 
             <button class="auth-btn" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); margin-top: 10px;" onclick="cerrarSesion()">
                 Cerrar Sesión ✕
             </button>
 
             <div style="text-align: center;">
-                <a href="../index.html" class="back-home-link">← Volver al inicio de WIBSIPROJECT</a>
+                <a href="index.html" class="back-home-link">← Volver al inicio de WIBSIPROJECT</a>
             </div>
         </div>
 
@@ -715,34 +715,16 @@
         </div>
     </div>
 
-    <!-- ============ FIREBASE: Auth + Firestore (directorio de usuarios compartido) ============ -->
+    <!-- ============ FIREBASE (solo para recuperar contraseña) ============ -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
         import {
             getAuth,
-            setPersistence,
-            browserSessionPersistence,
-            signInWithEmailAndPassword,
-            createUserWithEmailAndPassword,
-            signInWithCredential,
-            GoogleAuthProvider,
             sendPasswordResetEmail,
-            signOut
+            createUserWithEmailAndPassword,
+            fetchSignInMethodsForEmail
         } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
-        import {
-            getFirestore,
-            doc,
-            setDoc,
-            updateDoc,
-            collection,
-            query,
-            where,
-            limit,
-            getDocs,
-            serverTimestamp
-        } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
-        // ============ CONFIGURACIÓN DE FIREBASE (proyecto AnthonyPG) ============
         const firebaseConfig = {
             apiKey: "AIzaSyAg8n3AcKE-0QDQYcswUBYZwI702TzPZIU",
             authDomain: "anthonypg.firebaseapp.com",
@@ -755,9 +737,85 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
 
-        // Credenciales del administrador (no usa Firebase Auth, se valida aparte)
+        // Crea (si no existe ya) una cuenta "espejo" en Firebase Auth para que
+        // el correo de recuperación de contraseña tenga a quién mandarle el link.
+        // Esto NO cambia el login/registro visible de WIBSIPROJECT: solo permite
+        // que "¿Olvidaste tu contraseña?" funcione de verdad.
+        window.fbEspejoRegistro = async function (email, password) {
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+            } catch (err) {
+                // Si el correo ya tiene una cuenta espejo, lo ignoramos en silencio.
+                if (err.code !== 'auth/email-already-in-use') {
+                    console.warn('No se pudo crear la cuenta espejo de recuperación:', err.code);
+                }
+            }
+        };
+
+        window.fbEnviarRecuperacion = function (email) {
+            return sendPasswordResetEmail(auth, email);
+        };
+
+        // ============ UI DEL MODAL DE RECUPERAR CONTRASEÑA ============
+        window.abrirModalRecuperacion = function (event) {
+            if (event) event.preventDefault();
+            document.getElementById('recuperarFormWrap').style.display = 'block';
+            document.getElementById('recuperarExitoBox').style.display = 'none';
+            document.getElementById('recuperarErrorMsg').style.display = 'none';
+            const input = document.getElementById('recuperarEmailInput');
+            input.value = document.getElementById('loginEmail').value || '';
+            document.getElementById('modalRecuperar').classList.add('show');
+            setTimeout(() => input.focus(), 100);
+        };
+
+        window.cerrarModalRecuperacion = function () {
+            document.getElementById('modalRecuperar').classList.remove('show');
+        };
+
+        window.enviarRecuperacionPassword = function () {
+            const input = document.getElementById('recuperarEmailInput');
+            const email = input.value.trim();
+            const btn = document.getElementById('btnEnviarRecuperacion');
+            const errorBox = document.getElementById('recuperarErrorMsg');
+            const errorTexto = document.getElementById('recuperarErrorTexto');
+
+            errorBox.style.display = 'none';
+
+            if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+                errorTexto.textContent = 'Ingresa un correo electrónico válido.';
+                errorBox.style.display = 'flex';
+                input.focus();
+                return;
+            }
+
+            btn.disabled = true;
+            const textoOriginal = btn.textContent;
+            btn.textContent = 'Enviando...';
+
+            window.fbEnviarRecuperacion(email)
+                .then(() => {
+                    document.getElementById('recuperarEmailMostrado').textContent = email;
+                    document.getElementById('recuperarFormWrap').style.display = 'none';
+                    document.getElementById('recuperarExitoBox').style.display = 'flex';
+                })
+                .catch((error) => {
+                    let msg = 'No se pudo enviar el correo. Inténtalo de nuevo.';
+                    if (error.code === 'auth/invalid-email') msg = 'Ese correo no tiene un formato válido.';
+                    else if (error.code === 'auth/user-not-found') msg = 'No existe ninguna cuenta con ese correo. Regístrate primero.';
+                    else if (error.code === 'auth/too-many-requests') msg = 'Demasiados intentos. Espera unos minutos.';
+                    errorTexto.textContent = msg;
+                    errorBox.style.display = 'flex';
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.textContent = textoOriginal;
+                });
+        };
+    </script>
+
+    <script>
+        // Credenciales actualizadas del administrador
         const CORREO_ADMIN = "admin_administrador@gmail.com";
         const PASSWORD_ADMIN = "admin2436";
         const SESSION_KEY = 'wibsitihub_sesion_activa';
@@ -765,12 +823,12 @@
         let inactivityTimeout = null;
 
         /* ==========================================================================
-           Manejo de la sesión activa (LOCAL a este dispositivo/pestaña):
-           - Usuarios normales: se guardan en sessionStorage, exclusivo de cada pestaña.
-           - Administrador: se guarda en localStorage, igual que antes.
-           Esto solo controla "quién ve la sesión iniciada en ESTE navegador".
-           Los datos reales de la cuenta (para que otros te encuentren por tu ID)
-           ahora viven en Firestore, así que funcionan entre cualquier dispositivo.
+           Manejo de la sesión activa:
+           - Usuarios normales: se guardan en sessionStorage, que es exclusivo de
+             cada pestaña. Así, si abres dos pestañas con dos cuentas distintas (o
+             recargas una), cada una conserva SU propia sesión sin mezclarse.
+           - Administrador: se mantiene igual que antes, en localStorage, para no
+             tocar el comportamiento del panel de administrador.
         ========================================================================== */
         function guardarSesionActiva(usuario) {
             if (usuario && usuario.isAdmin) {
@@ -783,10 +841,12 @@
         }
 
         function obtenerSesionActiva() {
+            // Prioridad 1: sesión de esta pestaña (usuario normal, aislada por pestaña)
             const sesionPestana = sessionStorage.getItem(SESSION_KEY);
             if (sesionPestana) {
                 try { return JSON.parse(sesionPestana); } catch (e) { /* ignorar */ }
             }
+            // Prioridad 2: sesión de administrador (comportamiento sin cambios)
             const sesionAdmin = localStorage.getItem(SESSION_KEY);
             if (sesionAdmin) {
                 try {
@@ -804,43 +864,14 @@
             localStorage.removeItem(SESSION_KEY);
         }
 
-        function generarIdUnico() {
-            return 'WIB-' + Math.random().toString(36).substring(2, 8).toUpperCase() + '-' + Date.now().toString().slice(-4);
-        }
-
-        // ============ FIRESTORE: directorio de usuarios (compartido entre dispositivos) ============
-        async function buscarUsuarioPorEmail(emailLower) {
-            const q = query(collection(db, 'usuarios'), where('emailLower', '==', emailLower), limit(1));
-            const snap = await getDocs(q);
-            if (snap.empty) return null;
-            return snap.docs[0].data();
-        }
-
-        async function guardarYRegistrarUsuario(usuario) {
-            guardarSesionActiva(usuario);
-            try {
-                await setDoc(doc(db, 'usuarios', usuario.id), {
-                    id: usuario.id,
-                    name: usuario.name,
-                    email: usuario.email,
-                    emailLower: usuario.email.toLowerCase(),
-                    isAdmin: !!usuario.isAdmin,
-                    avatar: usuario.avatar || null,
-                    totalActiveSeconds: usuario.totalActiveSeconds || 0,
-                    actualizado: serverTimestamp()
-                }, { merge: true });
-            } catch (e) {
-                console.warn('No se pudo sincronizar el perfil con la nube:', e);
-            }
-        }
-
         document.addEventListener("DOMContentLoaded", function() {
             document.getElementById('loginEmail').value = '';
             document.getElementById('loginPassword').value = '';
-
+            
             document.getElementById('loginEmail').addEventListener('input', function(e) {
                 const emailIngresado = e.target.value.trim().toLowerCase();
                 const recaptchaDiv = document.getElementById('recaptchaContainer');
+                
                 if (emailIngresado === CORREO_ADMIN.toLowerCase()) {
                     recaptchaDiv.classList.remove('hidden');
                 } else {
@@ -852,209 +883,206 @@
             configurarEventosInactividad();
         });
 
-        window.pasarPagina = function(destino) {
+        function pasarPagina(destino) {
             const wrapper = document.getElementById('pagesWrapper');
-            wrapper.style.transform = destino === 'register' ? 'translateX(-50%)' : 'translateX(0)';
-        };
-
-        // ============ GOOGLE SIGN-IN (también autenticado contra Firebase) ============
-        window.handleGoogleSignIn = async function(response) {
-            try {
-                await setPersistence(auth, browserSessionPersistence);
-                const credential = GoogleAuthProvider.credential(response.credential);
-                const result = await signInWithCredential(auth, credential);
-                const fbUser = result.user;
-                const emailUser = (fbUser.email || '').toLowerCase();
-                const esAdmin = emailUser === CORREO_ADMIN.toLowerCase();
-
-                const perfil = await buscarUsuarioPorEmail(emailUser);
-                const usuarioGoogle = {
-                    id: perfil ? perfil.id : generarIdUnico(),
-                    name: fbUser.displayName || (perfil ? perfil.name : 'Usuario'),
-                    email: fbUser.email,
-                    isAdmin: esAdmin,
-                    avatar: (perfil && perfil.avatar) || fbUser.photoURL || null,
-                    loginTime: Date.now(),
-                    totalActiveSeconds: perfil ? (perfil.totalActiveSeconds || 0) : 0
-                };
-
-                await guardarYRegistrarUsuario(usuarioGoogle);
-                mostrarToast(`¡Bienvenido, ${usuarioGoogle.name}! Sesión iniciada correctamente.`);
-
-                setTimeout(() => {
-                    if (esAdmin) window.location.href = 'panel_administrador.html';
-                    else verificarEstadoSesion();
-                }, 800);
-            } catch (err) {
-                console.error(err);
-                mostrarAdvertenciaSesion('No se pudo iniciar sesión con Google. Intenta de nuevo.');
+            if (destino === 'register') {
+                wrapper.style.transform = 'translateX(-50%)';
+            } else {
+                wrapper.style.transform = 'translateX(0)';
             }
-        };
+        }
 
-        // ============ LOGIN ============
-        window.ejecutarLogin = async function(event) {
+        function generarIdUnico() {
+            return 'WIB-' + Math.random().toString(36).substring(2, 8).toUpperCase() + '-' + Date.now().toString().slice(-4);
+        }
+
+        function handleGoogleSignIn(response) {
+            const responsePayload = parseJwt(response.credential);
+            const emailUser = responsePayload.email.toLowerCase();
+            const esAdmin = emailUser === CORREO_ADMIN.toLowerCase();
+            
+            let listaUsuarios = JSON.parse(localStorage.getItem('wibsitihub_usuarios_registrados')) || [];
+            let usuarioExistente = listaUsuarios.find(u => u.email.toLowerCase() === emailUser);
+
+            const usuarioGoogle = {
+                id: usuarioExistente ? usuarioExistente.id : generarIdUnico(),
+                name: responsePayload.name,
+                email: responsePayload.email,
+                isAdmin: esAdmin,
+                avatar: usuarioExistente?.avatar || responsePayload.picture || null,
+                loginTime: Date.now(),
+                totalActiveSeconds: usuarioExistente ? (usuarioExistente.totalActiveSeconds || 0) : 0
+            };
+
+            guardarYRegistrarUsuario(usuarioGoogle);
+            mostrarToast(`¡Bienvenido, ${responsePayload.name}! Sesión iniciada correctamente.`);
+
+            setTimeout(() => {
+                if (esAdmin) {
+                    window.location.href = 'panel_administrador.html';
+                } else {
+                    verificarEstadoSesion();
+                }
+            }, 800);
+        }
+
+        function parseJwt(token) {
+            var base64Url = token.split('.')[1];
+            var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(jsonPayload);
+        }
+
+        function ejecutarLogin(event) {
             event.preventDefault();
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
             const emailLower = email.toLowerCase();
             const esAdmin = emailLower === CORREO_ADMIN.toLowerCase();
-            const btn = event.target.querySelector('button[type="submit"]');
 
             if (esAdmin) {
                 if (password !== PASSWORD_ADMIN) {
                     mostrarAdvertenciaSesion("¡Contraseña de administrador incorrecta!");
                     return;
                 }
-                const recaptchaResponse = window.grecaptcha ? grecaptcha.getResponse() : '';
+
+                const recaptchaResponse = grecaptcha.getResponse();
                 if (!recaptchaResponse || recaptchaResponse.length === 0) {
                     mostrarAdvertenciaSesion("¡Por favor completa el reCAPTCHA (semáforos/pasos de peatones)!");
                     return;
                 }
-                const usuarioSesion = {
-                    id: 'WIB-ADMIN', name: "Administrador", email, isAdmin: true,
-                    avatar: null, loginTime: Date.now(), totalActiveSeconds: 0
-                };
-                await guardarYRegistrarUsuario(usuarioSesion);
-                mostrarToast("¡Inicio de sesión exitoso!");
-                setTimeout(() => window.location.href = 'panel_administrador.html', 800);
+            }
+            
+            let listaUsuarios = JSON.parse(localStorage.getItem('wibsitihub_usuarios_registrados')) || [];
+            let usuarioExistente = listaUsuarios.find(u => u.email.toLowerCase() === emailLower);
+
+            if (!usuarioExistente && !esAdmin) {
+                mostrarAdvertenciaSesion("No existe una cuenta con este correo. Regístrate en la siguiente pestaña.");
+                pasarPagina('register');
+                document.getElementById('regEmail').value = email;
                 return;
             }
 
-            if (btn) { btn.disabled = true; btn.dataset.original = btn.textContent; btn.textContent = 'Verificando...'; }
-            try {
-                await setPersistence(auth, browserSessionPersistence);
-                await signInWithEmailAndPassword(auth, email, password);
-                const perfil = await buscarUsuarioPorEmail(emailLower);
-
-                const usuarioSesion = {
-                    id: perfil ? perfil.id : generarIdUnico(),
-                    name: perfil ? perfil.name : email.split('@')[0].toUpperCase(),
-                    email: email,
-                    isAdmin: false,
-                    avatar: perfil ? perfil.avatar : null,
-                    loginTime: Date.now(),
-                    totalActiveSeconds: perfil ? (perfil.totalActiveSeconds || 0) : 0
-                };
-
-                await guardarYRegistrarUsuario(usuarioSesion);
-                mostrarToast("¡Inicio de sesión exitoso!");
-                setTimeout(() => verificarEstadoSesion(), 800);
-            } catch (err) {
-                let msg = 'No se pudo iniciar sesión. Intenta de nuevo.';
-                if (err.code === 'auth/user-not-found') {
-                    msg = 'No existe una cuenta con este correo. Regístrate en la siguiente pestaña.';
-                    window.pasarPagina('register');
-                    document.getElementById('regEmail').value = email;
-                } else if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
-                    msg = 'Contraseña incorrecta.';
-                } else if (err.code === 'auth/invalid-email') {
-                    msg = 'Ese correo no tiene un formato válido.';
-                } else if (err.code === 'auth/too-many-requests') {
-                    msg = 'Demasiados intentos. Espera unos minutos e intenta de nuevo.';
+            const usuarioSesion = {
+                id: usuarioExistente ? usuarioExistente.id : generarIdUnico(),
+                name: usuarioExistente ? usuarioExistente.name : (esAdmin ? "Administrador" : email.split('@')[0].toUpperCase()),
+                email: email,
+                isAdmin: esAdmin,
+                avatar: usuarioExistente ? usuarioExistente.avatar : null,
+                loginTime: Date.now(),
+                totalActiveSeconds: usuarioExistente ? (usuarioExistente.totalActiveSeconds || 0) : 0
+            };
+            
+            guardarYRegistrarUsuario(usuarioSesion);
+            mostrarToast("¡Inicio de sesión exitoso!");
+            
+            setTimeout(() => { 
+                if (esAdmin) {
+                    window.location.href = 'panel_administrador.html';
+                } else {
+                    verificarEstadoSesion(); 
                 }
-                mostrarAdvertenciaSesion(msg);
-            } finally {
-                if (btn) { btn.disabled = false; btn.textContent = btn.dataset.original || 'Iniciar Sesión ✦'; }
-            }
-        };
+            }, 800);
+        }
 
-        // ============ REGISTRO ============
-        window.ejecutarRegistro = async function(event) {
+        function ejecutarRegistro(event) {
             event.preventDefault();
             const nombre = document.getElementById('regName').value.trim();
             const email = document.getElementById('regEmail').value.trim();
             const password = document.getElementById('regPassword').value;
             const emailLower = email.toLowerCase();
             const esAdmin = emailLower === CORREO_ADMIN.toLowerCase();
-            const btn = event.target.querySelector('button[type="submit"]');
 
-            if (btn) { btn.disabled = true; btn.dataset.original = btn.textContent; btn.textContent = 'Creando cuenta...'; }
-            try {
-                await setPersistence(auth, browserSessionPersistence);
-                await createUserWithEmailAndPassword(auth, email, password);
+            let listaUsuarios = JSON.parse(localStorage.getItem('wibsitihub_usuarios_registrados')) || [];
+            let correoDuplicado = listaUsuarios.some(u => u.email.toLowerCase() === emailLower);
 
-                const nuevoUsuario = {
-                    id: generarIdUnico(), name: nombre, email, isAdmin: esAdmin,
-                    avatar: null, loginTime: Date.now(), totalActiveSeconds: 0
-                };
-
-                await guardarYRegistrarUsuario(nuevoUsuario);
-                mostrarToast("¡Cuenta creada y sesión iniciada con éxito!");
-                document.getElementById('registerForm').reset();
-
-                setTimeout(() => {
-                    if (esAdmin) window.location.href = 'panel_administrador.html';
-                    else verificarEstadoSesion();
-                }, 800);
-            } catch (err) {
-                let msg = 'No se pudo crear la cuenta. Intenta de nuevo.';
-                if (err.code === 'auth/email-already-in-use') {
-                    msg = 'Este correo ya está registrado. Inicia sesión en su lugar.';
-                    window.pasarPagina('login');
-                    document.getElementById('loginEmail').value = email;
-                } else if (err.code === 'auth/weak-password') {
-                    msg = 'La contraseña debe tener al menos 6 caracteres.';
-                } else if (err.code === 'auth/invalid-email') {
-                    msg = 'Ese correo no tiene un formato válido.';
-                }
-                mostrarAdvertenciaSesion(msg);
-            } finally {
-                if (btn) { btn.disabled = false; btn.textContent = btn.dataset.original || 'Crear Cuenta ✦'; }
+            if (correoDuplicado) {
+                mostrarAdvertenciaSesion("Este correo ya está registrado. Inicia sesión en su lugar.");
+                pasarPagina('login');
+                document.getElementById('loginEmail').value = email;
+                return;
             }
-        };
 
-        // ============ FOTO DE PERFIL ============
-        function comprimirAvatar(dataUrl, callback) {
-            const img = new Image();
-            img.onload = function() {
-                const MAX_LADO = 300;
-                let w = img.width, h = img.height;
-                if (w > MAX_LADO || h > MAX_LADO) {
-                    if (w > h) { h = Math.round(h * (MAX_LADO / w)); w = MAX_LADO; }
-                    else { w = Math.round(w * (MAX_LADO / h)); h = MAX_LADO; }
-                }
-                const canvas = document.createElement('canvas');
-                canvas.width = w; canvas.height = h;
-                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                callback(canvas.toDataURL('image/jpeg', 0.75));
+            const nuevoUsuario = {
+                id: generarIdUnico(),
+                name: nombre,
+                email: email,
+                isAdmin: esAdmin,
+                avatar: null,
+                loginTime: Date.now(),
+                totalActiveSeconds: 0
             };
-            img.src = dataUrl;
+
+            guardarYRegistrarUsuario(nuevoUsuario);
+            mostrarToast("¡Cuenta creada y sesión iniciada con éxito!");
+
+            // Crea en segundo plano una cuenta "espejo" en Firebase Auth con este
+            // mismo correo y contraseña, únicamente para que "¿Olvidaste tu
+            // contraseña?" pueda enviar el correo de recuperación real.
+            if (password && window.fbEspejoRegistro) {
+                window.fbEspejoRegistro(email, password);
+            }
+            
+            document.getElementById('registerForm').reset();
+            
+            setTimeout(() => {
+                if (esAdmin) {
+                    window.location.href = 'panel_administrador.html';
+                } else {
+                    verificarEstadoSesion();
+                }
+            }, 800);
         }
 
-        window.cambiarFotoPerfil = function(event) {
+        function guardarYRegistrarUsuario(usuario) {
+            guardarSesionActiva(usuario);
+
+            let listaUsuarios = JSON.parse(localStorage.getItem('wibsitihub_usuarios_registrados')) || [];
+            const existeIndex = listaUsuarios.findIndex(u => u.email.toLowerCase() === usuario.email.toLowerCase() || u.id === usuario.id);
+            
+            if (existeIndex !== -1) {
+                if(!usuario.avatar && listaUsuarios[existeIndex].avatar) {
+                    usuario.avatar = listaUsuarios[existeIndex].avatar;
+                }
+                usuario.totalActiveSeconds = listaUsuarios[existeIndex].totalActiveSeconds || usuario.totalActiveSeconds || 0;
+                listaUsuarios[existeIndex] = usuario;
+            } else {
+                listaUsuarios.push(usuario);
+            }
+            localStorage.setItem('wibsitihub_usuarios_registrados', JSON.stringify(listaUsuarios));
+        }
+
+        function cambiarFotoPerfil(event) {
             const archivo = event.target.files[0];
             if (!archivo) return;
 
             const lector = new FileReader();
             lector.onload = function(e) {
-                comprimirAvatar(e.target.result, async function(dataUrlComprimido) {
-                    const avatarDiv = document.getElementById('profileInitials');
-                    if (avatarDiv) {
-                        avatarDiv.style.backgroundImage = `url(${dataUrlComprimido})`;
-                        avatarDiv.textContent = '';
-                    }
+                const base64Image = e.target.result;
 
-                    let sesion = obtenerSesionActiva();
-                    if (sesion) {
-                        sesion.avatar = dataUrlComprimido;
-                        guardarSesionActiva(sesion);
-                        try {
-                            await updateDoc(doc(db, 'usuarios', sesion.id), { avatar: dataUrlComprimido });
-                        } catch (e) {
-                            console.warn('No se pudo guardar el avatar en la nube:', e);
-                        }
-                    }
+                const avatarDiv = document.getElementById('profileInitials');
+                if(avatarDiv) {
+                    avatarDiv.style.backgroundImage = `url(${base64Image})`;
+                    avatarDiv.textContent = '';
+                }
 
-                    mostrarToast("¡Foto de perfil actualizada con éxito!");
-                });
+                let sesion = obtenerSesionActiva();
+                if (sesion) {
+                    sesion.avatar = base64Image;
+                    guardarYRegistrarUsuario(sesion);
+                }
+
+                mostrarToast("¡Foto de perfil actualizada con éxito!");
             };
             lector.readAsDataURL(archivo);
-        };
+        }
 
-        // ============ ESTADO DE SESIÓN / PERFIL ============
         function verificarEstadoSesion() {
             const usuario = obtenerSesionActiva();
             if (usuario) {
+                
                 if (!usuario.id) {
                     usuario.id = generarIdUnico();
                     guardarYRegistrarUsuario(usuario);
@@ -1062,6 +1090,7 @@
 
                 const esAdminReal = usuario.email.toLowerCase() === CORREO_ADMIN.toLowerCase() || usuario.isAdmin;
 
+                // Redirigir al panel de administrador si se encuentra sesión activa y es admin
                 if (esAdminReal && window.location.pathname.includes('cuenta')) {
                     window.location.href = 'panel_administrador.html';
                     return;
@@ -1083,7 +1112,7 @@
                     const initials = usuario.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
                     avatarDiv.textContent = initials || 'W';
                 }
-
+                
                 if (esAdminReal) {
                     document.getElementById('adminBadgeContainer').classList.remove('hidden');
                     document.getElementById('statRango').textContent = 'VIP';
@@ -1101,48 +1130,44 @@
 
         function iniciarContadorActivo(usuario) {
             if (timerActivoInterval) clearInterval(timerActivoInterval);
+
             if (!usuario.totalActiveSeconds) usuario.totalActiveSeconds = 0;
 
-            let segundosSinGuardarEnNube = 0;
             timerActivoInterval = setInterval(() => {
                 usuario.totalActiveSeconds++;
-                segundosSinGuardarEnNube++;
-
                 const lblTiempo = document.getElementById('statTiempoActivo');
                 if (lblTiempo) lblTiempo.textContent = formatearTiempo(usuario.totalActiveSeconds);
-
-                guardarSesionActiva(usuario);
-
-                // Para no gastar cuota de Firestore, solo se sincroniza cada 10s
-                if (segundosSinGuardarEnNube >= 10) {
-                    segundosSinGuardarEnNube = 0;
-                    updateDoc(doc(db, 'usuarios', usuario.id), { totalActiveSeconds: usuario.totalActiveSeconds }).catch(() => {});
-                }
+                guardarYRegistrarUsuario(usuario);
             }, 1000);
         }
 
         function formatearTiempo(segundos) {
-            if (segundos < 60) return segundos + "s";
-            if (segundos < 3600) {
+            if (segundos < 60) {
+                return segundos + "s";
+            } else if (segundos < 3600) {
                 const mins = Math.floor(segundos / 60);
                 const secs = segundos % 60;
                 return mins + "m " + secs + "s";
+            } else {
+                const horas = Math.floor(segundos / 3600);
+                const mins = Math.floor((segundos % 3600) / 60);
+                return horas + "h " + mins + "m";
             }
-            const horas = Math.floor(segundos / 3600);
-            const mins = Math.floor((segundos % 3600) / 60);
-            return horas + "h " + mins + "m";
         }
 
         function configurarEventosInactividad() {
             const marcarActivo = () => {
                 const lblEstado = document.getElementById('statEstado');
                 if (lblEstado) lblEstado.textContent = 'Activo';
+                
                 if (inactivityTimeout) clearTimeout(inactivityTimeout);
+                
                 inactivityTimeout = setTimeout(() => {
                     const lblEstadoInactivo = document.getElementById('statEstado');
                     if (lblEstadoInactivo) lblEstadoInactivo.textContent = 'Inactivo';
                 }, 30000);
             };
+
             window.addEventListener('mousemove', marcarActivo);
             window.addEventListener('keypress', marcarActivo);
             window.addEventListener('click', marcarActivo);
@@ -1153,10 +1178,12 @@
         function mostrarAdvertenciaSesion(mensaje) {
             const alertaExistente = document.querySelector('.auth-warning-banner');
             if (alertaExistente) alertaExistente.remove();
+
             const banner = document.createElement('div');
             banner.className = 'auth-warning-banner';
             banner.innerHTML = `<span style="font-size: 16px;">⚠️</span><span>${mensaje}</span>`;
             document.body.appendChild(banner);
+
             setTimeout(() => {
                 banner.style.transition = 'opacity 0.4s ease';
                 banner.style.opacity = '0';
@@ -1164,96 +1191,41 @@
             }, 4000);
         }
 
-        window.cerrarSesion = function() {
+        function cerrarSesion() {
             if (timerActivoInterval) clearInterval(timerActivoInterval);
             if (inactivityTimeout) clearTimeout(inactivityTimeout);
-
-            signOut(auth).catch(() => {});
+            
             eliminarSesionActiva();
-
+            
             document.getElementById('loginEmail').value = '';
             document.getElementById('loginPassword').value = '';
             document.getElementById('recaptchaContainer').classList.add('hidden');
-            if (window.grecaptcha) grecaptcha.reset();
+            if(window.grecaptcha) grecaptcha.reset();
 
             document.getElementById('authSection').classList.remove('hidden');
             document.getElementById('profileSection').classList.add('hidden');
-
+            
             document.getElementById('loginForm').reset();
             document.getElementById('registerForm').reset();
-            window.pasarPagina('login');
-
+            pasarPagina('login');
+            
             mostrarAdvertenciaSesion("¡Sesión cerrada correctamente!");
-        };
+        }
 
         function mostrarToast(mensaje) {
             const existingToast = document.querySelector('.account-toast');
             if (existingToast) existingToast.remove();
+
             const toast = document.createElement('div');
             toast.className = 'account-toast';
             toast.innerHTML = `<span>✓</span><p style="margin:0;">${mensaje}</p>`;
             document.body.appendChild(toast);
+
             setTimeout(() => {
                 toast.style.opacity = '0';
                 setTimeout(() => toast.remove(), 300);
             }, 2000);
         }
-
-        // ============ RECUPERAR CONTRASEÑA (ahora sobre cuentas reales de Firebase) ============
-        window.abrirModalRecuperacion = function(event) {
-            if (event) event.preventDefault();
-            document.getElementById('recuperarFormWrap').style.display = 'block';
-            document.getElementById('recuperarExitoBox').style.display = 'none';
-            document.getElementById('recuperarErrorMsg').style.display = 'none';
-            const input = document.getElementById('recuperarEmailInput');
-            input.value = document.getElementById('loginEmail').value || '';
-            document.getElementById('modalRecuperar').classList.add('show');
-            setTimeout(() => input.focus(), 100);
-        };
-
-        window.cerrarModalRecuperacion = function() {
-            document.getElementById('modalRecuperar').classList.remove('show');
-        };
-
-        window.enviarRecuperacionPassword = function() {
-            const input = document.getElementById('recuperarEmailInput');
-            const email = input.value.trim();
-            const btn = document.getElementById('btnEnviarRecuperacion');
-            const errorBox = document.getElementById('recuperarErrorMsg');
-            const errorTexto = document.getElementById('recuperarErrorTexto');
-
-            errorBox.style.display = 'none';
-
-            if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
-                errorTexto.textContent = 'Ingresa un correo electrónico válido.';
-                errorBox.style.display = 'flex';
-                input.focus();
-                return;
-            }
-
-            btn.disabled = true;
-            const textoOriginal = btn.textContent;
-            btn.textContent = 'Enviando...';
-
-            sendPasswordResetEmail(auth, email)
-                .then(() => {
-                    document.getElementById('recuperarEmailMostrado').textContent = email;
-                    document.getElementById('recuperarFormWrap').style.display = 'none';
-                    document.getElementById('recuperarExitoBox').style.display = 'flex';
-                })
-                .catch((error) => {
-                    let msg = 'No se pudo enviar el correo. Inténtalo de nuevo.';
-                    if (error.code === 'auth/invalid-email') msg = 'Ese correo no tiene un formato válido.';
-                    else if (error.code === 'auth/user-not-found') msg = 'No existe ninguna cuenta con ese correo. Regístrate primero.';
-                    else if (error.code === 'auth/too-many-requests') msg = 'Demasiados intentos. Espera unos minutos.';
-                    errorTexto.textContent = msg;
-                    errorBox.style.display = 'flex';
-                })
-                .finally(() => {
-                    btn.disabled = false;
-                    btn.textContent = textoOriginal;
-                });
-        };
     </script>
 </body>
 

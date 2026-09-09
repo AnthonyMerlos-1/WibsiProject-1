@@ -2270,24 +2270,34 @@ const stickers = [
     "✅","❌","⚡","💀","👀","🚀"
 ];
 
-
 function poblarStickers() {
     const panel = document.getElementById("stickerPanel");
-    panel.innerHTML = stickers.map(emoji => {
+    if (!panel) return;
+    panel.innerHTML = "";
+    
+    stickers.forEach(emoji => {
         const div = document.createElement("div");
         div.className = "sticker-option";
         div.textContent = emoji;
-        div.onclick = () => enviarStickerDirecto(emoji);
-        return div;
-    }).join("");
+        div.onclick = (e) => {
+            e.stopPropagation();
+            enviarStickerDirecto(emoji);
+        };
+        panel.appendChild(div);
+    });
 }
 
 window.alternarPanelStickers = function() {
-    document.getElementById("stickerPanel").classList.toggle("active");
+    const panel = document.getElementById("stickerPanel");
+    if (panel) {
+        panel.classList.toggle("active");
+    }
 };
 
 async function enviarStickerDirecto(emoji) {
-    document.getElementById("stickerPanel").classList.remove("active");
+    const panel = document.getElementById("stickerPanel");
+    if (panel) panel.classList.remove("active");
+    
     if (!chatActivoUid) {
         mostrarToast("Selecciona un amigo primero.");
         return;

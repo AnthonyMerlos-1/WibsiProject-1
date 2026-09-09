@@ -8,7 +8,6 @@
     <link rel="icon" href="../assets/img/cuenta.png" type="image/png">
 
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
     <style>
         body {
@@ -295,14 +294,6 @@
             outline: none;
             border-color: #6366f1;
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
-        }
-
-        .recaptcha-wrapper {
-            display: flex;
-            justify-content: center;
-            margin: 12px 0;
-            transform: scale(0.9);
-            transform-origin: 0 0;
         }
 
         .auth-btn {
@@ -695,7 +686,8 @@
                         <div id="g_id_onload"
                             data-client_id="913264385243-5niaqo5la6q46o1t65qs7jaufr753euh.apps.googleusercontent.com"
                             data-callback="handleGoogleSignIn"
-                            data-auto_prompt="false">
+                            data-auto_prompt="false"
+                            data-use_fedcm_for_prompt="true">
                         </div>
 
                         <div class="g_id_signin"
@@ -749,23 +741,6 @@
                             onclick="abrirModalRecuperacion(event)">
                             ¿Olvidaste tu contraseña?
                         </a>
-
-                        <div id="recaptchaContainer"
-                            class="form-group hidden">
-
-                            <label style="margin-bottom: 6px; color: #818cf8; font-weight: 600;">
-                                Verificación de seguridad (Semáforos / Pasos)
-                            </label>
-
-                            <div class="recaptcha-wrapper">
-
-                                <div class="g-recaptcha"
-                                    data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71IEGNQ_MXjiZKhI">
-                                </div>
-
-                            </div>
-
-                        </div>
 
                         <button type="submit"
                             class="auth-btn"
@@ -1228,11 +1203,6 @@
            PERSISTENCIA REAL DE FIREBASE
         ========================================================= */
 
-        /*
-         * Esto hace que Firebase recuerde la sesión
-         * aunque cierres y vuelvas a abrir la página.
-         */
-
         setPersistence(
             auth,
             browserLocalPersistence
@@ -1286,30 +1256,6 @@
             return user.email
                 .toLowerCase()
                 === CORREO_ADMIN.toLowerCase();
-
-        }
-
-
-        /* =========================================================
-           REDIRECCIÓN ADMIN
-        ========================================================= */
-
-        function redirigirSiEsAdmin(user) {
-
-            if (!user) {
-                return false;
-            }
-
-            if (esAdministrador(user)) {
-
-                window.location.href =
-                    "panel_administrador.html";
-
-                return true;
-
-            }
-
-            return false;
 
         }
 
@@ -1654,11 +1600,6 @@
 
             try {
 
-                /*
-                 * IMPORTANTE:
-                 * Firebase conservará la sesión.
-                 */
-
                 await setPersistence(
                     auth,
                     browserLocalPersistence
@@ -1716,12 +1657,6 @@
                     usuarioSesion
                 );
 
-
-                /*
-                 * ADMINISTRADOR
-                 *
-                 * Va directamente al panel.
-                 */
 
                 if (esAdminActual) {
 
@@ -2008,11 +1943,6 @@
 
                 try {
 
-                    /*
-                     * PRIMER INTENTO:
-                     * entrar normalmente con Google.
-                     */
-
                     const resultado =
                         await signInWithCredential(
                             auth,
@@ -2036,12 +1966,6 @@
                         errorGoogle
                     );
 
-
-                    /*
-                     * Si el correo existe con
-                     * otro método de acceso,
-                     * NO creamos otra cuenta.
-                     */
 
                     if (
                         errorGoogle.code ===
@@ -2158,10 +2082,6 @@
             );
 
 
-            /*
-             * ADMINISTRADOR
-             */
-
             if (esAdminActual) {
 
                 mostrarToast(
@@ -2227,23 +2147,6 @@
             }
 
 
-            /*
-             * Si es administrador,
-             * mandarlo directamente al panel.
-             */
-
-            if (
-                esAdministrador(user)
-            ) {
-
-                window.location.href =
-                    "panel_administrador.html";
-
-                return;
-
-            }
-
-
             try {
 
                 const perfil =
@@ -2262,7 +2165,7 @@
 
                     email: user.email,
 
-                    isAdmin: false,
+                    isAdmin: esAdministrador(user),
 
                     avatar:
                         perfil.avatar || null,
@@ -2803,29 +2706,6 @@
                     "loginPassword"
                 )
                 .value = "";
-
-
-            document
-                .getElementById(
-                    "recaptchaContainer"
-                )
-                .classList
-                .add("hidden");
-
-
-            if (
-                window.grecaptcha &&
-                typeof grecaptcha.reset ===
-                "function"
-            ) {
-
-                try {
-
-                    grecaptcha.reset();
-
-                } catch (e) {}
-
-            }
 
 
             document
@@ -3468,62 +3348,13 @@
 
 
         /* =========================================================
-           MOSTRAR RECAPTCHA ADMIN
+           INICIALIZACIÓN
         ========================================================= */
 
         document.addEventListener(
             "DOMContentLoaded",
             function() {
-
-                const loginEmail =
-                    document.getElementById(
-                        "loginEmail"
-                    );
-
-
-                loginEmail.addEventListener(
-                    "input",
-                    function(e) {
-
-                        const emailIngresado =
-                            e.target.value
-                                .trim()
-                                .toLowerCase();
-
-
-                        const recaptchaDiv =
-                            document.getElementById(
-                                "recaptchaContainer"
-                            );
-
-
-                        if (
-                            emailIngresado ===
-                            CORREO_ADMIN.toLowerCase()
-                        ) {
-
-                            recaptchaDiv
-                                .classList
-                                .remove(
-                                    "hidden"
-                                );
-
-                        } else {
-
-                            recaptchaDiv
-                                .classList
-                                .add(
-                                    "hidden"
-                                );
-
-                        }
-
-                    }
-                );
-
-
                 configurarEventosInactividad();
-
             }
         );
 
@@ -3532,39 +3363,19 @@
            FIREBASE AUTH
         ========================================================= */
 
+        let authInitialized = false;
+
         onAuthStateChanged(
             auth,
             async (user) => {
 
                 if (user) {
-
-                    /*
-                     * Si ya está autenticado
-                     * y es administrador,
-                     * entra directo al panel.
-                     */
-
-                    if (
-                        esAdministrador(user)
-                    ) {
-
-                        window.location.href =
-                            "panel_administrador.html";
-
-                        return;
-
+                    if (!authInitialized) {
+                        authInitialized = true;
+                        await verificarEstadoSesion();
                     }
-
-
-                    await verificarEstadoSesion();
-
                 } else {
-
-                    /*
-                     * No mostrar una sesión falsa
-                     * usando solamente sessionStorage.
-                     */
-
+                    authInitialized = false;
                     document
                         .getElementById(
                             "authSection"

@@ -7,10 +7,7 @@
     <title>Mi Cuenta - WIBSIPROJECT</title>
     <link rel="icon" href="../assets/img/cuenta.png" type="image/png">
 
-    <!-- SDK de Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-
-    <!-- SDK de Google reCAPTCHA -->
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
     <style>
@@ -541,8 +538,6 @@
             }
         }
 
-        /* ============ MODAL RECUPERAR CONTRASEÑA ============ */
-
         .modal-overlay-recuperar {
             position: fixed;
             inset: 0;
@@ -650,15 +645,13 @@
         <div class="floating-blob blob-2"></div>
     </div>
 
-    <!-- Contenedor principal -->
     <div class="book-container bubble-effect" id="bookContainer">
 
-        <!-- PÁGINAS DE AUTENTICACIÓN -->
         <div id="authSection">
 
             <div class="book-pages-wrapper" id="pagesWrapper">
 
-                <!-- PÁGINA 1: INICIAR SESIÓN -->
+                <!-- LOGIN -->
                 <div class="book-page">
 
                     <div class="hub-logo-container"
@@ -668,7 +661,8 @@
 
                         <div class="hub-logo-ring">
                             <div class="hub-logo-graphic">
-                                <img src="../assets/img/logwiti.png" alt="Logo Wibsitihub">
+                                <img src="../assets/img/logwiti.png"
+                                    alt="Logo Wibsitihub">
                             </div>
                         </div>
 
@@ -682,7 +676,9 @@
                     </div>
 
                     <div class="page-navigation">
-                        <button class="page-nav-btn active" type="button">
+
+                        <button class="page-nav-btn active"
+                            type="button">
                             Iniciar Sesión
                         </button>
 
@@ -691,6 +687,7 @@
                             onclick="pasarPagina('register')">
                             Registrarse →
                         </button>
+
                     </div>
 
                     <div class="google-btn-wrapper">
@@ -716,26 +713,35 @@
                         o correo electrónico
                     </div>
 
-                    <form id="loginForm" onsubmit="ejecutarLogin(event)">
+                    <form id="loginForm"
+                        onsubmit="ejecutarLogin(event)">
 
                         <div class="form-group">
-                            <label>Correo electrónico</label>
+
+                            <label>
+                                Correo electrónico
+                            </label>
 
                             <input type="email"
                                 id="loginEmail"
                                 placeholder="tu@gmail.com"
                                 required
                                 autocomplete="email">
+
                         </div>
 
                         <div class="form-group">
-                            <label>Contraseña</label>
+
+                            <label>
+                                Contraseña
+                            </label>
 
                             <input type="password"
                                 id="loginPassword"
                                 placeholder="••••••••"
                                 required
                                 autocomplete="current-password">
+
                         </div>
 
                         <a href="#"
@@ -744,7 +750,6 @@
                             ¿Olvidaste tu contraseña?
                         </a>
 
-                        <!-- reCAPTCHA para administrador -->
                         <div id="recaptchaContainer"
                             class="form-group hidden">
 
@@ -753,9 +758,11 @@
                             </label>
 
                             <div class="recaptcha-wrapper">
+
                                 <div class="g-recaptcha"
-                                    data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI">
+                                    data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71IEGNQ_MXjiZKhI">
                                 </div>
+
                             </div>
 
                         </div>
@@ -769,15 +776,17 @@
                     </form>
 
                     <div style="text-align: center;">
+
                         <a href="../index.html"
                             class="back-home-link">
                             ← Volver al inicio
                         </a>
+
                     </div>
 
                 </div>
 
-                <!-- PÁGINA 2: REGISTRARSE -->
+                <!-- REGISTRO -->
                 <div class="book-page">
 
                     <div class="hub-logo-container"
@@ -786,10 +795,14 @@
                         title="Recargar página">
 
                         <div class="hub-logo-ring">
+
                             <div class="hub-logo-graphic">
+
                                 <img src="../assets/img/logwiti.png"
                                     alt="Logo WIBSIPROJECT">
+
                             </div>
+
                         </div>
 
                         <div class="hub-logo-title">
@@ -799,6 +812,7 @@
                         <div class="hub-logo-subtitle">
                             Registro de Nuevo Miembro
                         </div>
+
                     </div>
 
                     <div class="page-navigation">
@@ -821,27 +835,38 @@
                         style="margin-top: 15px;">
 
                         <div class="form-group">
-                            <label>Nombre de Usuario</label>
+
+                            <label>
+                                Nombre de Usuario
+                            </label>
 
                             <input type="text"
                                 id="regName"
                                 placeholder="Tu Nombre"
                                 required
                                 autocomplete="name">
+
                         </div>
 
                         <div class="form-group">
-                            <label>Correo electrónico</label>
+
+                            <label>
+                                Correo electrónico
+                            </label>
 
                             <input type="email"
                                 id="regEmail"
                                 placeholder="tu@gmail.com"
                                 required
                                 autocomplete="email">
+
                         </div>
 
                         <div class="form-group">
-                            <label>Contraseña</label>
+
+                            <label>
+                                Contraseña
+                            </label>
 
                             <input type="password"
                                 id="regPassword"
@@ -849,6 +874,7 @@
                                 required
                                 minlength="6"
                                 autocomplete="new-password">
+
                         </div>
 
                         <button type="submit"
@@ -860,18 +886,21 @@
                     </form>
 
                     <div style="text-align: center;">
+
                         <a href="../index.html"
                             class="back-home-link">
                             ← Volver al inicio
                         </a>
+
                     </div>
 
                 </div>
 
             </div>
+
         </div>
 
-        <!-- VISTA DE PERFIL -->
+        <!-- PERFIL -->
         <div id="profileSection"
             class="profile-view hidden"
             style="padding: 35px;">
@@ -883,11 +912,14 @@
                     style="width: 50px; height: 50px;">
 
                     <div class="hub-logo-graphic">
+
                         <img src="../assets/img/logwiti.png"
                             alt="Logo WIBSIPROJECT">
+
                     </div>
 
                 </div>
+
             </div>
 
             <input type="file"
@@ -918,10 +950,12 @@
             </div>
 
             <div>
+
                 <span class="profile-id-badge"
                     id="profileDisplayId">
                     ID: --
                 </span>
+
             </div>
 
             <div id="adminBadgeContainer"
@@ -935,8 +969,7 @@
 
             <div class="profile-stats">
 
-                <div class="stat-item"
-                    id="statRangoBox">
+                <div class="stat-item">
 
                     <span class="stat-value"
                         id="statRango">
@@ -994,17 +1027,19 @@
             </button>
 
             <div style="text-align: center;">
+
                 <a href="../index.html"
                     class="back-home-link">
                     ← Volver al inicio de WIBSIPROJECT
                 </a>
+
             </div>
 
         </div>
 
     </div>
 
-    <!-- MODAL RECUPERAR CONTRASEÑA -->
+    <!-- MODAL RECUPERAR -->
     <div class="modal-overlay-recuperar"
         id="modalRecuperar">
 
@@ -1078,11 +1113,15 @@
                 </h3>
 
                 <p class="sub">
+
                     Te enviamos un enlace a
+
                     <b id="recuperarEmailMostrado"
                         style="color:#fff;"></b>
+
                     para restablecer tu contraseña.
                     Revisa también la carpeta de spam.
+
                 </p>
 
                 <button type="button"
@@ -1097,6 +1136,7 @@
             </div>
 
         </div>
+
     </div>
 
 
@@ -1110,6 +1150,7 @@
             initializeApp
         } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
 
+
         import {
             getAuth,
             signInWithEmailAndPassword,
@@ -1119,8 +1160,13 @@
             signInWithCredential,
             signOut,
             onAuthStateChanged,
-            updateProfile
+            updateProfile,
+            setPersistence,
+            browserLocalPersistence,
+            fetchSignInMethodsForEmail,
+            linkWithCredential
         } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+
 
         import {
             getDatabase,
@@ -1136,14 +1182,23 @@
         ========================================================= */
 
         const firebaseConfig = {
+
             apiKey: "AIzaSyAg8n3AcKE-0QDQYcswUBYZwI702TzPZIU",
+
             authDomain: "anthonypg.firebaseapp.com",
+
             databaseURL: "https://anthonypg-default-rtdb.firebaseio.com/",
+
             projectId: "anthonypg",
+
             storageBucket: "anthonypg.firebasestorage.app",
+
             messagingSenderId: "620424695699",
+
             appId: "1:620424695699:web:429c9ace801a5bc75a6266",
+
             measurementId: "G-YVFYEWDQ98"
+
         };
 
 
@@ -1158,9 +1213,11 @@
            CONFIGURACIÓN
         ========================================================= */
 
-        const CORREO_ADMIN = "admin_administrador@gmail.com";
+        const CORREO_ADMIN =
+            "admin_administrador@gmail.com";
 
-        const SESSION_KEY = "wibsitihub_sesion_activa";
+        const SESSION_KEY =
+            "wibsitihub_sesion_activa";
 
         let timerActivoInterval = null;
 
@@ -1168,37 +1225,91 @@
 
 
         /* =========================================================
+           PERSISTENCIA REAL DE FIREBASE
+        ========================================================= */
+
+        /*
+         * Esto hace que Firebase recuerde la sesión
+         * aunque cierres y vuelvas a abrir la página.
+         */
+
+        setPersistence(
+            auth,
+            browserLocalPersistence
+        ).catch(error => {
+
+            console.error(
+                "No se pudo activar la persistencia:",
+                error
+            );
+
+        });
+
+
+        /* =========================================================
            FUNCIONES GLOBALES
         ========================================================= */
 
         window.pasarPagina = pasarPagina;
-
         window.ejecutarLogin = ejecutarLogin;
-
         window.ejecutarRegistro = ejecutarRegistro;
-
         window.cerrarSesion = cerrarSesion;
-
         window.cambiarFotoPerfil = cambiarFotoPerfil;
-
         window.abrirModalRecuperacion = abrirModalRecuperacion;
-
         window.cerrarModalRecuperacion = cerrarModalRecuperacion;
-
         window.enviarRecuperacionPassword = enviarRecuperacionPassword;
-
         window.handleGoogleSignIn = handleGoogleSignIn;
-
         window.irAlChat = irAlChat;
 
 
         /* =========================================================
-           IR A WCHAT
+           IR AL CHAT
         ========================================================= */
 
         function irAlChat() {
 
             window.location.href = "Wchat.html";
+
+        }
+
+
+        /* =========================================================
+           COMPROBAR ADMINISTRADOR
+        ========================================================= */
+
+        function esAdministrador(user) {
+
+            if (!user || !user.email) {
+                return false;
+            }
+
+            return user.email
+                .toLowerCase()
+                === CORREO_ADMIN.toLowerCase();
+
+        }
+
+
+        /* =========================================================
+           REDIRECCIÓN ADMIN
+        ========================================================= */
+
+        function redirigirSiEsAdmin(user) {
+
+            if (!user) {
+                return false;
+            }
+
+            if (esAdministrador(user)) {
+
+                window.location.href =
+                    "panel_administrador.html";
+
+                return true;
+
+            }
+
+            return false;
 
         }
 
@@ -1210,11 +1321,14 @@
         function generarIdUnico() {
 
             return "WIB-" +
+
                 Math.random()
                     .toString(36)
                     .substring(2, 8)
-                    .toUpperCase() +
-                "-" +
+                    .toUpperCase()
+
+                + "-" +
+
                 Date.now()
                     .toString()
                     .slice(-4);
@@ -1223,48 +1337,59 @@
 
 
         /* =========================================================
-           OBTENER PERFIL FIREBASE
+           OBTENER PERFIL
         ========================================================= */
 
         async function obtenerPerfil(uid) {
 
-            const perfilRef = ref(db, "usuarios/" + uid);
+            const perfilRef =
+                ref(db, "usuarios/" + uid);
 
-            const snapshot = await get(perfilRef);
+            const snapshot =
+                await get(perfilRef);
 
             if (snapshot.exists()) {
+
                 return snapshot.val();
+
             }
 
             return null;
+
         }
 
 
         /* =========================================================
-           CREAR / ACTUALIZAR PERFIL
+           GUARDAR PERFIL
         ========================================================= */
 
-        async function guardarPerfilFirebase(user, datosExtra = {}) {
+        async function guardarPerfilFirebase(
+            user,
+            datosExtra = {}
+        ) {
 
             if (!user) {
-                throw new Error("Usuario Firebase no válido.");
+
+                throw new Error(
+                    "Usuario Firebase no válido."
+                );
+
             }
+
 
             const uid = user.uid;
 
-            const perfilRef = ref(db, "usuarios/" + uid);
+            const perfilRef =
+                ref(db, "usuarios/" + uid);
 
-            const snapshot = await get(perfilRef);
+            const snapshot =
+                await get(perfilRef);
 
-            let perfilActual = snapshot.exists()
-                ? snapshot.val()
-                : null;
+            let perfilActual =
+                snapshot.exists()
+                    ? snapshot.val()
+                    : null;
 
-
-            /*
-             * IMPORTANTE:
-             * Si el usuario ya tiene WIB-ID NO SE CAMBIA.
-             */
 
             const wibIdExistente =
                 perfilActual &&
@@ -1277,7 +1402,11 @@
                 datosExtra.name ||
                 perfilActual?.name ||
                 user.displayName ||
-                (user.email ? user.email.split("@")[0] : "Usuario");
+                (
+                    user.email
+                        ? user.email.split("@")[0]
+                        : "Usuario"
+                );
 
 
             const avatar =
@@ -1291,8 +1420,7 @@
 
 
             const esAdmin =
-                user.email &&
-                user.email.toLowerCase() === CORREO_ADMIN.toLowerCase();
+                esAdministrador(user);
 
 
             const perfil = {
@@ -1303,7 +1431,10 @@
 
                 name: nombre,
 
-                email: user.email || perfilActual?.email || "",
+                email:
+                    user.email ||
+                    perfilActual?.email ||
+                    "",
 
                 avatar: avatar,
 
@@ -1313,7 +1444,8 @@
                     perfilActual?.createdAt ||
                     Date.now(),
 
-                updatedAt: Date.now(),
+                updatedAt:
+                    Date.now(),
 
                 totalActiveSeconds:
                     perfilActual?.totalActiveSeconds ||
@@ -1322,21 +1454,19 @@
             };
 
 
-            await set(perfilRef, perfil);
+            await set(
+                perfilRef,
+                perfil
+            );
 
-
-            /*
-             * Mantener el índice WIB-ID → UID.
-             *
-             * Esto conserva:
-             *
-             * wibToUid
-             *   WIB-H4AUEA-6378
-             *      → HJRGiQ4Ybka2XNL8JKzIXFWnPjF3
-             */
 
             const indiceRef =
-                ref(db, "wibToUid/" + wibIdExistente);
+                ref(
+                    db,
+                    "wibToUid/" +
+                    wibIdExistente
+                );
+
 
             const indiceSnapshot =
                 await get(indiceRef);
@@ -1349,25 +1479,6 @@
                     uid
                 );
 
-            } else {
-
-                const uidActual =
-                    indiceSnapshot.val();
-
-                /*
-                 * NO sobrescribir un índice que ya pertenece
-                 * a otro UID.
-                 */
-
-                if (uidActual !== uid) {
-
-                    console.warn(
-                        "El WIB-ID ya pertenece a otro usuario:",
-                        wibIdExistente
-                    );
-
-                }
-
             }
 
 
@@ -1377,7 +1488,7 @@
 
 
         /* =========================================================
-           GUARDAR SESIÓN LOCAL
+           SESIÓN LOCAL
         ========================================================= */
 
         function guardarSesionActiva(usuario) {
@@ -1392,14 +1503,12 @@
         }
 
 
-        /* =========================================================
-           OBTENER SESIÓN LOCAL
-        ========================================================= */
-
         function obtenerSesionActiva() {
 
             const sesion =
-                sessionStorage.getItem(SESSION_KEY);
+                sessionStorage.getItem(
+                    SESSION_KEY
+                );
 
             if (!sesion) {
                 return null;
@@ -1411,7 +1520,9 @@
 
             } catch (error) {
 
-                sessionStorage.removeItem(SESSION_KEY);
+                sessionStorage.removeItem(
+                    SESSION_KEY
+                );
 
                 return null;
 
@@ -1420,28 +1531,30 @@
         }
 
 
-        /* =========================================================
-           ELIMINAR SESIÓN
-        ========================================================= */
-
         function eliminarSesionActiva() {
 
-            sessionStorage.removeItem(SESSION_KEY);
+            sessionStorage.removeItem(
+                SESSION_KEY
+            );
 
         }
 
 
         /* =========================================================
-           PASAR PÁGINA
+           CAMBIAR PÁGINA
         ========================================================= */
 
         function pasarPagina(destino) {
 
             const wrapper =
-                document.getElementById("pagesWrapper");
+                document.getElementById(
+                    "pagesWrapper"
+                );
 
             const botones =
-                document.querySelectorAll(".page-nav-btn");
+                document.querySelectorAll(
+                    ".page-nav-btn"
+                );
 
 
             if (destino === "register") {
@@ -1451,12 +1564,18 @@
 
                 botones.forEach(btn => {
 
-                    btn.classList.remove("active");
+                    btn.classList.remove(
+                        "active"
+                    );
 
                 });
 
                 if (botones[1]) {
-                    botones[1].classList.add("active");
+
+                    botones[1]
+                        .classList
+                        .add("active");
+
                 }
 
             } else {
@@ -1466,12 +1585,18 @@
 
                 botones.forEach(btn => {
 
-                    btn.classList.remove("active");
+                    btn.classList.remove(
+                        "active"
+                    );
 
                 });
 
                 if (botones[0]) {
-                    botones[0].classList.add("active");
+
+                    botones[0]
+                        .classList
+                        .add("active");
+
                 }
 
             }
@@ -1480,7 +1605,7 @@
 
 
         /* =========================================================
-           LOGIN CON FIREBASE
+           LOGIN EMAIL + CONTRASEÑA
         ========================================================= */
 
         async function ejecutarLogin(event) {
@@ -1489,12 +1614,15 @@
 
 
             const email =
-                document.getElementById("loginEmail")
+                document
+                    .getElementById("loginEmail")
                     .value
                     .trim();
 
+
             const password =
-                document.getElementById("loginPassword")
+                document
+                    .getElementById("loginPassword")
                     .value;
 
 
@@ -1510,7 +1638,10 @@
 
 
             const btn =
-                document.getElementById("btnLogin");
+                document.getElementById(
+                    "btnLogin"
+                );
+
 
             btn.disabled = true;
 
@@ -1524,8 +1655,15 @@
             try {
 
                 /*
-                 * LOGIN REAL EN FIREBASE
+                 * IMPORTANTE:
+                 * Firebase conservará la sesión.
                  */
+
+                await setPersistence(
+                    auth,
+                    browserLocalPersistence
+                );
+
 
                 const resultado =
                     await signInWithEmailAndPassword(
@@ -1539,18 +1677,14 @@
                     resultado.user;
 
 
-                /*
-                 * Crear/obtener perfil
-                 */
-
                 const perfil =
-                    await guardarPerfilFirebase(user);
+                    await guardarPerfilFirebase(
+                        user
+                    );
 
 
-                const esAdmin =
-                    user.email &&
-                    user.email.toLowerCase() ===
-                    CORREO_ADMIN.toLowerCase();
+                const esAdminActual =
+                    esAdministrador(user);
 
 
                 const usuarioSesion = {
@@ -1563,11 +1697,14 @@
 
                     email: user.email,
 
-                    isAdmin: esAdmin,
+                    isAdmin:
+                        esAdminActual,
 
-                    avatar: perfil.avatar || null,
+                    avatar:
+                        perfil.avatar || null,
 
-                    loginTime: Date.now(),
+                    loginTime:
+                        Date.now(),
 
                     totalActiveSeconds:
                         perfil.totalActiveSeconds || 0
@@ -1580,38 +1717,40 @@
                 );
 
 
-                mostrarToast(
-                    "¡Inicio de sesión exitoso!"
-                );
-
-
                 /*
-                 * Administrador
+                 * ADMINISTRADOR
+                 *
+                 * Va directamente al panel.
                  */
 
-                if (esAdmin) {
+                if (esAdminActual) {
+
+                    mostrarToast(
+                        "¡Bienvenido, administrador!"
+                    );
 
                     setTimeout(() => {
 
                         window.location.href =
                             "panel_administrador.html";
 
-                    }, 700);
+                    }, 400);
 
                     return;
 
                 }
 
 
-                /*
-                 * Usuario normal
-                 */
+                mostrarToast(
+                    "¡Inicio de sesión exitoso!"
+                );
+
 
                 setTimeout(() => {
 
                     verificarEstadoSesion();
 
-                }, 500);
+                }, 300);
 
 
             } catch (error) {
@@ -1621,8 +1760,9 @@
                     error
                 );
 
-
-                mostrarErrorFirebase(error);
+                mostrarErrorFirebase(
+                    error
+                );
 
             } finally {
 
@@ -1637,7 +1777,7 @@
 
 
         /* =========================================================
-           REGISTRO REAL EN FIREBASE
+           REGISTRO
         ========================================================= */
 
         async function ejecutarRegistro(event) {
@@ -1646,17 +1786,22 @@
 
 
             const nombre =
-                document.getElementById("regName")
+                document
+                    .getElementById("regName")
                     .value
                     .trim();
+
 
             const email =
-                document.getElementById("regEmail")
+                document
+                    .getElementById("regEmail")
                     .value
                     .trim();
 
+
             const password =
-                document.getElementById("regPassword")
+                document
+                    .getElementById("regPassword")
                     .value;
 
 
@@ -1683,7 +1828,10 @@
 
 
             const btn =
-                document.getElementById("btnRegister");
+                document.getElementById(
+                    "btnRegister"
+                );
+
 
             btn.disabled = true;
 
@@ -1696,9 +1844,11 @@
 
             try {
 
-                /*
-                 * Crear usuario REAL en Firebase Auth
-                 */
+                await setPersistence(
+                    auth,
+                    browserLocalPersistence
+                );
+
 
                 const resultado =
                     await createUserWithEmailAndPassword(
@@ -1712,21 +1862,14 @@
                     resultado.user;
 
 
-                /*
-                 * Guardar nombre en Firebase Auth
-                 */
-
                 await updateProfile(
                     user,
                     {
-                        displayName: nombre
+                        displayName:
+                            nombre
                     }
                 );
 
-
-                /*
-                 * Crear perfil en RTDB
-                 */
 
                 const perfil =
                     await guardarPerfilFirebase(
@@ -1737,9 +1880,8 @@
                     );
 
 
-                const esAdmin =
-                    email.toLowerCase() ===
-                    CORREO_ADMIN.toLowerCase();
+                const esAdminActual =
+                    esAdministrador(user);
 
 
                 const usuarioSesion = {
@@ -1752,11 +1894,13 @@
 
                     email: email,
 
-                    isAdmin: esAdmin,
+                    isAdmin:
+                        esAdminActual,
 
                     avatar: null,
 
-                    loginTime: Date.now(),
+                    loginTime:
+                        Date.now(),
 
                     totalActiveSeconds: 0
 
@@ -1769,33 +1913,40 @@
 
 
                 document
-                    .getElementById("registerForm")
+                    .getElementById(
+                        "registerForm"
+                    )
                     .reset();
 
 
-                mostrarToast(
-                    "¡Cuenta creada y sesión iniciada con éxito!"
-                );
+                if (esAdminActual) {
 
-
-                if (esAdmin) {
+                    mostrarToast(
+                        "¡Cuenta creada!"
+                    );
 
                     setTimeout(() => {
 
                         window.location.href =
                             "panel_administrador.html";
 
-                    }, 700);
+                    }, 400);
 
-                } else {
-
-                    setTimeout(() => {
-
-                        verificarEstadoSesion();
-
-                    }, 500);
+                    return;
 
                 }
+
+
+                mostrarToast(
+                    "¡Cuenta creada y sesión iniciada!"
+                );
+
+
+                setTimeout(() => {
+
+                    verificarEstadoSesion();
+
+                }, 300);
 
 
             } catch (error) {
@@ -1805,8 +1956,9 @@
                     error
                 );
 
-
-                mostrarErrorFirebase(error);
+                mostrarErrorFirebase(
+                    error
+                );
 
             } finally {
 
@@ -1824,11 +1976,16 @@
            GOOGLE LOGIN
         ========================================================= */
 
-        async function handleGoogleSignIn(response) {
+        async function handleGoogleSignIn(
+            response
+        ) {
 
             try {
 
-                if (!response || !response.credential) {
+                if (
+                    !response ||
+                    !response.credential
+                ) {
 
                     throw new Error(
                         "Google no devolvió las credenciales."
@@ -1837,10 +1994,11 @@
                 }
 
 
-                /*
-                 * Convertir credencial de Google
-                 * a credencial Firebase
-                 */
+                await setPersistence(
+                    auth,
+                    browserLocalPersistence
+                );
+
 
                 const credential =
                     GoogleAuthProvider.credential(
@@ -1848,89 +2006,72 @@
                     );
 
 
-                const resultado =
-                    await signInWithCredential(
-                        auth,
-                        credential
+                try {
+
+                    /*
+                     * PRIMER INTENTO:
+                     * entrar normalmente con Google.
+                     */
+
+                    const resultado =
+                        await signInWithCredential(
+                            auth,
+                            credential
+                        );
+
+
+                    const user =
+                        resultado.user;
+
+
+                    await finalizarLoginFirebase(
+                        user
                     );
 
 
-                const user =
-                    resultado.user;
+                } catch (errorGoogle) {
 
-
-                /*
-                 * Crear o actualizar perfil
-                 */
-
-                const perfil =
-                    await guardarPerfilFirebase(
-                        user,
-                        {
-                            name:
-                                user.displayName ||
-                                "Usuario",
-
-                            avatar:
-                                user.photoURL || null
-                        }
+                    console.error(
+                        "Google login:",
+                        errorGoogle
                     );
 
 
-                const esAdmin =
-                    user.email &&
-                    user.email.toLowerCase() ===
-                    CORREO_ADMIN.toLowerCase();
+                    /*
+                     * Si el correo existe con
+                     * otro método de acceso,
+                     * NO creamos otra cuenta.
+                     */
+
+                    if (
+                        errorGoogle.code ===
+                        "auth/account-exists-with-different-credential"
+                    ) {
+
+                        mostrarAdvertenciaSesion(
+                            "Esta cuenta de Google ya está registrada con correo y contraseña. Inicia sesión primero con tu correo y contraseña."
+                        );
+
+                        return;
+
+                    }
 
 
-                const usuarioSesion = {
+                    if (
+                        errorGoogle.code ===
+                        "auth/email-already-in-use"
+                    ) {
 
-                    uid: user.uid,
+                        mostrarAdvertenciaSesion(
+                            "Este correo ya tiene una cuenta. Inicia sesión con correo y contraseña."
+                        );
 
-                    id: perfil.id,
+                        return;
 
-                    name: perfil.name,
-
-                    email: user.email,
-
-                    isAdmin: esAdmin,
-
-                    avatar: perfil.avatar,
-
-                    loginTime: Date.now(),
-
-                    totalActiveSeconds:
-                        perfil.totalActiveSeconds || 0
-
-                };
+                    }
 
 
-                guardarSesionActiva(
-                    usuarioSesion
-                );
-
-
-                mostrarToast(
-                    `¡Bienvenido, ${perfil.name}!`
-                );
-
-
-                if (esAdmin) {
-
-                    setTimeout(() => {
-
-                        window.location.href =
-                            "panel_administrador.html";
-
-                    }, 700);
-
-                } else {
-
-                    setTimeout(() => {
-
-                        verificarEstadoSesion();
-
-                    }, 500);
+                    throw errorGoogle;
 
                 }
 
@@ -1942,10 +2083,113 @@
                     error
                 );
 
-
-                mostrarErrorFirebase(error);
+                mostrarErrorFirebase(
+                    error
+                );
 
             }
+
+        }
+
+
+        /* =========================================================
+           FINALIZAR LOGIN
+        ========================================================= */
+
+        async function finalizarLoginFirebase(
+            user
+        ) {
+
+            if (!user) {
+
+                throw new Error(
+                    "Usuario Firebase no válido."
+                );
+
+            }
+
+
+            const perfil =
+                await guardarPerfilFirebase(
+                    user,
+                    {
+                        name:
+                            user.displayName ||
+                            "Usuario",
+
+                        avatar:
+                            user.photoURL ||
+                            null
+                    }
+                );
+
+
+            const esAdminActual =
+                esAdministrador(user);
+
+
+            const usuarioSesion = {
+
+                uid: user.uid,
+
+                id: perfil.id,
+
+                name: perfil.name,
+
+                email: user.email,
+
+                isAdmin:
+                    esAdminActual,
+
+                avatar:
+                    perfil.avatar || null,
+
+                loginTime:
+                    Date.now(),
+
+                totalActiveSeconds:
+                    perfil.totalActiveSeconds || 0
+
+            };
+
+
+            guardarSesionActiva(
+                usuarioSesion
+            );
+
+
+            /*
+             * ADMINISTRADOR
+             */
+
+            if (esAdminActual) {
+
+                mostrarToast(
+                    "¡Bienvenido, administrador!"
+                );
+
+                setTimeout(() => {
+
+                    window.location.href =
+                        "panel_administrador.html";
+
+                }, 400);
+
+                return;
+
+            }
+
+
+            mostrarToast(
+                `¡Bienvenido, ${perfil.name}!`
+            );
+
+
+            setTimeout(() => {
+
+                verificarEstadoSesion();
+
+            }, 300);
 
         }
 
@@ -1963,12 +2207,37 @@
             if (!user) {
 
                 document
-                    .getElementById("authSection")
-                    .classList.remove("hidden");
+                    .getElementById(
+                        "authSection"
+                    )
+                    .classList
+                    .remove("hidden");
+
 
                 document
-                    .getElementById("profileSection")
-                    .classList.add("hidden");
+                    .getElementById(
+                        "profileSection"
+                    )
+                    .classList
+                    .add("hidden");
+
+
+                return;
+
+            }
+
+
+            /*
+             * Si es administrador,
+             * mandarlo directamente al panel.
+             */
+
+            if (
+                esAdministrador(user)
+            ) {
+
+                window.location.href =
+                    "panel_administrador.html";
 
                 return;
 
@@ -1978,33 +2247,9 @@
             try {
 
                 const perfil =
-                    await guardarPerfilFirebase(user);
-
-
-                const esAdmin =
-                    user.email &&
-                    user.email.toLowerCase() ===
-                    CORREO_ADMIN.toLowerCase();
-
-
-                /*
-                 * Si es administrador y está en cuenta,
-                 * mandarlo al panel.
-                 */
-
-                if (
-                    esAdmin &&
-                    window.location.pathname
-                        .toLowerCase()
-                        .includes("cuenta")
-                ) {
-
-                    window.location.href =
-                        "panel_administrador.html";
-
-                    return;
-
-                }
+                    await guardarPerfilFirebase(
+                        user
+                    );
 
 
                 const usuarioSesion = {
@@ -2017,16 +2262,18 @@
 
                     email: user.email,
 
-                    isAdmin: esAdmin,
+                    isAdmin: false,
 
-                    avatar: perfil.avatar || null,
+                    avatar:
+                        perfil.avatar || null,
 
                     loginTime:
                         obtenerSesionActiva()?.loginTime ||
                         Date.now(),
 
                     totalActiveSeconds:
-                        perfil.totalActiveSeconds || 0
+                        perfil.totalActiveSeconds ||
+                        0
 
                 };
 
@@ -2048,7 +2295,9 @@
                     error
                 );
 
-                mostrarErrorFirebase(error);
+                mostrarErrorFirebase(
+                    error
+                );
 
             }
 
@@ -2059,34 +2308,54 @@
            MOSTRAR PERFIL
         ========================================================= */
 
-        function mostrarPerfil(usuario) {
+        function mostrarPerfil(
+            usuario
+        ) {
 
             document
-                .getElementById("authSection")
-                .classList.add("hidden");
+                .getElementById(
+                    "authSection"
+                )
+                .classList
+                .add("hidden");
 
 
             document
-                .getElementById("profileSection")
-                .classList.remove("hidden");
+                .getElementById(
+                    "profileSection"
+                )
+                .classList
+                .remove("hidden");
 
 
             document
-                .getElementById("profileDisplayName")
+                .getElementById(
+                    "profileDisplayName"
+                )
                 .textContent =
-                usuario.name || "Usuario";
+                usuario.name ||
+                "Usuario";
 
 
             document
-                .getElementById("profileDisplayEmail")
+                .getElementById(
+                    "profileDisplayEmail"
+                )
                 .textContent =
-                usuario.email || "";
+                usuario.email ||
+                "";
 
 
             document
-                .getElementById("profileDisplayId")
+                .getElementById(
+                    "profileDisplayId"
+                )
                 .textContent =
-                "ID: " + (usuario.id || "--");
+                "ID: " +
+                (
+                    usuario.id ||
+                    "--"
+                );
 
 
             const avatarDiv =
@@ -2109,21 +2378,28 @@
 
 
                 const nombre =
-                    usuario.name || "W";
+                    usuario.name ||
+                    "W";
 
 
                 const initials =
                     nombre
                         .split(" ")
                         .filter(Boolean)
-                        .map(n => n[0])
+                        .map(
+                            n => n[0]
+                        )
                         .join("")
-                        .substring(0, 2)
+                        .substring(
+                            0,
+                            2
+                        )
                         .toUpperCase();
 
 
                 avatarDiv.textContent =
-                    initials || "W";
+                    initials ||
+                    "W";
 
             }
 
@@ -2131,24 +2407,34 @@
             if (usuario.isAdmin) {
 
                 document
-                    .getElementById("adminBadgeContainer")
-                    .classList.remove("hidden");
+                    .getElementById(
+                        "adminBadgeContainer"
+                    )
+                    .classList
+                    .remove("hidden");
 
 
                 document
-                    .getElementById("statRango")
+                    .getElementById(
+                        "statRango"
+                    )
                     .textContent =
                     "VIP";
 
             } else {
 
                 document
-                    .getElementById("adminBadgeContainer")
-                    .classList.add("hidden");
+                    .getElementById(
+                        "adminBadgeContainer"
+                    )
+                    .classList
+                    .add("hidden");
 
 
                 document
-                    .getElementById("statRango")
+                    .getElementById(
+                        "statRango"
+                    )
                     .textContent =
                     "Usuario";
 
@@ -2156,10 +2442,13 @@
 
 
             document
-                .getElementById("statTiempoActivo")
+                .getElementById(
+                    "statTiempoActivo"
+                )
                 .textContent =
                 formatearTiempo(
-                    usuario.totalActiveSeconds || 0
+                    usuario.totalActiveSeconds ||
+                    0
                 );
 
 
@@ -2171,10 +2460,12 @@
 
 
         /* =========================================================
-           CONTADOR DE TIEMPO
+           CONTADOR
         ========================================================= */
 
-        function iniciarContadorActivo(usuario) {
+        function iniciarContadorActivo(
+            usuario
+        ) {
 
             if (timerActivoInterval) {
 
@@ -2187,77 +2478,77 @@
 
             if (!usuario.totalActiveSeconds) {
 
-                usuario.totalActiveSeconds = 0;
+                usuario.totalActiveSeconds =
+                    0;
 
             }
 
 
             timerActivoInterval =
-                setInterval(async () => {
+                setInterval(
+                    async () => {
 
-                    usuario.totalActiveSeconds++;
-
-
-                    const lblTiempo =
-                        document.getElementById(
-                            "statTiempoActivo"
-                        );
+                        usuario.totalActiveSeconds++;
 
 
-                    if (lblTiempo) {
-
-                        lblTiempo.textContent =
-                            formatearTiempo(
-                                usuario.totalActiveSeconds
-                            );
-
-                    }
+                        const lblTiempo =
+                            document
+                                .getElementById(
+                                    "statTiempoActivo"
+                                );
 
 
-                    /*
-                     * Guardar cada 10 segundos en Firebase
-                     */
+                        if (lblTiempo) {
 
-                    if (
-                        usuario.totalActiveSeconds % 10 === 0 &&
-                        usuario.uid
-                    ) {
-
-                        try {
-
-                            await update(
-                                ref(
-                                    db,
-                                    "usuarios/" +
-                                    usuario.uid
-                                ),
-                                {
-                                    totalActiveSeconds:
-                                        usuario.totalActiveSeconds,
-
-                                    updatedAt:
-                                        Date.now()
-                                }
-                            );
-
-                        } catch (error) {
-
-                            console.warn(
-                                "No se pudo actualizar el tiempo:",
-                                error
-                            );
+                            lblTiempo.textContent =
+                                formatearTiempo(
+                                    usuario.totalActiveSeconds
+                                );
 
                         }
 
-                    }
+
+                        if (
+                            usuario.totalActiveSeconds % 10 === 0 &&
+                            usuario.uid
+                        ) {
+
+                            try {
+
+                                await update(
+                                    ref(
+                                        db,
+                                        "usuarios/" +
+                                        usuario.uid
+                                    ),
+                                    {
+                                        totalActiveSeconds:
+                                            usuario.totalActiveSeconds,
+
+                                        updatedAt:
+                                            Date.now()
+                                    }
+                                );
+
+                            } catch (error) {
+
+                                console.warn(
+                                    "No se pudo actualizar el tiempo:",
+                                    error
+                                );
+
+                            }
+
+                        }
 
 
-                    guardarSesionActiva(
-                        usuario
-                    );
+                        guardarSesionActiva(
+                            usuario
+                        );
 
-
-                }, 1000);
+                    },
+                    1000
+                );
 
         }
 
@@ -2266,15 +2557,19 @@
            FORMATEAR TIEMPO
         ========================================================= */
 
-        function formatearTiempo(segundos) {
+        function formatearTiempo(
+            segundos
+        ) {
 
             segundos =
-                Number(segundos) || 0;
+                Number(segundos) ||
+                0;
 
 
             if (segundos < 60) {
 
-                return segundos + "s";
+                return segundos +
+                    "s";
 
             }
 
@@ -2285,6 +2580,7 @@
                     Math.floor(
                         segundos / 60
                     );
+
 
                 const secs =
                     segundos % 60;
@@ -2322,7 +2618,9 @@
            CAMBIAR FOTO
         ========================================================= */
 
-        function cambiarFotoPerfil(event) {
+        function cambiarFotoPerfil(
+            event
+        ) {
 
             const archivo =
                 event.target.files[0];
@@ -2332,10 +2630,6 @@
                 return;
             }
 
-
-            /*
-             * Evitar imágenes demasiado grandes
-             */
 
             if (archivo.size > 700000) {
 
@@ -2372,7 +2666,8 @@
                         avatarDiv.style.backgroundImage =
                             `url("${base64Image}")`;
 
-                        avatarDiv.textContent = "";
+                        avatarDiv.textContent =
+                            "";
 
                     }
 
@@ -2382,9 +2677,7 @@
 
 
                     if (!user) {
-
                         return;
-
                     }
 
 
@@ -2461,7 +2754,8 @@
                     timerActivoInterval
                 );
 
-                timerActivoInterval = null;
+                timerActivoInterval =
+                    null;
 
             }
 
@@ -2472,14 +2766,17 @@
                     inactivityTimeout
                 );
 
-                inactivityTimeout = null;
+                inactivityTimeout =
+                    null;
 
             }
 
 
             try {
 
-                await signOut(auth);
+                await signOut(
+                    auth
+                );
 
             } catch (error) {
 
@@ -2495,53 +2792,75 @@
 
 
             document
-                .getElementById("loginEmail")
+                .getElementById(
+                    "loginEmail"
+                )
                 .value = "";
 
 
             document
-                .getElementById("loginPassword")
+                .getElementById(
+                    "loginPassword"
+                )
                 .value = "";
 
 
             document
-                .getElementById("recaptchaContainer")
-                .classList.add("hidden");
+                .getElementById(
+                    "recaptchaContainer"
+                )
+                .classList
+                .add("hidden");
 
 
             if (
                 window.grecaptcha &&
-                typeof grecaptcha.reset === "function"
+                typeof grecaptcha.reset ===
+                "function"
             ) {
 
                 try {
+
                     grecaptcha.reset();
+
                 } catch (e) {}
 
             }
 
 
             document
-                .getElementById("authSection")
-                .classList.remove("hidden");
+                .getElementById(
+                    "authSection"
+                )
+                .classList
+                .remove("hidden");
 
 
             document
-                .getElementById("profileSection")
-                .classList.add("hidden");
+                .getElementById(
+                    "profileSection"
+                )
+                .classList
+                .add("hidden");
 
 
             document
-                .getElementById("loginForm")
+                .getElementById(
+                    "loginForm"
+                )
                 .reset();
 
 
             document
-                .getElementById("registerForm")
+                .getElementById(
+                    "registerForm"
+                )
                 .reset();
 
 
-            pasarPagina("login");
+            pasarPagina(
+                "login"
+            );
 
 
             mostrarAdvertenciaSesion(
@@ -2555,26 +2874,42 @@
            MODAL RECUPERACIÓN
         ========================================================= */
 
-        function abrirModalRecuperacion(event) {
+        function abrirModalRecuperacion(
+            event
+        ) {
 
             if (event) {
+
                 event.preventDefault();
+
             }
 
 
             document
-                .getElementById("recuperarFormWrap")
-                .style.display = "block";
+                .getElementById(
+                    "recuperarFormWrap"
+                )
+                .style
+                .display =
+                "block";
 
 
             document
-                .getElementById("recuperarExitoBox")
-                .style.display = "none";
+                .getElementById(
+                    "recuperarExitoBox"
+                )
+                .style
+                .display =
+                "none";
 
 
             document
-                .getElementById("recuperarErrorMsg")
-                .style.display = "none";
+                .getElementById(
+                    "recuperarErrorMsg"
+                )
+                .style
+                .display =
+                "none";
 
 
             const input =
@@ -2586,19 +2921,26 @@
             input.value =
                 document.getElementById(
                     "loginEmail"
-                ).value || "";
+                ).value ||
+                "";
 
 
             document
-                .getElementById("modalRecuperar")
-                .classList.add("show");
+                .getElementById(
+                    "modalRecuperar"
+                )
+                .classList
+                .add("show");
 
 
-            setTimeout(() => {
+            setTimeout(
+                () => {
 
-                input.focus();
+                    input.focus();
 
-            }, 100);
+                },
+                100
+            );
 
         }
 
@@ -2606,8 +2948,11 @@
         function cerrarModalRecuperacion() {
 
             document
-                .getElementById("modalRecuperar")
-                .classList.remove("show");
+                .getElementById(
+                    "modalRecuperar"
+                )
+                .classList
+                .remove("show");
 
         }
 
@@ -2625,8 +2970,7 @@
 
 
             const email =
-                input.value
-                    .trim();
+                input.value.trim();
 
 
             const btn =
@@ -2653,16 +2997,16 @@
 
             if (
                 !email ||
-                !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+                !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+                    email
+                )
             ) {
 
                 errorTexto.textContent =
                     "Ingresa un correo electrónico válido.";
 
-
                 errorBox.style.display =
                     "flex";
-
 
                 input.focus();
 
@@ -2673,8 +3017,10 @@
 
             btn.disabled = true;
 
+
             const textoOriginal =
                 btn.textContent;
+
 
             btn.textContent =
                 "Enviando...";
@@ -2700,7 +3046,8 @@
                     .getElementById(
                         "recuperarFormWrap"
                     )
-                    .style.display =
+                    .style
+                    .display =
                     "none";
 
 
@@ -2708,7 +3055,8 @@
                     .getElementById(
                         "recuperarExitoBox"
                     )
-                    .style.display =
+                    .style
+                    .display =
                     "flex";
 
 
@@ -2779,10 +3127,12 @@
 
 
         /* =========================================================
-           MENSAJES DE FIREBASE
+           ERRORES FIREBASE
         ========================================================= */
 
-        function mostrarErrorFirebase(error) {
+        function mostrarErrorFirebase(
+            error
+        ) {
 
             let mensaje =
                 "Ocurrió un error. Inténtalo nuevamente.";
@@ -2821,7 +3171,17 @@
                     mensaje =
                         "Este correo ya está registrado. Inicia sesión.";
 
-                    pasarPagina("login");
+                    pasarPagina(
+                        "login"
+                    );
+
+                    break;
+
+
+                case "auth/account-exists-with-different-credential":
+
+                    mensaje =
+                        "Este correo ya está registrado con otro método de acceso.";
 
                     break;
 
@@ -2865,6 +3225,16 @@
                         error.code
                     );
 
+                    if (
+                        error.message
+                    ) {
+
+                        console.error(
+                            error.message
+                        );
+
+                    }
+
                     break;
 
             }
@@ -2881,7 +3251,9 @@
            ADVERTENCIA
         ========================================================= */
 
-        function mostrarAdvertenciaSesion(mensaje) {
+        function mostrarAdvertenciaSesion(
+            mensaje
+        ) {
 
             const alertaExistente =
                 document.querySelector(
@@ -2890,7 +3262,9 @@
 
 
             if (alertaExistente) {
+
                 alertaExistente.remove();
+
             }
 
 
@@ -2914,22 +3288,28 @@
             );
 
 
-            setTimeout(() => {
+            setTimeout(
+                () => {
 
-                banner.style.transition =
-                    "opacity 0.4s ease";
+                    banner.style.transition =
+                        "opacity 0.4s ease";
 
-                banner.style.opacity =
-                    "0";
+                    banner.style.opacity =
+                        "0";
 
 
-                setTimeout(() => {
+                    setTimeout(
+                        () => {
 
-                    banner.remove();
+                            banner.remove();
 
-                }, 400);
+                        },
+                        400
+                    );
 
-            }, 4000);
+                },
+                4000
+            );
 
         }
 
@@ -2938,7 +3318,9 @@
            TOAST
         ========================================================= */
 
-        function mostrarToast(mensaje) {
+        function mostrarToast(
+            mensaje
+        ) {
 
             const existingToast =
                 document.querySelector(
@@ -2947,7 +3329,9 @@
 
 
             if (existingToast) {
+
                 existingToast.remove();
+
             }
 
 
@@ -2963,7 +3347,9 @@
 
             toast.innerHTML =
                 `<span>✓</span>
-                 <p style="margin:0;">${mensaje}</p>`;
+                 <p style="margin:0;">
+                    ${mensaje}
+                 </p>`;
 
 
             document.body.appendChild(
@@ -2971,19 +3357,25 @@
             );
 
 
-            setTimeout(() => {
+            setTimeout(
+                () => {
 
-                toast.style.opacity =
-                    "0";
+                    toast.style.opacity =
+                        "0";
 
 
-                setTimeout(() => {
+                    setTimeout(
+                        () => {
 
-                    toast.remove();
+                            toast.remove();
 
-                }, 300);
+                        },
+                        300
+                    );
 
-            }, 2000);
+                },
+                2000
+            );
 
         }
 
@@ -2994,50 +3386,56 @@
 
         function configurarEventosInactividad() {
 
-            const marcarActivo = () => {
+            const marcarActivo =
+                () => {
 
-                const lblEstado =
-                    document.getElementById(
-                        "statEstado"
-                    );
-
-
-                if (lblEstado) {
-
-                    lblEstado.textContent =
-                        "Activo";
-
-                }
+                    const lblEstado =
+                        document.getElementById(
+                            "statEstado"
+                        );
 
 
-                if (inactivityTimeout) {
+                    if (lblEstado) {
 
-                    clearTimeout(
-                        inactivityTimeout
-                    );
+                        lblEstado.textContent =
+                            "Activo";
 
-                }
-
-
-                inactivityTimeout =
-                    setTimeout(() => {
-
-                        const lblEstadoInactivo =
-                            document.getElementById(
-                                "statEstado"
-                            );
+                    }
 
 
-                        if (lblEstadoInactivo) {
+                    if (inactivityTimeout) {
 
-                            lblEstadoInactivo.textContent =
-                                "Inactivo";
+                        clearTimeout(
+                            inactivityTimeout
+                        );
 
-                        }
+                    }
 
-                    }, 30000);
 
-            };
+                    inactivityTimeout =
+                        setTimeout(
+                            () => {
+
+                                const lblEstadoInactivo =
+                                    document.getElementById(
+                                        "statEstado"
+                                    );
+
+
+                                if (
+                                    lblEstadoInactivo
+                                ) {
+
+                                    lblEstadoInactivo.textContent =
+                                        "Inactivo";
+
+                                }
+
+                            },
+                            30000
+                        );
+
+                };
 
 
             window.addEventListener(
@@ -3070,7 +3468,7 @@
 
 
         /* =========================================================
-           CAMBIO DEL EMAIL DEL LOGIN
+           MOSTRAR RECAPTCHA ADMIN
         ========================================================= */
 
         document.addEventListener(
@@ -3106,13 +3504,17 @@
 
                             recaptchaDiv
                                 .classList
-                                .remove("hidden");
+                                .remove(
+                                    "hidden"
+                                );
 
                         } else {
 
                             recaptchaDiv
                                 .classList
-                                .add("hidden");
+                                .add(
+                                    "hidden"
+                                );
 
                         }
 
@@ -3127,7 +3529,7 @@
 
 
         /* =========================================================
-           ESCUCHAR FIREBASE AUTH
+           FIREBASE AUTH
         ========================================================= */
 
         onAuthStateChanged(
@@ -3136,37 +3538,51 @@
 
                 if (user) {
 
+                    /*
+                     * Si ya está autenticado
+                     * y es administrador,
+                     * entra directo al panel.
+                     */
+
+                    if (
+                        esAdministrador(user)
+                    ) {
+
+                        window.location.href =
+                            "panel_administrador.html";
+
+                        return;
+
+                    }
+
+
                     await verificarEstadoSesion();
 
                 } else {
 
-                    const sesion =
-                        obtenerSesionActiva();
-
-
                     /*
-                     * Si Firebase dice que no hay usuario,
-                     * no mostramos una sesión falsa.
+                     * No mostrar una sesión falsa
+                     * usando solamente sessionStorage.
                      */
 
-                    if (!sesion) {
+                    document
+                        .getElementById(
+                            "authSection"
+                        )
+                        .classList
+                        .remove(
+                            "hidden"
+                        );
 
-                        document
-                            .getElementById(
-                                "authSection"
-                            )
-                            .classList
-                            .remove("hidden");
 
-
-                        document
-                            .getElementById(
-                                "profileSection"
-                            )
-                            .classList
-                            .add("hidden");
-
-                    }
+                    document
+                        .getElementById(
+                            "profileSection"
+                        )
+                        .classList
+                        .add(
+                            "hidden"
+                        );
 
                 }
 

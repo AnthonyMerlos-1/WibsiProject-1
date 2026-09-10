@@ -1137,7 +1137,9 @@
             onAuthStateChanged,
             updateProfile,
             setPersistence,
-            browserLocalPersistence
+            browserLocalPersistence,
+            fetchSignInMethodsForEmail,
+            linkWithCredential
         } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 
 
@@ -1276,6 +1278,29 @@
                 Date.now()
                     .toString()
                     .slice(-4);
+
+        }
+
+
+        /* =========================================================
+           OBTENER PERFIL
+        ========================================================= */
+
+        async function obtenerPerfil(uid) {
+
+            const perfilRef =
+                ref(db, "usuarios/" + uid);
+
+            const snapshot =
+                await get(perfilRef);
+
+            if (snapshot.exists()) {
+
+                return snapshot.val();
+
+            }
+
+            return null;
 
         }
 

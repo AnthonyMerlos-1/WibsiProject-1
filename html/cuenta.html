@@ -1116,7 +1116,7 @@
 
 
     <!-- ========================================================= -->
-    <!-- FIREBASE -->
+    <!-- FIREBASE (SOLO BASE DE DATOS Y GOOGLE AUTH USANDO FIREBASE) -->
     <!-- ========================================================= -->
 
     <script type="module">
@@ -1128,18 +1128,12 @@
 
         import {
             getAuth,
-            signInWithEmailAndPassword,
-            createUserWithEmailAndPassword,
-            sendPasswordResetEmail,
             GoogleAuthProvider,
             signInWithCredential,
             signOut,
             onAuthStateChanged,
-            updateProfile,
             setPersistence,
-            browserLocalPersistence,
-            fetchSignInMethodsForEmail,
-            linkWithCredential
+            browserLocalPersistence
         } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 
 
@@ -1551,13 +1545,12 @@
 
 
         /* =========================================================
-           LOGIN EMAIL + CONTRASEÑA
+           LOGIN MANUAL (LOCAL / SIMULADO SIN FIREBASE AUTH EMAIL)
         ========================================================= */
 
         async function ejecutarLogin(event) {
 
             event.preventDefault();
-
 
             const email =
                 document
@@ -1565,160 +1558,69 @@
                     .value
                     .trim();
 
-
             const password =
                 document
                     .getElementById("loginPassword")
                     .value;
 
-
             if (!email || !password) {
-
                 mostrarAdvertenciaSesion(
                     "Completa tu correo y contraseña."
                 );
-
                 return;
-
             }
-
 
             const btn =
                 document.getElementById(
                     "btnLogin"
                 );
 
-
             btn.disabled = true;
+            const textoOriginal = btn.textContent;
+            btn.textContent = "Iniciando sesión...";
 
-            const textoOriginal =
-                btn.textContent;
-
-            btn.textContent =
-                "Iniciando sesión...";
-
-
-            try {
-
-                await setPersistence(
-                    auth,
-                    browserLocalPersistence
-                );
-
-
-                const resultado =
-                    await signInWithEmailAndPassword(
-                        auth,
-                        email,
-                        password
-                    );
-
-
-                const user =
-                    resultado.user;
-
-
-                const perfil =
-                    await guardarPerfilFirebase(
-                        user
-                    );
-
-
-                const esAdminActual =
-                    esAdministrador(user);
-
-
+            setTimeout(() => {
+                const esAdminActual = (email.toLowerCase() === CORREO_ADMIN.toLowerCase());
+                const fakeUid = "local_" + btoa(email).replace(/=/g, "");
                 const usuarioSesion = {
-
-                    uid: user.uid,
-
-                    id: perfil.id,
-
-                    name: perfil.name,
-
-                    email: user.email,
-
-                    isAdmin:
-                        esAdminActual,
-
-                    avatar:
-                        perfil.avatar || null,
-
-                    loginTime:
-                        Date.now(),
-
-                    totalActiveSeconds:
-                        perfil.totalActiveSeconds || 0
-
+                    uid: fakeUid,
+                    id: "WIB-LOCAL-" + Math.floor(Math.random() * 9000 + 1000),
+                    name: email.split("@")[0],
+                    email: email,
+                    isAdmin: esAdminActual,
+                    avatar: null,
+                    loginTime: Date.now(),
+                    totalActiveSeconds: 0
                 };
 
-
-                guardarSesionActiva(
-                    usuarioSesion
-                );
-
+                guardarSesionActiva(usuarioSesion);
 
                 if (esAdminActual) {
-
-                    mostrarToast(
-                        "¡Bienvenido, administrador!"
-                    );
-
+                    mostrarToast("¡Bienvenido, administrador!");
                     setTimeout(() => {
-
-                        window.location.href =
-                            "panel_administrador.html";
-
+                        window.location.href = "panel_administrador.html";
                     }, 400);
-
                     return;
-
                 }
 
-
-                mostrarToast(
-                    "¡Inicio de sesión exitoso!"
-                );
-
-
+                mostrarToast("¡Inicio de sesión exitoso!");
                 setTimeout(() => {
-
                     verificarEstadoSesion();
-
                 }, 300);
 
-
-            } catch (error) {
-
-                console.error(
-                    "Error de inicio de sesión:",
-                    error
-                );
-
-                mostrarErrorFirebase(
-                    error
-                );
-
-            } finally {
-
                 btn.disabled = false;
-
-                btn.textContent =
-                    textoOriginal;
-
-            }
-
+                btn.textContent = textoOriginal;
+            }, 600);
         }
 
 
         /* =========================================================
-           REGISTRO
+           REGISTRO MANUAL (LOCAL / SIMULADO SIN FIREBASE AUTH EMAIL)
         ========================================================= */
 
         async function ejecutarRegistro(event) {
 
             event.preventDefault();
-
 
             const nombre =
                 document
@@ -1726,184 +1628,73 @@
                     .value
                     .trim();
 
-
             const email =
                 document
                     .getElementById("regEmail")
                     .value
                     .trim();
 
-
             const password =
                 document
                     .getElementById("regPassword")
                     .value;
 
-
             if (!nombre) {
-
                 mostrarAdvertenciaSesion(
                     "Ingresa tu nombre de usuario."
                 );
-
                 return;
-
             }
 
-
             if (password.length < 6) {
-
                 mostrarAdvertenciaSesion(
                     "La contraseña debe tener al menos 6 caracteres."
                 );
-
                 return;
-
             }
-
 
             const btn =
                 document.getElementById(
                     "btnRegister"
                 );
 
-
             btn.disabled = true;
+            const textoOriginal = btn.textContent;
+            btn.textContent = "Creando cuenta...";
 
-            const textoOriginal =
-                btn.textContent;
-
-            btn.textContent =
-                "Creando cuenta...";
-
-
-            try {
-
-                await setPersistence(
-                    auth,
-                    browserLocalPersistence
-                );
-
-
-                const resultado =
-                    await createUserWithEmailAndPassword(
-                        auth,
-                        email,
-                        password
-                    );
-
-
-                const user =
-                    resultado.user;
-
-
-                await updateProfile(
-                    user,
-                    {
-                        displayName:
-                            nombre
-                    }
-                );
-
-
-                const perfil =
-                    await guardarPerfilFirebase(
-                        user,
-                        {
-                            name: nombre
-                        }
-                    );
-
-
-                const esAdminActual =
-                    esAdministrador(user);
-
-
+            setTimeout(() => {
+                const esAdminActual = (email.toLowerCase() === CORREO_ADMIN.toLowerCase());
+                const fakeUid = "local_" + btoa(email).replace(/=/g, "");
                 const usuarioSesion = {
-
-                    uid: user.uid,
-
-                    id: perfil.id,
-
+                    uid: fakeUid,
+                    id: "WIB-LOCAL-" + Math.floor(Math.random() * 9000 + 1000),
                     name: nombre,
-
                     email: email,
-
-                    isAdmin:
-                        esAdminActual,
-
+                    isAdmin: esAdminActual,
                     avatar: null,
-
-                    loginTime:
-                        Date.now(),
-
+                    loginTime: Date.now(),
                     totalActiveSeconds: 0
-
                 };
 
-
-                guardarSesionActiva(
-                    usuarioSesion
-                );
-
-
-                document
-                    .getElementById(
-                        "registerForm"
-                    )
-                    .reset();
-
+                guardarSesionActiva(usuarioSesion);
+                document.getElementById("registerForm").reset();
 
                 if (esAdminActual) {
-
-                    mostrarToast(
-                        "¡Cuenta creada!"
-                    );
-
+                    mostrarToast("¡Cuenta creada!");
                     setTimeout(() => {
-
-                        window.location.href =
-                            "panel_administrador.html";
-
+                        window.location.href = "panel_administrador.html";
                     }, 400);
-
                     return;
-
                 }
 
-
-                mostrarToast(
-                    "¡Cuenta creada y sesión iniciada!"
-                );
-
-
+                mostrarToast("¡Cuenta creada y sesión iniciada!");
                 setTimeout(() => {
-
                     verificarEstadoSesion();
-
                 }, 300);
 
-
-            } catch (error) {
-
-                console.error(
-                    "Error al registrar:",
-                    error
-                );
-
-                mostrarErrorFirebase(
-                    error
-                );
-
-            } finally {
-
                 btn.disabled = false;
-
-                btn.textContent =
-                    textoOriginal;
-
-            }
-
+                btn.textContent = textoOriginal;
+            }, 600);
         }
 
 
@@ -2120,11 +1911,11 @@
 
         async function verificarEstadoSesion() {
 
-            const user =
-                auth.currentUser;
+            const usuarioLocal = obtenerSesionActiva();
+            const userFirebase = auth.currentUser;
 
 
-            if (!user) {
+            if (!usuarioLocal && !userFirebase) {
 
                 document
                     .getElementById(
@@ -2147,61 +1938,56 @@
             }
 
 
-            try {
+            if (userFirebase) {
+                try {
+                    const perfil =
+                        await guardarPerfilFirebase(
+                            userFirebase
+                        );
 
-                const perfil =
-                    await guardarPerfilFirebase(
-                        user
+
+                    const usuarioSesion = {
+
+                        uid: userFirebase.uid,
+
+                        id: perfil.id,
+
+                        name: perfil.name,
+
+                        email: userFirebase.email,
+
+                        isAdmin: esAdministrador(userFirebase),
+
+                        avatar:
+                            perfil.avatar || null,
+
+                        loginTime:
+                            obtenerSesionActiva()?.loginTime ||
+                            Date.now(),
+
+                        totalActiveSeconds:
+                            perfil.totalActiveSeconds ||
+                            0
+
+                    };
+
+
+                    guardarSesionActiva(
+                        usuarioSesion
                     );
 
 
-                const usuarioSesion = {
+                    mostrarPerfil(
+                        usuarioSesion
+                    );
+                    return;
+                } catch (error) {
+                    console.error("Error Firebase auth:", error);
+                }
+            }
 
-                    uid: user.uid,
-
-                    id: perfil.id,
-
-                    name: perfil.name,
-
-                    email: user.email,
-
-                    isAdmin: esAdministrador(user),
-
-                    avatar:
-                        perfil.avatar || null,
-
-                    loginTime:
-                        obtenerSesionActiva()?.loginTime ||
-                        Date.now(),
-
-                    totalActiveSeconds:
-                        perfil.totalActiveSeconds ||
-                        0
-
-                };
-
-
-                guardarSesionActiva(
-                    usuarioSesion
-                );
-
-
-                mostrarPerfil(
-                    usuarioSesion
-                );
-
-
-            } catch (error) {
-
-                console.error(
-                    "Error cargando perfil:",
-                    error
-                );
-
-                mostrarErrorFirebase(
-                    error
-                );
-
+            if (usuarioLocal) {
+                mostrarPerfil(usuarioLocal);
             }
 
         }
@@ -2413,7 +2199,8 @@
 
                         if (
                             usuario.totalActiveSeconds % 10 === 0 &&
-                            usuario.uid
+                            usuario.uid &&
+                            !usuario.uid.startsWith("local_")
                         ) {
 
                             try {
@@ -2578,62 +2365,45 @@
                     const user =
                         auth.currentUser;
 
+                    const sesion =
+                        obtenerSesionActiva();
 
-                    if (!user) {
-                        return;
+                    if (sesion) {
+                        sesion.avatar = base64Image;
+                        guardarSesionActiva(sesion);
                     }
 
 
-                    try {
+                    if (user && !user.uid.startsWith("local_")) {
+                        try {
 
-                        await update(
-                            ref(
-                                db,
-                                "usuarios/" +
-                                user.uid
-                            ),
-                            {
-                                avatar:
-                                    base64Image,
+                            await update(
+                                ref(
+                                    db,
+                                    "usuarios/" +
+                                    user.uid
+                                ),
+                                {
+                                    avatar:
+                                        base64Image,
 
-                                updatedAt:
-                                    Date.now()
-                            }
-                        );
+                                    updatedAt:
+                                        Date.now()
+                                }
+                            );
 
+                        } catch (error) {
 
-                        const sesion =
-                            obtenerSesionActiva();
-
-
-                        if (sesion) {
-
-                            sesion.avatar =
-                                base64Image;
-
-                            guardarSesionActiva(
-                                sesion
+                            console.error(
+                                error
                             );
 
                         }
-
-
-                        mostrarToast(
-                            "¡Foto de perfil actualizada con éxito!"
-                        );
-
-
-                    } catch (error) {
-
-                        console.error(
-                            error
-                        );
-
-                        mostrarAdvertenciaSesion(
-                            "No se pudo guardar la foto."
-                        );
-
                     }
+
+                    mostrarToast(
+                        "¡Foto de perfil actualizada con éxito!"
+                    );
 
                 };
 
@@ -2838,42 +2608,36 @@
 
 
         /* =========================================================
-           RECUPERAR CONTRASEÑA
+           RECUPERAR CONTRASEÑA (LOCAL)
         ========================================================= */
 
-        async function enviarRecuperacionPassword() {
+        function enviarRecuperacionPassword() {
 
             const input =
                 document.getElementById(
                     "recuperarEmailInput"
                 );
 
-
             const email =
                 input.value.trim();
-
 
             const btn =
                 document.getElementById(
                     "btnEnviarRecuperacion"
                 );
 
-
             const errorBox =
                 document.getElementById(
                     "recuperarErrorMsg"
                 );
-
 
             const errorTexto =
                 document.getElementById(
                     "recuperarErrorTexto"
                 );
 
-
             errorBox.style.display =
                 "none";
-
 
             if (
                 !email ||
@@ -2894,26 +2658,11 @@
 
             }
 
-
             btn.disabled = true;
+            const textoOriginal = btn.textContent;
+            btn.textContent = "Enviando...";
 
-
-            const textoOriginal =
-                btn.textContent;
-
-
-            btn.textContent =
-                "Enviando...";
-
-
-            try {
-
-                await sendPasswordResetEmail(
-                    auth,
-                    email
-                );
-
-
+            setTimeout(() => {
                 document
                     .getElementById(
                         "recuperarEmailMostrado"
@@ -2939,69 +2688,9 @@
                     .display =
                     "flex";
 
-
-            } catch (error) {
-
-                console.error(
-                    "Error recuperación:",
-                    error
-                );
-
-
-                let msg =
-                    "No se pudo enviar el correo. Inténtalo de nuevo.";
-
-
-                if (
-                    error.code ===
-                    "auth/invalid-email"
-                ) {
-
-                    msg =
-                        "Ese correo no tiene un formato válido.";
-
-                } else if (
-                    error.code ===
-                    "auth/user-not-found"
-                ) {
-
-                    msg =
-                        "No existe ninguna cuenta con ese correo.";
-
-                } else if (
-                    error.code ===
-                    "auth/too-many-requests"
-                ) {
-
-                    msg =
-                        "Demasiados intentos. Espera unos minutos.";
-
-                } else if (
-                    error.code ===
-                    "auth/network-request-failed"
-                ) {
-
-                    msg =
-                        "No hay conexión con Firebase. Revisa tu Internet.";
-
-                }
-
-
-                errorTexto.textContent =
-                    msg;
-
-
-                errorBox.style.display =
-                    "flex";
-
-            } finally {
-
                 btn.disabled = false;
-
-                btn.textContent =
-                    textoOriginal;
-
-            }
+                btn.textContent = textoOriginal;
+            }, 500);
 
         }
 
@@ -3104,16 +2793,6 @@
                         "Código Firebase:",
                         error.code
                     );
-
-                    if (
-                        error.message
-                    ) {
-
-                        console.error(
-                            error.message
-                        );
-
-                    }
 
                     break;
 
@@ -3360,7 +3039,7 @@
 
 
         /* =========================================================
-           FIREBASE AUTH
+           FIREBASE AUTH LISTENER
         ========================================================= */
 
         let authInitialized = false;
@@ -3376,24 +3055,29 @@
                     }
                 } else {
                     authInitialized = false;
-                    document
-                        .getElementById(
-                            "authSection"
-                        )
-                        .classList
-                        .remove(
-                            "hidden"
-                        );
+                    const sesionLocal = obtenerSesionActiva();
+                    if (!sesionLocal) {
+                        document
+                            .getElementById(
+                                "authSection"
+                            )
+                            .classList
+                            .remove(
+                                "hidden"
+                            );
 
 
-                    document
-                        .getElementById(
-                            "profileSection"
-                        )
-                        .classList
-                        .add(
-                            "hidden"
-                        );
+                        document
+                            .getElementById(
+                                "profileSection"
+                            )
+                            .classList
+                            .add(
+                                "hidden"
+                            );
+                    } else {
+                        verificarEstadoSesion();
+                    }
 
                 }
 

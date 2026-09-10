@@ -8,7 +8,6 @@
     <link rel="icon" href="../assets/img/cuenta.png" type="image/png">
 
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
     <style>
         body {
@@ -295,14 +294,6 @@
             outline: none;
             border-color: #6366f1;
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
-        }
-
-        .recaptcha-wrapper {
-            display: flex;
-            justify-content: center;
-            margin: 12px 0;
-            transform: scale(0.9);
-            transform-origin: 0 0;
         }
 
         .auth-btn {
@@ -695,7 +686,8 @@
                         <div id="g_id_onload"
                             data-client_id="913264385243-5niaqo5la6q46o1t65qs7jaufr753euh.apps.googleusercontent.com"
                             data-callback="handleGoogleSignIn"
-                            data-auto_prompt="false">
+                            data-auto_prompt="false"
+                            data-use_fedcm_for_prompt="true">
                         </div>
 
                         <div class="g_id_signin"
@@ -749,23 +741,6 @@
                             onclick="abrirModalRecuperacion(event)">
                             ¿Olvidaste tu contraseña?
                         </a>
-
-                        <div id="recaptchaContainer"
-                            class="form-group hidden">
-
-                            <label style="margin-bottom: 6px; color: #818cf8; font-weight: 600;">
-                                Verificación de seguridad (Semáforos / Pasos)
-                            </label>
-
-                            <div class="recaptcha-wrapper">
-
-                                <div class="g-recaptcha"
-                                    data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71IEGNQ_MXjiZKhI">
-                                </div>
-
-                            </div>
-
-                        </div>
 
                         <button type="submit"
                             class="auth-btn"
@@ -1156,6 +1131,8 @@
             signInWithEmailAndPassword,
             createUserWithEmailAndPassword,
             sendPasswordResetEmail,
+            GoogleAuthProvider,
+            signInWithCredential,
             signOut,
             onAuthStateChanged,
             updateProfile,
@@ -1315,7 +1292,7 @@
             if (!user) {
 
                 throw new Error(
-                    "Usuario no válido."
+                    "Usuario Firebase no válido."
                 );
 
             }
@@ -1906,99 +1883,209 @@
 
 
         /* =========================================================
-           GOOGLE LOGIN (DIRECTO CON GOOGLE Y MI CÓDIGO)
+           GOOGLE LOGIN
         ========================================================= */
 
-        function decodeJwtResponse(token) {
+        async function handleGoogleSignIn(
+            response
+        ) {
+
             try {
-                var base64Url = token.split('.')[1];
-                var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-                    return '%' + ('0' + c.charCodeAt(0).toString(16)).slice(-2);
-                }).join(''));
-                return JSON.parse(jsonPayload);
-            } catch (e) {
-                return null;
-            }
-        }
 
-        async function handleGoogleSignIn(response) {
-            try {
-                if (!response || !response.credential) {
-                    throw new Error("Google no devolvió las credenciales.");
+                if (
+                    !response ||
+                    !response.credential
+                ) {
+
+                    throw new Error(
+                        "Google no devolvió las credenciales."
+                    );
+
                 }
 
-                const payload = decodeJwtResponse(response.credential);
-                if (!payload) {
-                    throw new Error("No se pudo decodificar el token de Google.");
+
+                await setPersistence(
+                    auth,
+                    browserLocalPersistence
+                );
+
+
+                const credential =
+                    GoogleAuthProvider.credential(
+                        response.credential
+                    );
+
+
+                try {
+
+                    const resultado =
+                        await signInWithCredential(
+                            auth,
+                            credential
+                        );
+
+
+                    const user =
+                        resultado.user;
+
+
+                    await finalizarLoginFirebase(
+                        user
+                    );
+
+
+                } catch (errorGoogle) {
+
+                    console.error(
+                        "Google login:",
+                        errorGoogle
+                    );
+
+
+                    if (
+                        errorGoogle.code ===
+                        "auth/account-exists-with-different-credential"
+                    ) {
+
+                        mostrarAdvertenciaSesion(
+                            "Esta cuenta de Google ya está registrada con correo y contraseña. Inicia sesión primero con tu correo y contraseña."
+                        );
+
+                        return;
+
+                    }
+
+
+                    if (
+                        errorGoogle.code ===
+                        "auth/email-already-in-use"
+                    ) {
+
+                        mostrarAdvertenciaSesion(
+                            "Este correo ya tiene una cuenta. Inicia sesión con correo y contraseña."
+                        );
+
+                        return;
+
+                    }
+
+
+                    throw errorGoogle;
+
                 }
 
-                const googleEmail = payload.email;
-                const googleName = payload.name || "Usuario Google";
-                const googlePicture = payload.picture || null;
-
-                // UID personalizado para Google guardado en base de datos sin pasar por Firebase Auth
-                const safeUid = "google_" + googleEmail.replace(/[@\.]/g, "_");
-
-                const perfilRef = ref(db, "usuarios/" + safeUid);
-                const snapshot = await get(perfilRef);
-                let perfilActual = snapshot.exists() ? snapshot.val() : null;
-
-                const wibIdExistente = perfilActual && perfilActual.id ? perfilActual.id : generarIdUnico();
-
-                const perfil = {
-                    uid: safeUid,
-                    id: wibIdExistente,
-                    name: googleName,
-                    email: googleEmail,
-                    avatar: googlePicture || perfilActual?.avatar || null,
-                    isAdmin: esAdministrador({ email: googleEmail }),
-                    createdAt: perfilActual?.createdAt || Date.now(),
-                    updatedAt: Date.now(),
-                    totalActiveSeconds: perfilActual?.totalActiveSeconds || 0
-                };
-
-                await set(perfilRef, perfil);
-
-                const indiceRef = ref(db, "wibToUid/" + wibIdExistente);
-                const indiceSnapshot = await get(indiceRef);
-                if (!indiceSnapshot.exists()) {
-                    await set(indiceRef, safeUid);
-                }
-
-                const esAdminActual = perfil.isAdmin;
-
-                const usuarioSesion = {
-                    uid: safeUid,
-                    id: perfil.id,
-                    name: perfil.name,
-                    email: googleEmail,
-                    isAdmin: esAdminActual,
-                    avatar: perfil.avatar,
-                    loginTime: Date.now(),
-                    totalActiveSeconds: perfil.totalActiveSeconds
-                };
-
-                guardarSesionActiva(usuarioSesion);
-
-                if (esAdminActual) {
-                    mostrarToast("¡Bienvenido, administrador!");
-                    setTimeout(() => {
-                        window.location.href = "panel_administrador.html";
-                    }, 400);
-                    return;
-                }
-
-                mostrarToast(`¡Bienvenido, ${perfil.name}!`);
-
-                setTimeout(() => {
-                    verificarEstadoSesion();
-                }, 300);
 
             } catch (error) {
-                console.error("Error Google Login:", error);
-                mostrarAdvertenciaSesion("Error al iniciar sesión con Google.");
+
+                console.error(
+                    "Error Google/Firebase:",
+                    error
+                );
+
+                mostrarErrorFirebase(
+                    error
+                );
+
             }
+
+        }
+
+
+        /* =========================================================
+           FINALIZAR LOGIN
+        ========================================================= */
+
+        async function finalizarLoginFirebase(
+            user
+        ) {
+
+            if (!user) {
+
+                throw new Error(
+                    "Usuario Firebase no válido."
+                );
+
+            }
+
+
+            const perfil =
+                await guardarPerfilFirebase(
+                    user,
+                    {
+                        name:
+                            user.displayName ||
+                            "Usuario",
+
+                        avatar:
+                            user.photoURL ||
+                            null
+                    }
+                );
+
+
+            const esAdminActual =
+                esAdministrador(user);
+
+
+            const usuarioSesion = {
+
+                uid: user.uid,
+
+                id: perfil.id,
+
+                name: perfil.name,
+
+                email: user.email,
+
+                isAdmin:
+                    esAdminActual,
+
+                avatar:
+                    perfil.avatar || null,
+
+                loginTime:
+                    Date.now(),
+
+                totalActiveSeconds:
+                    perfil.totalActiveSeconds || 0
+
+            };
+
+
+            guardarSesionActiva(
+                usuarioSesion
+            );
+
+
+            if (esAdminActual) {
+
+                mostrarToast(
+                    "¡Bienvenido, administrador!"
+                );
+
+                setTimeout(() => {
+
+                    window.location.href =
+                        "panel_administrador.html";
+
+                }, 400);
+
+                return;
+
+            }
+
+
+            mostrarToast(
+                `¡Bienvenido, ${perfil.name}!`
+            );
+
+
+            setTimeout(() => {
+
+                verificarEstadoSesion();
+
+            }, 300);
+
         }
 
 
@@ -2008,11 +2095,11 @@
 
         async function verificarEstadoSesion() {
 
-            const user = auth.currentUser;
-            const sesionLocal = obtenerSesionActiva();
+            const user =
+                auth.currentUser;
 
 
-            if (!user && !sesionLocal) {
+            if (!user) {
 
                 document
                     .getElementById(
@@ -2035,43 +2122,31 @@
             }
 
 
-            const currentEmail = user ? user.email : sesionLocal.email;
-
-            if (esAdministrador({ email: currentEmail })) {
-
-                window.location.href =
-                    "panel_administrador.html";
-
-                return;
-
-            }
-
-
             try {
 
-                const uidActivo = user ? user.uid : sesionLocal.uid;
-                const perfilRef = ref(db, "usuarios/" + uidActivo);
-                const snapshot = await get(perfilRef);
-                const perfil = snapshot.exists() ? snapshot.val() : sesionLocal;
+                const perfil =
+                    await guardarPerfilFirebase(
+                        user
+                    );
 
 
                 const usuarioSesion = {
 
-                    uid: uidActivo,
+                    uid: user.uid,
 
                     id: perfil.id,
 
                     name: perfil.name,
 
-                    email: currentEmail,
+                    email: user.email,
 
-                    isAdmin: false,
+                    isAdmin: esAdministrador(user),
 
                     avatar:
                         perfil.avatar || null,
 
                     loginTime:
-                        sesionLocal?.loginTime ||
+                        obtenerSesionActiva()?.loginTime ||
                         Date.now(),
 
                     totalActiveSeconds:
@@ -2475,8 +2550,13 @@
                     }
 
 
-                    const sesion = obtenerSesionActiva();
-                    if (!sesion) return;
+                    const user =
+                        auth.currentUser;
+
+
+                    if (!user) {
+                        return;
+                    }
 
 
                     try {
@@ -2485,7 +2565,7 @@
                             ref(
                                 db,
                                 "usuarios/" +
-                                sesion.uid
+                                user.uid
                             ),
                             {
                                 avatar:
@@ -2495,6 +2575,10 @@
                                     Date.now()
                             }
                         );
+
+
+                        const sesion =
+                            obtenerSesionActiva();
 
 
                         if (sesion) {
@@ -2572,7 +2656,14 @@
                     auth
                 );
 
-            } catch (error) {}
+            } catch (error) {
+
+                console.error(
+                    "Error cerrando Firebase:",
+                    error
+                );
+
+            }
 
 
             eliminarSesionActiva();
@@ -2590,29 +2681,6 @@
                     "loginPassword"
                 )
                 .value = "";
-
-
-            document
-                .getElementById(
-                    "recaptchaContainer"
-                )
-                .classList
-                .add("hidden");
-
-
-            if (
-                window.grecaptcha &&
-                typeof grecaptcha.reset ===
-                "function"
-            ) {
-
-                try {
-
-                    grecaptcha.reset();
-
-                } catch (e) {}
-
-            }
 
 
             document
@@ -2965,10 +3033,26 @@
                     break;
 
 
+                case "auth/account-exists-with-different-credential":
+
+                    mensaje =
+                        "Este correo ya está registrado con otro método de acceso.";
+
+                    break;
+
+
                 case "auth/weak-password":
 
                     mensaje =
                         "La contraseña debe tener al menos 6 caracteres.";
+
+                    break;
+
+
+                case "auth/operation-not-allowed":
+
+                    mensaje =
+                        "El inicio de sesión por correo no está activado en Firebase.";
 
                     break;
 
@@ -2990,6 +3074,21 @@
 
 
                 default:
+
+                    console.error(
+                        "Código Firebase:",
+                        error.code
+                    );
+
+                    if (
+                        error.message
+                    ) {
+
+                        console.error(
+                            error.message
+                        );
+
+                    }
 
                     break;
 
@@ -3224,110 +3323,34 @@
 
 
         /* =========================================================
-           MOSTRAR RECAPTCHA ADMIN
+           INICIALIZACIÓN
         ========================================================= */
 
         document.addEventListener(
             "DOMContentLoaded",
             function() {
-
-                const loginEmail =
-                    document.getElementById(
-                        "loginEmail"
-                    );
-
-
-                loginEmail.addEventListener(
-                    "input",
-                    function(e) {
-
-                        const emailIngresado =
-                            e.target.value
-                                .trim()
-                                .toLowerCase();
-
-
-                        const recaptchaDiv =
-                            document.getElementById(
-                                "recaptchaContainer"
-                            );
-
-
-                        if (
-                            emailIngresado ===
-                            CORREO_ADMIN.toLowerCase()
-                        ) {
-
-                            recaptchaDiv
-                                .classList
-                                .remove(
-                                    "hidden"
-                                );
-
-                        } else {
-
-                            recaptchaDiv
-                                .classList
-                                .add(
-                                    "hidden"
-                                );
-
-                        }
-
-                    }
-                );
-
-
                 configurarEventosInactividad();
-
             }
         );
 
 
         /* =========================================================
-           FIREBASE AUTH LISTENER + SESIÓN LOCAL
+           FIREBASE AUTH
         ========================================================= */
+
+        let authInitialized = false;
 
         onAuthStateChanged(
             auth,
             async (user) => {
 
-                const sesionLocal = obtenerSesionActiva();
-
                 if (user) {
-
-                    if (
-                        esAdministrador(user)
-                    ) {
-
-                        window.location.href =
-                            "panel_administrador.html";
-
-                        return;
-
+                    if (!authInitialized) {
+                        authInitialized = true;
+                        await verificarEstadoSesion();
                     }
-
-
-                    await verificarEstadoSesion();
-
-                } else if (sesionLocal) {
-
-                    if (
-                        esAdministrador({ email: sesionLocal.email })
-                    ) {
-
-                        window.location.href =
-                            "panel_administrador.html";
-
-                        return;
-
-                    }
-
-
-                    await verificarEstadoSesion();
-
                 } else {
-
+                    authInitialized = false;
                     document
                         .getElementById(
                             "authSection"

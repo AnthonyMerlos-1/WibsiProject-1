@@ -14,93 +14,17 @@
             color: #e0e0e0 !important;
         }
 
-        /* --- ESTILOS DE LA PANTALLA DE CARGA PROFESIONAL --- */
-        #splashScreen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: #0d0d12;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 99999;
-            transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+        /* --- FONDO ANIMADO DEGRADADO FLUIDO --- */
+        body.dark-mode {
+            background: linear-gradient(-45deg, #0a0a0f, #12121a, #1a1025, #0d111a);
+            background-size: 400% 400%;
+            animation: gradientBackground 15s ease infinite;
         }
 
-        #splashScreen.cinematic-exit {
-            opacity: 0;
-            transform: scale(1.15);
-            pointer-events: none;
-        }
-
-        .splash-content {
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .splash-logo-circle {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #6366f1, #a855f7);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            font-weight: 900;
-            color: #ffffff;
-            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.5);
-            animation: pulseLogo 1.5s infinite ease-in-out;
-        }
-
-        .splash-title {
-            font-size: 24px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            color: #ffffff;
-            font-family: system-ui, -apple-system, sans-serif;
-        }
-
-        .splash-title span {
-            color: #6366f1;
-        }
-
-        .splash-loader-bar {
-            width: 200px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .splash-loader-progress {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #6366f1, #a855f7);
-            border-radius: 4px;
-            transition: width 0.1s linear;
-        }
-
-        .splash-status-text {
-            font-size: 12px;
-            color: #888899;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        @keyframes pulseLogo {
-            0%, 100% { transform: scale(1); box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4); }
-            50% { transform: scale(1.08); box-shadow: 0 15px 40px rgba(168, 85, 247, 0.6); }
+        @keyframes gradientBackground {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         /* --- ESTILOS PARA SOPORTE DE MODO OSCURO / BLANCO --- */
@@ -130,6 +54,63 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* --- ANIMACIONES Y MEJORAS DE DISEÑO EN BOTONES Y TARJETAS --- */
+        button, .top-button, .side-link, .category, .action-chip, .view-all, .profile-button, .icon-button {
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover, .top-button:hover, .side-link:hover, .category:hover, .action-chip:hover, .view-all:hover, .profile-button:hover, .icon-button:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.35);
+        }
+
+        button:active, .top-button:active, .side-link:active, .category:active {
+            transform: translateY(1px) scale(0.98);
+        }
+
+        /* Efecto brillo al pasar el mouse por botones principales */
+        .top-button::after, .side-link::after, .category::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(0deg, rgba(255,255,255,0), rgba(255,255,255,0.1), rgba(255,255,255,0));
+            transform: rotate(45deg) translateY(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .top-button:hover::after, .side-link:hover::after, .category:hover::after {
+            transform: rotate(45deg) translateY(100%);
+        }
+
+        /* Tarjetas de video con microanimación mejorada */
+        .video-card {
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease !important;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(30, 30, 35, 0.6);
+            backdrop-filter: blur(10px);
+        }
+
+        .video-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 16px 35px rgba(99, 102, 241, 0.25);
+            border-color: rgba(99, 102, 241, 0.4);
+        }
+
+        .video-card img {
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .video-card:hover img {
+            transform: scale(1.08);
         }
 
         /* --- Estilos y Animación Exclusivos para "Mira. Explora. Repite." --- */
@@ -350,10 +331,6 @@
             color: #fff !important;
             border-color: #ff007f;
         }
-        .action-chip.playlist-btn:hover {
-            background: #10b981 !important;
-            color: #fff !important;
-        }
 
         @media (max-width: 768px) {
             .ymusic-right-controls .hide-mobile {
@@ -370,18 +347,6 @@
 </head>
 
 <body class="dark-mode">
-
-    <!-- PANTALLA DE CARGA PROFESIONAL -->
-    <div id="splashScreen">
-        <div class="splash-content">
-            <img src="assets/img/logwiti.png" alt="WIBSIPROJECT Logo" style="width: 80px; height: 80px; object-fit: contain; margin-bottom: 15px; animation: pulse 1.5s infinite;">
-            <div class="splash-title">WIBSIPROJECT<span>.</span></div>
-            <div class="splash-loader-bar">
-                <div class="splash-loader-progress" id="splashProgress"></div>
-            </div>
-            <div class="splash-status-text" id="splashStatus">Ingresando a WIBSIPROJECT... 0%</div>
-        </div>
-    </div>
 
     <div class="ambient ambient-one"></div>
     <div class="ambient ambient-two"></div>
@@ -1222,67 +1187,6 @@
 
     <script>
         // =====================================================
-        // CONTROLADOR INTELIGENTE DE LA PANTALLA DE CARGA CON CINEMÁTICA
-        // =====================================================
-       (function() {
-    window.addEventListener('load', function() {
-        const splash = document.getElementById('splashScreen');
-        
-        if (!splash) return;
-
-        const navEntries = performance.getEntriesByType('navigation');
-        const isReload = navEntries.length > 0 && navEntries[0].type === 'reload';
-        const alreadyLoaded = sessionStorage.getItem('wibsi_splash_shown');
-
-        if (alreadyLoaded && !isReload) {
-            splash.remove();
-            return;
-        }
-
-        sessionStorage.setItem('wibsi_splash_shown', 'true');
-
-        const progressBar = document.getElementById('splashProgress');
-        const statusText = document.getElementById('splashStatus');
-        
-        let progress = 0;
-        
-        const interval = setInterval(function() {
-            progress += Math.floor(Math.random() * 8) + 4;
-            if (progress > 100) progress = 100;
-            
-            if (progressBar) {
-                progressBar.style.width = progress + '%';
-            }
-            
-            if (statusText) {
-                if (progress < 40) {
-                    statusText.innerText = `Cargando módulos de WIBSIPROJECT... ${progress}%`;
-                } else if (progress < 80) {
-                    statusText.innerText = `Sincronizando almacenamiento local... ${progress}%`;
-                } else {
-                    statusText.innerText = `Finalizando configuración... ${progress}%`;
-                }
-            }
-            
-            if (progress === 100) {
-                clearInterval(interval);
-                
-                if (statusText) {
-                    statusText.innerText = "¡Bienvenido a WIBSIPROJECT!";
-                }
-                
-                setTimeout(function() {
-                    splash.classList.add('cinematic-exit');
-                    setTimeout(function() {
-                        splash.remove();
-                    }, 800);
-                }, 400);
-            }
-        }, 35);
-    });
-})();
-
-        // =====================================================
         // BOTÓN "SORPRÉNDEME" - ELIGE UN VIDEO ALEATORIO
         // =====================================================
         document.addEventListener("DOMContentLoaded", function () {
@@ -1359,6 +1263,7 @@
         };
 
         document.addEventListener("DOMContentLoaded", function() {
+            // Filtrar y eliminar de inmediato los videos guardados como eliminados previamente
             let videosEliminados = JSON.parse(localStorage.getItem('wibsi_videos_eliminados')) || [];
             const cardsIniciales = document.querySelectorAll('.video-grid .video-card');
             cardsIniciales.forEach((card, index) => {
@@ -1387,7 +1292,6 @@
                 actionsDiv.className = 'card-quick-actions';
                 actionsDiv.innerHTML = `
                     <button class="action-chip fav-btn ${esFav ? 'favorito-activo' : ''}" onclick="toggleFavoritoIndex(event, '${uniqueFavId}', this)" title="Marcar como favorito">❤</button>
-                    <button class="action-chip playlist-btn" onclick="agregarAPlaylist(event, '${tituloVal.replace(/'/g, "\\'")}', '${videoUrl}', '${imagenUrl}')" title="Agregar a Playlist">📋 Playlist</button>
                     <button class="action-chip" onclick="abrirModalEditar(event, '${index}', '${tituloVal.replace(/'/g, "\\'")}')" title="Editar título">✏️</button>
                     <button class="action-chip privado-btn" onclick="enviarAVideoPrivado(event, '${tituloVal.replace(/'/g, "\\'")}', '${videoUrl}', '${imagenUrl}')" title="Guardar como privado">🔒</button>
                     <button class="action-chip" onclick="eliminarVideoConContrasena(event, this, '${uniqueFavId}', '${videoUrl}')" title="Eliminar video">🗑️</button>
@@ -1521,6 +1425,7 @@
 
                         const indexCard = videoGrid.querySelectorAll('.video-card').length;
 
+                        // Verificar si este custom ya estaba eliminado
                         if (videosEliminados.includes(uniqueFavId) || videosEliminados.includes(urlVideo)) {
                             return;
                         }
@@ -1534,7 +1439,6 @@
                                 <button class="play-button">▶</button>
                                 <div class="card-quick-actions" style="opacity: 1;">
                                     <button class="action-chip fav-btn" onclick="toggleFavoritoIndex(event, '${uniqueFavId}', this)" title="Marcar como favorito">❤</button>
-                                    <button class="action-chip playlist-btn" onclick="agregarAPlaylist(event, '${titulo.replace(/'/g, "\\'")}', '${urlVideo}', '${portada}')" title="Agregar a Playlist">📋 Playlist</button>
                                     <button class="action-chip" onclick="abrirModalEditar(event, '${indexCard}', '${titulo.replace(/'/g, "\\'")}')" title="Editar título">✏️</button>
                                     <button class="action-chip privado-btn" onclick="enviarAVideoPrivado(event, '${titulo.replace(/'/g, "\\'")}', '${urlVideo}', '${portada}')" title="Guardar como privado">🔒</button>
                                     <button class="action-chip" onclick="eliminarVideoConContrasena(event, this, '${uniqueFavId}', '${urlVideo}')" title="Eliminar video">🗑️</button>
@@ -1575,79 +1479,6 @@
         });
 
         // =====================================================
-        // FUNCIÓN DE AGREGAR A PLAYLIST (TENDENCIAS Y FAVORITOS)
-        // =====================================================
-        function agregarAPlaylist(event, titulo, videoUrl, imagenUrl) {
-            event.stopPropagation();
-            
-            // Sincronizar con almacenamiento de tendencias y playlist general
-            let playlistTendencias = JSON.parse(localStorage.getItem('wibsi_playlist_tendencias')) || [];
-            let playlistGeneral = JSON.parse(localStorage.getItem('wibsi_playlist')) || [];
-            
-            const newItem = {
-                title: titulo,
-                video: videoUrl,
-                image: imagenUrl,
-                fecha: new Date().toLocaleDateString()
-            };
-
-            const yaExisteTendencias = playlistTendencias.some(item => item.video === videoUrl);
-            if (!yaExisteTendencias) {
-                playlistTendencias.push(newItem);
-                localStorage.setItem('wibsi_playlist_tendencias', JSON.stringify(playlistTendencias));
-            }
-
-            const yaExisteGeneral = playlistGeneral.some(item => item.video === videoUrl);
-            if (!yaExisteGeneral) {
-                playlistGeneral.push(newItem);
-                localStorage.setItem('wibsi_playlist', JSON.stringify(playlistGeneral));
-            }
-
-            mostrarToast("¡Video agregado a la Playlist y Tendencias con éxito! 📋");
-        }
-
-        // =====================================================
-        // FUNCIÓN DE FAVORITOS (CORAZÓN) Y TENDENCIAS
-        // =====================================================
-        function toggleFavoritoIndex(event, id, btnElement) {
-            event.stopPropagation();
-            let favoritos = JSON.parse(localStorage.getItem('wibsi_favoritos')) || [];
-            const index = favoritos.indexOf(id);
-
-            let catalogoDinamico = JSON.parse(localStorage.getItem('wibsi_catalogo_favoritos')) || [];
-            
-            const cardEl = btnElement.closest('.video-card');
-            if (cardEl) {
-                const titulo = cardEl.querySelector('.video-title') ? cardEl.querySelector('.video-title').textContent : 'Video WIBSIPROJECT';
-                const videoUrl = cardEl.getAttribute('data-video') || '';
-                const imagenUrl = cardEl.querySelector('img') ? cardEl.querySelector('img').src : 'assets/img/portada1.jpg';
-                
-                if (!catalogoDinamico.some(item => item.id === id || item.video === videoUrl)) {
-                    catalogoDinamico.push({
-                        id: id,
-                        titulo: titulo,
-                        descripcion: 'Video guardado desde favoritos',
-                        video: videoUrl,
-                        image: imagenUrl
-                    });
-                    localStorage.setItem('wibsi_catalogo_favoritos', JSON.stringify(catalogoDinamico));
-                }
-            }
-
-            if (index > -1) {
-                favoritos.splice(index, 1);
-                btnElement.classList.remove('favorito-activo');
-                mostrarToast("Eliminado de favoritos 💔");
-            } else {
-                favoritos.push(id);
-                btnElement.classList.add('favorito-activo');
-                mostrarToast("¡Añadido a Favoritos con éxito! ❤");
-            }
-
-            localStorage.setItem('wibsi_favoritos', JSON.stringify(favoritos));
-        }
-
-        // =====================================================
         // FUNCIÓN DE ELIMINAR VIDEO CON CONTRASEÑA Y PERSISTENCIA
         // =====================================================
         function eliminarVideoConContrasena(event, btnElement, uniqueId, videoUrl) {
@@ -1657,6 +1488,7 @@
             if (passwordIngresada === "borrar123basura") {
                 const card = btnElement.closest('.video-card');
                 if (card) {
+                    // Guardar en la lista de eliminados en localStorage
                     let videosEliminados = JSON.parse(localStorage.getItem('wibsi_videos_eliminados')) || [];
                     if (uniqueId && !videosEliminados.includes(uniqueId)) {
                         videosEliminados.push(uniqueId);
@@ -1707,6 +1539,41 @@
             }
         }
 
+        function toggleFavoritoIndex(event, id, btnElement) {
+            event.stopPropagation();
+            let favoritos = JSON.parse(localStorage.getItem('wibsi_favoritos')) || [];
+            const index = favoritos.indexOf(id);
+
+            let catalogoDinamico = JSON.parse(localStorage.getItem('wibsi_catalogo_favoritos')) || [];
+            
+            const cardEl = btnElement.closest('.video-card');
+            if (cardEl && !catalogoDinamico.some(item => item.id === id)) {
+                const titulo = cardEl.querySelector('.video-title') ? cardEl.querySelector('.video-title').textContent : 'Video WIBSIPROJECT';
+                const videoUrl = cardEl.getAttribute('data-video') || '';
+                const imagenUrl = cardEl.querySelector('img') ? cardEl.querySelector('img').src : 'assets/img/portada1.jpg';
+                catalogoDinamico.push({
+                    id: id,
+                    titulo: '🎬 ' + titulo,
+                    descripcion: 'Video interactivo guardado directamente.',
+                    video: videoUrl,
+                    image: imagenUrl
+                });
+                localStorage.setItem('wibsi_catalogo_favoritos', JSON.stringify(catalogoDinamico));
+            }
+
+            if (index > -1) {
+                favoritos.splice(index, 1);
+                btnElement.classList.remove('favorito-activo');
+                mostrarToast("Eliminado de favoritos 💔");
+            } else {
+                favoritos.push(id);
+                btnElement.classList.add('favorito-activo');
+                mostrarToast("¡Añadido a favoritos con éxito! ❤");
+            }
+
+            localStorage.setItem('wibsi_favoritos', JSON.stringify(favoritos));
+        }
+
         function actualizarPanelVideos() {
             const panelContainer = document.getElementById('panelVideosContainer');
             const panelContador = document.getElementById('panelContadorVideos');
@@ -1715,6 +1582,7 @@
             let misVideosPanel = JSON.parse(localStorage.getItem('wibsitihub_panel_videos')) || [];
             let videosEliminados = JSON.parse(localStorage.getItem('wibsi_videos_eliminados')) || [];
             
+            // Filtrar panel si alguno fue eliminado
             misVideosPanel = misVideosPanel.filter(v => !videosEliminados.includes(v.id) && !videosEliminados.includes(v.video));
 
             panelContador.textContent = `${misVideosPanel.length} videos`;
@@ -2000,3 +1868,4 @@
     <script src="js/script.js"></script>
 </body>
 </html>
+```[cite: 2]

@@ -3,169 +3,592 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Historial - WibsiProject</title>
+    <title>Historial - WIBSIPROJECT</title>
     <link rel="stylesheet" href="../css/style.css">
     <link rel="icon" href="../assets/img/historial.png" type="image/png">
+    <!-- FontAwesome para íconos interactivos avanzados -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
         body.dark-mode {
-            background-color: #121212;
-            color: #e0e0e0;
+            background-color: #050508;
+            color: #f0f0f0;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
+
+        /* Fondo dinámico idéntico a las demás páginas principales */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
+            background: linear-gradient(135deg, #050508, #11111d, #1a0b2e);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        #canvas3d {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
         .historial-container {
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 20px;
+            max-width: 950px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem;
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            flex: 1;
         }
+
+        /* Barra superior elegante con efectos modernos */
         .top-nav-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
+            margin-bottom: 2.5rem;
+            background: rgba(18, 18, 30, 0.6);
+            backdrop-filter: blur(14px);
+            padding: 1rem 1.5rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
         }
+
         .btn-volver {
-            background: #6366f1;
-            color: white;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            transition: background 0.2s, transform 0.2s;
+            gap: 0.6rem;
+            padding: 0.6rem 1.3rem;
+            background: linear-gradient(135deg, #00d2ff, #9b51e0, #ff007f);
+            background-size: 200% 200%;
+            color: #ffffff;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 50px;
+            box-shadow: 0 5px 20px rgba(0, 210, 255, 0.3);
+            animation: colorShift 5s ease infinite, pulseGlow 2s infinite alternate;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
         }
+
+        @keyframes colorShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes pulseGlow {
+            from { box-shadow: 0 0 10px rgba(0, 210, 255, 0.2); }
+            to { box-shadow: 0 0 22px rgba(255, 0, 127, 0.6); }
+        }
+
         .btn-volver:hover {
-            background: #4f46e5;
-            transform: scale(1.02);
+            transform: scale(1.06) translateY(-2px);
+            box-shadow: 0 8px 25px rgba(155, 81, 224, 0.7);
         }
+
+        .btn-limpiar {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 0.6rem 1.2rem;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .btn-limpiar:hover {
+            background: #ef4444;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(239, 68, 68, 0.5);
+        }
+
+        .header-title-container {
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .header-title-container h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, #00d2ff, #9b51e0, #ff007f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.4rem;
+            letter-spacing: -0.5px;
+        }
+
+        .header-title-container p {
+            color: #a0a0c0;
+            font-size: 1rem;
+        }
+
+        /* Tarjetas de historial mejoradas con Glassmorphism y animaciones de entrada */
         .historial-card {
             display: flex;
             align-items: center;
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(18, 18, 30, 0.7);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 12px;
-            gap: 15px;
+            border-radius: 18px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            gap: 1.2rem;
             cursor: pointer;
-            transition: background 0.2s, transform 0.2s;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s ease, box-shadow 0.3s ease;
+            animation: cardEntrance 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            opacity: 0;
+            transform: translateY(15px);
         }
+
+        @keyframes cardEntrance {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .historial-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: linear-gradient(180deg, #00d2ff, #ff007f);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
         .historial-card:hover {
-            background: rgba(255, 255, 255, 0.06);
-            transform: translateY(-2px);
+            background: rgba(25, 25, 45, 0.85);
+            transform: translateY(-4px) scale(1.01);
+            border-color: rgba(0, 210, 255, 0.4);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 210, 255, 0.1);
         }
+
+        .historial-card:hover::before {
+            opacity: 1;
+        }
+
         .historial-thumb-container {
             position: relative;
-            width: 120px;
-            height: 70px;
-            border-radius: 6px;
+            width: 130px;
+            height: 75px;
+            border-radius: 10px;
             overflow: hidden;
             flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
         }
+
         .historial-thumb {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transition: transform 0.4s ease;
         }
+
+        .historial-card:hover .historial-thumb {
+            transform: scale(1.1);
+        }
+
         .play-overlay-icon {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.4);
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 16px;
+            color: #fff;
+            font-size: 1.2rem;
             opacity: 0;
-            transition: opacity 0.2s;
+            transition: opacity 0.3s ease;
         }
+
         .historial-card:hover .play-overlay-icon {
             opacity: 1;
         }
+
         .historial-info {
             flex: 1;
         }
+
         .historial-title {
-            font-size: 15px;
+            font-size: 1.05rem;
             font-weight: 600;
             color: #fff;
-            margin-bottom: 4px;
+            margin-bottom: 0.3rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
+
         .historial-date {
-            font-size: 12px;
+            font-size: 0.85rem;
             color: #9ca3af;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
         }
-        .btn-limpiar {
-            background: #ef4444;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: 600;
+
+        .btn-delete-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #9ca3af;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .btn-limpiar:hover {
-            background: #dc2626;
+
+        .btn-delete-item:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+            color: #ef4444;
+            transform: scale(1.15) rotate(90deg);
+        }
+
+        /* Estado vacío mejorado */
+        .empty-historial {
+            text-align: center;
+            padding: 5rem 2rem;
+            background: rgba(18, 18, 30, 0.4);
+            border-radius: 20px;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .empty-historial i {
+            font-size: 3.5rem;
+            color: #00d2ff;
+            margin-bottom: 1rem;
+            animation: pulseGlow 2s infinite alternate;
+        }
+
+        .empty-historial h3 {
+            font-size: 1.4rem;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-historial p {
+            color: #9ca3af;
+            font-size: 0.95rem;
+        }
+
+        /* Modal Reproductor rediseñado con estilo Glassmorphism */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 5, 8, 0.85);
+            backdrop-filter: blur(12px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .player-window {
+            width: 90%;
+            max-width: 800px;
+            background: rgba(18, 18, 30, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 210, 255, 0.2);
+        }
+
+        .player-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: rgba(12, 12, 20, 0.95);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .player-brand {
+            font-weight: bold;
+            color: #fff;
+            letter-spacing: 0.5px;
+            font-size: 1rem;
+        }
+
+        .player-brand span {
+            color: #00d2ff;
+        }
+
+        .btn-close-modal {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-close-modal:hover {
+            background: #ff007f;
+            border-color: #ff007f;
+            transform: rotate(90deg) scale(1.1);
+        }
+
+        .player {
+            position: relative;
+            width: 100%;
+            background: #000;
+            aspect-ratio: 16/9;
+        }
+
+        #videoPlayer {
+            width: 100%;
+            height: 100%;
+        }
+
+        .player-details {
+            padding: 1.2rem 1.5rem;
+            background: rgba(18, 18, 30, 0.5);
+        }
+
+        #playerTitle {
+            font-size: 1.2rem;
+            color: #fff;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+        }
+
+        .player-subtitle {
+            font-size: 0.85rem;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        /* Notificación Toast interactiva */
+        #toastContainer {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: rgba(18, 18, 30, 0.9);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            color: #fff;
+            padding: 0.9rem 1.4rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 0.9rem;
+            animation: toastSlideIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), toastFadeOut 0.3s ease 2.7s forwards;
+        }
+
+        .toast i {
+            color: #00d2ff;
+            font-size: 1.1rem;
+        }
+
+        @keyframes toastSlideIn {
+            from { transform: translateX(100%) scale(0.8); opacity: 0; }
+            to { transform: translateX(0) scale(1); opacity: 1; }
+        }
+
+        @keyframes toastFadeOut {
+            to { transform: translateY(20px); opacity: 0; }
+        }
+
+        footer {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            color: #707090;
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 2;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            background: rgba(5, 5, 8, 0.6);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Diseño Responsivo */
+        @media (max-width: 768px) {
+            .top-nav-bar {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+                text-align: center;
+            }
+            .btn-volver, .btn-limpiar {
+                justify-content: center;
+            }
+            .header-title-container h1 {
+                font-size: 2rem;
+            }
+            .historial-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .historial-thumb-container {
+                width: 100%;
+                height: 160px;
+            }
+            .btn-delete-item {
+                align-self: flex-end;
+                margin-top: -35px;
+            }
         }
     </style>
 </head>
 <body class="dark-mode">
 
+    <!-- Fondo dinámico y canvas Three.js idéntico al sistema -->
+    <div class="bg-animation"></div>
+    <canvas id="canvas3d"></canvas>
+
     <div class="historial-container">
-        <!-- Barra superior con botón de volver y vaciar historial -->
+        <!-- Barra superior interactiva con botones animados -->
         <div class="top-nav-bar">
-
-
-           <a href="../index.html" class="btn-volver">
-    <span>←</span> Volver a Inicio
-</a>
-
-
-
-            
-            <button class="btn-limpiar" onclick="limpiarHistorial()">Vaciar Historial</button>
+            <a href="../index.html" class="btn-volver">
+                <i class="fa-solid fa-arrow-left"></i> Volver a Inicio
+            </a>
+            <button class="btn-limpiar" onclick="limpiarHistorial()" title="Vaciar todo el historial">
+                <i class="fa-solid fa-trash-can"></i> Vaciar Historial
+            </button>
         </div>
 
-        <h1 style="margin-bottom: 20px;">Historial de Reproducción 💻️</h1>
+        <div class="header-title-container">
+            <h1>Historial de Reproducción 💻️</h1>
+            <p>Registros multimedia sincronizados con tu almacenamiento local en WIBSIPROJECT.</p>
+        </div>
 
         <div id="listaHistorial">
             <!-- Los elementos del historial se cargarán aquí automáticamente -->
         </div>
     </div>
 
-    <!-- Modal Reproductor integrado para ver los videos del historial -->
-    <div class="modal" id="videoModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center;">
-        <div class="player-window" style="width: 90%; max-width: 800px; background: #1e1e24; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
-            <div class="player-header" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: #121216;">
-                <div class="player-brand" style="font-weight: bold; color: #fff;">WIBSIPROJECT<span>. REPRODUCTOR</span></div>
-                <button onclick="cerrarModalVideo()" style="background: transparent; border: none; color: #fff; font-size: 18px; cursor: pointer;">✕</button>
+    <!-- Modal Reproductor integrado avanzado -->
+    <div class="modal" id="videoModal">
+        <div class="player-window">
+            <div class="player-header">
+                <div class="player-brand">WIBSIPROJECT<span>. REPRODUCTOR</span></div>
+                <button class="btn-close-modal" onclick="cerrarModalVideo()" title="Cerrar reproductor">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
-            <div class="player" style="position: relative; width: 100%; background: #000; aspect-ratio: 16/9;">
-                <video id="videoPlayer" controls playsinline style="width: 100%; height: 100%;"></video>
+            <div class="player">
+                <video id="videoPlayer" controls playsinline></video>
             </div>
-            <div class="player-details" style="padding: 15px 20px;">
-                <h2 id="playerTitle" style="font-size: 18px; color: #fff; margin-bottom: 5px;">Video</h2>
-                <p style="font-size: 13px; color: #9ca3af;">Reproduciendo desde tu historial de WibsiProject.</p>
+            <div class="player-details">
+                <h2 id="playerTitle">Video</h2>
+                <div class="player-subtitle">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Reproduciendo desde tu historial de WIBSIPROJECT.
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Contenedor de notificaciones Toast -->
+    <div id="toastContainer"></div>
+
+    <footer>
+        <p>&copy; 2026 WIBSIPROJECT - Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Three.js para mantener la animación de fondo 3D idéntica a las demás páginas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             renderizarHistorial();
         });
+
+        // Sistema de notificaciones Toast interactivas
+        function mostrarToast(mensaje, icono = 'fa-circle-check') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<i class="fa-solid ${icono}"></i> <span>${mensaje}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
 
         function renderizarHistorial() {
             const contenedor = document.getElementById('listaHistorial');
             const historial = JSON.parse(localStorage.getItem('wibsitihub_historial_videos')) || [];
 
             if (historial.length === 0) {
-                contenedor.innerHTML = `<p style="color: #888; font-style: italic;">No has reproducido ningún video o música todavía.</p>`;
+                contenedor.innerHTML = `
+                    <div class="empty-historial">
+                        <i class="fa-regular fa-folder-open"></i>
+                        <h3>Sin historial de reproducción</h3>
+                        <p>No has reproducido ningún video o música todavía. Explora los módulos de WIBSIPROJECT para generar registros.</p>
+                    </div>
+                `;
                 return;
             }
 
@@ -173,19 +596,24 @@
             historial.forEach((item, index) => {
                 const card = document.createElement('div');
                 card.className = 'historial-card';
-                // Al hacer clic en la tarjeta se abre el video directamente
                 card.setAttribute('onclick', `reproducirVideoHistorial('${item.title.replace(/'/g, "\\'")}', '${item.video}')`);
                 
                 card.innerHTML = `
                     <div class="historial-thumb-container">
                         <img src="${item.image || '../assets/img/portada1.jpg'}" class="historial-thumb" alt="Miniatura">
-                        <div class="play-overlay-icon">▶</div>
+                        <div class="play-overlay-icon">
+                            <i class="fa-solid fa-play"></i>
+                        </div>
                     </div>
                     <div class="historial-info">
                         <div class="historial-title">${item.title}</div>
-                        <div class="historial-date">Visto el: ${item.fecha || 'Recientemente'}</div>
+                        <div class="historial-date">
+                            <i class="fa-regular fa-clock"></i> Visto el: ${item.fecha || 'Recientemente'}
+                        </div>
                     </div>
-                    <button style="background:transparent; border:none; color:#ef4444; cursor:pointer; font-size:18px; padding: 10px;" onclick="event.stopPropagation(); eliminarItemHistorial(${index})" title="Eliminar del historial">✕</button>
+                    <button class="btn-delete-item" onclick="event.stopPropagation(); eliminarItemHistorial(${index})" title="Eliminar del historial">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
                 `;
                 contenedor.appendChild(card);
             });
@@ -220,17 +648,78 @@
 
         function eliminarItemHistorial(index) {
             let historial = JSON.parse(localStorage.getItem('wibsitihub_historial_videos')) || [];
+            const itemEliminado = historial[index];
             historial.splice(index, 1);
             localStorage.setItem('wibsitihub_historial_videos', JSON.stringify(historial));
             renderizarHistorial();
+            mostrarToast('Elemento eliminado del historial', 'fa-trash-can');
         }
 
         function limpiarHistorial() {
-            if (confirm("¿Estás seguro de que deseas vaciar todo tu historial?")) {
+            const historial = JSON.parse(localStorage.getItem('wibsitihub_historial_videos')) || [];
+            if (historial.length === 0) {
+                mostrarToast('El historial ya está vacío', 'fa-triangle-exclamation');
+                return;
+            }
+            if (confirm("¿Estás seguro de que deseas vaciar todo tu historial de reproducción?")) {
                 localStorage.removeItem('wibsitihub_historial_videos');
                 renderizarHistorial();
+                mostrarToast('Se ha vaciado todo el historial', 'fa-broom');
             }
         }
+
+        // Configuración del fondo 3D con Three.js (idéntico al resto de la plataforma)
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#canvas3d'), alpha: true, antialias: true });
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        const geometry = new THREE.IcosahedronGeometry(2, 0);
+        const material = new THREE.MeshStandardMaterial({
+            color: 0xff007f,
+            wireframe: true,
+            roughness: 0.4,
+            metalness: 0.8
+        });
+
+        const icosahedron = new THREE.Mesh(geometry, material);
+        scene.add(icosahedron);
+
+        const pointLight = new THREE.PointLight(0x00d2ff, 3, 50);
+        pointLight.position.set(5, 5, 5);
+        scene.add(pointLight);
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        camera.position.z = 6;
+
+        let mouseX = 0;
+        let mouseY = 0;
+
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX / window.innerWidth) - 0.5;
+            mouseY = (event.clientY / window.innerHeight) - 0.5;
+        });
+
+        const clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+            const elapsedTime = clock.getElapsedTime();
+            icosahedron.rotation.x = elapsedTime * 0.3 + mouseY * 0.6;
+            icosahedron.rotation.y = elapsedTime * 0.4 + mouseX * 0.6;
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
     </script>
 </body>
 </html>

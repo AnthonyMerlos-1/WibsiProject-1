@@ -1,2521 +1,1114 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link rel="icon" href="../assets/img/chast.png" type="image/png">
-
-    <title>Wchat - Chat en línea</title>
-
+    <link rel="icon" href="../assets/img/Wi.png" type="image/png">
+    <title>WitiIA - WIBSIPROJECT</title>
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --bg-main: #f8fafc;
+            --bg-sidebar: #ffffff;
+            --bg-card: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --accent-color: #6366f1;
+            --accent-hover: #4f46e5;
+            --bubble-incoming: #f1f5f9;
+            --bubble-outgoing: #6366f1;
+            --bubble-outgoing-text: #ffffff;
+            --input-bg: #f8fafc;
+        }
+
+        body.dark-theme {
+            --bg-main: #0d0e12;
+            --bg-sidebar: #16181d;
+            --bg-card: #16181d;
+            --border-color: #232731;
+            --text-primary: #ffffff;
+            --text-secondary: #8a99ad;
+            --accent-color: #5865F2;
+            --accent-hover: #4752C4;
+            --bubble-incoming: #1e222a;
+            --bubble-outgoing: #5865F2;
+            --bubble-outgoing-text: #ffffff;
+            --input-bg: #0f1015;
         }
 
         body {
-            background: #0b0f19;
-            color: #f3f4f6;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
             height: 100vh;
             display: flex;
-            justify-content: center;
-            align-items: center;
             overflow: hidden;
-            animation: fadeInBody 0.6s ease-out;
+            transition: background 0.3s, color 0.3s;
         }
 
-        @keyframes fadeInBody {
-            from { opacity: 0; transform: scale(0.98); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .wchat-container {
-            width: 100%;
-            max-width: 1250px;
-            height: 100vh;
-            background: rgba(18, 22, 35, 0.95);
-            display: flex;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, .6);
-            position: relative;
-            overflow: hidden;
-            animation: slideUpContainer 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes slideUpContainer {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        @media (min-width: 768px) {
-            .wchat-container {
-                height: 92vh;
-                border-radius: 20px;
-                border: 1px solid rgba(255, 255, 255, .08);
-            }
-        }
-
-        .wchat-sidebar {
-            width: 360px;
-            background: rgba(15, 18, 29, .98);
-            border-right: 1px solid rgba(255, 255, 255, .06);
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-        }
-
-        .wchat-sidebar-header {
-            padding: 16px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid rgba(255, 255, 255, .06);
-        }
-
-        .wchat-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .wchat-logo-icon {
-            width: 38px;
-            height: 38px;
-            background: linear-gradient(135deg, #00b09b, #96c93d);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            color: #fff;
-            font-size: 16px;
-            transition: transform 0.3s ease;
-        }
-        .wchat-logo-icon:hover {
-            transform: rotate(10deg) scale(1.05);
-        }
-
-        .wchat-logo-text {
-            font-size: 18px;
-            font-weight: 800;
-            color: #fff;
-        }
-
-        .wchat-logo-text span {
-            color: #00b09b;
-        }
-
-        .wchat-header-actions {
-            display: flex;
-            gap: 6px;
-        }
-
-        .wchat-action-btn {
-            background: rgba(255, 255, 255, .05);
-            border: 1px solid rgba(255, 255, 255, .08);
-            color: #d1d5db;
-            padding: 7px 10px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 11px;
-            font-weight: 600;
-            transition: all 0.2s ease;
-        }
-
-        .wchat-action-btn:hover {
-            background: rgba(0, 176, 155, .15);
-            border-color: #00b09b;
-            color: #fff;
-            transform: translateY(-1px);
-        }
-
-        .badge-count {
-            background: #ef4444;
-            color: white;
-            font-size: 9px;
-            padding: 2px 5px;
-            border-radius: 10px;
-            font-weight: bold;
-            animation: pulseBadge 2s infinite;
-        }
-
-        @keyframes pulseBadge {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.15); }
-            100% { transform: scale(1); }
-        }
-
-        .user-profile-summary {
-            background: rgba(0, 176, 155, .05);
-            border-bottom: 1px solid rgba(0, 176, 155, .15);
-            padding: 12px 18px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-        }
-
-        .user-profile-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            min-width: 0;
-            cursor: pointer;
-        }
-
-        .user-profile-avatar {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #00b09b, #4f46e5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            color: white;
-            font-size: 15px;
-            flex-shrink: 0;
-            object-fit: cover;
-            border: 2px solid rgba(0, 176, 155, 0.4);
-            overflow: hidden;
-            transition: transform 0.2s;
-        }
-
-        .user-profile-avatar:hover {
-            transform: scale(1.05);
-        }
-
-        .user-profile-avatar img {
+        #auth-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover;
-        }
-
-        .user-profile-info {
-            min-width: 0;
-            flex: 1;
-        }
-
-        .user-profile-name {
-            font-size: 13px;
-            font-weight: 700;
-            color: white;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .user-profile-desc {
-            font-size: 11px;
-            color: #9ca3af;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .user-profile-id {
-            font-size: 10px;
-            color: #00b09b;
-            font-family: monospace;
-        }
-
-        .settings-gear-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #d1d5db;
-            padding: 8px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 14px;
+            background: var(--bg-main);
             display: flex;
-            align-items: center;
             justify-content: center;
-            transition: all 0.2s;
+            align-items: center;
+            z-index: 100;
         }
 
-        .settings-gear-btn:hover {
-            background: rgba(0, 176, 155, 0.2);
-            color: white;
-            border-color: #00b09b;
-            transform: rotate(45deg);
-        }
-
-        .wchat-search-box {
-            padding: 12px 18px;
-        }
-
-        .wchat-search-input {
+        .auth-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 35px;
+            border-radius: 20px;
             width: 100%;
-            background: rgba(255, 255, 255, .04);
-            border: 1px solid rgba(255, 255, 255, .08);
-            padding: 10px 14px;
-            border-radius: 12px;
-            color: white;
-            outline: none;
+            max-width: 420px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .auth-card h2 {
+            margin-bottom: 25px;
+            font-size: 24px;
+            color: var(--text-primary);
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
             transition: border-color 0.2s;
         }
 
-        .wchat-search-input:focus {
-            border-color: #00b09b;
+        .form-group input:focus {
+            border-color: var(--accent-color);
+            outline: none;
         }
 
-        .wchat-chats-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 0 8px;
-        }
-
-        .wchat-chat-item {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 12px 14px;
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
             cursor: pointer;
-            border-radius: 12px;
-            margin-bottom: 4px;
             transition: background 0.2s, transform 0.1s;
+            font-size: 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
         }
 
-        .wchat-chat-item:hover {
-            background: rgba(255, 255, 255, .04);
-            transform: translateX(3px);
+        .btn-primary:hover {
+            background: var(--accent-hover);
         }
 
-        .wchat-chat-item.active {
-            background: linear-gradient(
-                90deg,
-                rgba(0, 176, 155, .15),
-                rgba(0, 176, 155, .03)
-            );
-            border-left: 3px solid #00b09b;
+        .btn-primary:active {
+            transform: scale(0.98);
         }
 
-        .wchat-avatar {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #4f46e5, #06b6d4);
+        #chat-app {
+            display: none;
+            width: 100%;
+            height: 100vh;
+            background: var(--bg-main);
+        }
+
+        .app-layout {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        .sidebar {
+            width: 340px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-profile-info h4 {
+            font-size: 15px;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .user-profile-info span {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .sidebar-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .btn-icon-top {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 700;
-            color: white;
+            cursor: pointer;
             font-size: 14px;
-            flex-shrink: 0;
+            transition: background 0.2s;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .btn-icon-top:hover {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .btn-new-chat {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .btn-new-chat:hover { background: var(--accent-hover); }
+
+        .chats-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .chat-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: background 0.2s;
             position: relative;
+        }
+
+        .chat-item:hover, .chat-item.active {
+            background: var(--input-bg);
+        }
+
+        .chat-item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            overflow: hidden;
+            flex: 1;
+        }
+
+        .chat-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: var(--accent-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+
+        .chat-info {
             overflow: hidden;
         }
 
-        .wchat-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .wchat-status-dot {
-            width: 10px;
-            height: 10px;
-            background: #10b981;
-            border: 2px solid #12151f;
-            border-radius: 50%;
-            position: absolute;
-            bottom: 1px;
-            right: 1px;
-        }
-
-        .offline {
-            background: #6b7280 !important;
-        }
-
-        .wchat-chat-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .wchat-chat-name-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 3px;
-        }
-
-        .wchat-chat-name {
-            font-size: 14px;
+        .chat-info h5 {
+            font-size: 13px;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
             font-weight: 600;
-            color: white;
         }
 
-        .wchat-chat-time {
-            font-size: 10px;
-            color: #6b7280;
-        }
-
-        .wchat-chat-preview {
-            font-size: 12px;
-            color: #9ca3af;
+        .chat-info p {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 2px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        .wchat-main {
+        /* Menú de 3 puntos para cada chat */
+        .chat-options-container {
+            position: relative;
+        }
+
+        .btn-three-dots {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: color 0.2s, background 0.2s;
+        }
+
+        .btn-three-dots:hover {
+            color: var(--text-primary);
+            background: var(--border-color);
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 30px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            z-index: 50;
+            width: 140px;
+            overflow: hidden;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .dropdown-item {
+            padding: 10px 14px;
+            font-size: 12px;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background: var(--input-bg);
+        }
+
+        .dropdown-item.danger {
+            color: #ef4444;
+        }
+        .dropdown-item.danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .chat-main {
             flex: 1;
             display: flex;
             flex-direction: column;
-            background: #0d1019;
-            min-width: 0;
+            background: var(--bg-main);
         }
 
-        .wchat-main-header {
-            padding: 12px 16px;
-            background: rgba(18, 22, 35, .9);
-            border-bottom: 1px solid rgba(255, 255, 255, .06);
+        .chat-header-bar {
+            padding: 15px 25px;
+            background: var(--bg-sidebar);
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
+            justify-content: space-between;
         }
 
-        .wchat-active-user {
+        .chat-header-left {
             display: flex;
             align-items: center;
             gap: 12px;
         }
 
-        .wchat-active-details h3 {
-            font-size: 15px;
-            color: white;
-        }
-
-        .wchat-active-details p {
-            font-size: 12px;
-            color: #00b09b;
-        }
-
-        .wchat-messages-scroll {
+        .messages-container {
             flex: 1;
-            padding: 16px;
+            padding: 25px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            scroll-behavior: smooth;
+            gap: 16px;
+            background-image: radial-gradient(circle, var(--border-color) 1px, transparent 1px);
+            background-size: 32px 32px;
         }
 
-        .empty-chat {
-            margin: auto;
-            text-align: center;
-            color: #6b7280;
-            animation: fadeIn 0.5s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .wchat-msg {
-            max-width: 75%;
-            padding: 10px 14px;
+        .message {
+            max-width: 70%;
+            padding: 12px 16px;
             border-radius: 14px;
-            font-size: 13.5px;
-            line-height: 1.45;
-            word-break: break-word;
-            animation: messagePop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            font-size: 14px;
+            line-height: 1.5;
+            position: relative;
+            animation: messagePop 0.3s ease-out;
+            word-wrap: break-word;
+            white-space: pre-wrap;
         }
 
-        @keyframes messagePop {
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .wchat-msg.incoming {
-            background: #1a1e2d;
+        .message.incoming {
+            background: var(--bubble-incoming);
+            color: var(--text-primary);
             align-self: flex-start;
             border-bottom-left-radius: 4px;
+            border: 1px solid var(--border-color);
         }
 
-        .wchat-msg.outgoing {
-            background: linear-gradient(135deg, #00b09b, #00897b);
+        .message.outgoing {
+            background: var(--bubble-outgoing);
+            color: var(--bubble-outgoing-text);
             align-self: flex-end;
             border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
         }
 
-        .wchat-msg-time {
-            font-size: 9px;
-            opacity: .7;
+        .message-time {
+            font-size: 10px;
+            color: inherit;
+            opacity: 0.7;
             text-align: right;
-            margin-top: 4px;
+            margin-top: 6px;
         }
 
-        .wchat-msg.sticker {
-            background: transparent !important;
-            font-size: 45px;
-            padding: 0;
-            box-shadow: none;
-        }
-
-        .wchat-file-card {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(0,0,0,0.2);
-            padding: 8px 12px;
-            border-radius: 10px;
-            margin-bottom: 5px;
-            border: 1px solid rgba(255,255,255,0.08);
-        }
-
-        .wchat-file-icon {
-            font-size: 24px;
-        }
-
-        .wchat-file-info {
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-        }
-
-        .wchat-file-name {
-            font-weight: 600;
-            font-size: 12px;
-            color: white;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .wchat-file-download {
-            font-size: 10.5px;
-            color: #00b09b;
-            text-decoration: none;
-            margin-top: 2px;
-            font-weight: 600;
-        }
-
-        .wchat-file-download:hover {
-            text-decoration: underline;
-        }
-
-        .typing-indicator-box {
+        .typing-indicator {
             display: none;
+            align-self: flex-start;
+            background: var(--bubble-incoming);
+            border: 1px solid var(--border-color);
+            padding: 12px 16px;
+            border-radius: 14px;
+            border-bottom-left-radius: 4px;
+            font-size: 13px;
+            color: var(--text-secondary);
             align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            color: #9ca3af;
-            font-size: 11.5px;
-            background: rgba(18, 22, 35, 0.5);
-            width: fit-content;
-            border-radius: 12px;
-            margin-left: 16px;
-            margin-bottom: 6px;
-            animation: fadeIn 0.3s;
-        }
-
-        .typing-indicator-box.active {
-            display: flex;
+            gap: 8px;
         }
 
         .typing-dots {
             display: flex;
-            gap: 3px;
-            align-items: center;
+            gap: 4px;
         }
 
         .typing-dots span {
-            width: 4px;
-            height: 4px;
-            background: #00b09b;
+            width: 6px;
+            height: 6px;
+            background: var(--accent-color);
             border-radius: 50%;
-            animation: typingBounce 1.4s infinite ease-in-out both;
+            animation: typingBounce 1.2s infinite ease-in-out;
         }
 
-        .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
-        .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
 
         @keyframes typingBounce {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1.0); }
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
         }
 
-        .wchat-input-bar {
-            padding: 10px 14px;
-            background: rgba(18, 22, 35, .95);
-            border-top: 1px solid rgba(255, 255, 255, .06);
+        .suggestions-bar {
+            padding: 8px 20px;
+            background: var(--bg-sidebar);
+            border-top: 1px solid var(--border-color);
             display: flex;
             gap: 8px;
-            position: relative;
+            overflow-x: auto;
         }
 
-        .wchat-text-input {
-            flex: 1;
-            min-width: 0;
-            background: rgba(255, 255, 255, .04);
-            border: 1px solid rgba(255, 255, 255, .08);
-            padding: 10px 14px;
-            border-radius: 12px;
-            color: white;
-            font-size: 13.5px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        .wchat-text-input:focus {
-            border-color: #00b09b;
-        }
-
-        .wchat-send-btn {
-            background: linear-gradient(135deg, #00b09b, #00897b);
-            color: white;
-            border: none;
-            padding: 10px 14px;
-            border-radius: 12px;
-            font-size: 13px;
-            font-weight: 600;
+        .suggestion-chip {
+            background: var(--input-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
             cursor: pointer;
-            transition: transform 0.1s, opacity 0.2s;
-            flex-shrink: 0;
-        }
-
-        .wchat-send-btn:hover {
-            transform: translateY(-1px);
-            opacity: 0.95;
-        }
-
-        .sticker-panel {
-            position: absolute;
-            bottom: 65px;
-            right: 10px;
-            background: #161b2c;
-            border: 1px solid rgba(255,255,255,.1);
-            border-radius: 14px;
-            padding: 10px;
-            display: none;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 6px;
-            width: 300px;
-            max-height: 260px;
-            overflow-y: auto;
-            z-index: 20;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            animation: popPanel 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes popPanel {
-            from { transform: translateY(10px) scale(0.95); opacity: 0; }
-            to { transform: translateY(0) scale(1); opacity: 1; }
-        }
-
-        .sticker-panel.active {
-            display: grid;
-        }
-
-        .sticker-option {
-            font-size: 24px;
-            text-align: center;
-            padding: 4px;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: background 0.15s, transform 0.1s;
-        }
-
-        .sticker-option:hover {
-            background: rgba(255,255,255,.08);
-            transform: scale(1.15);
-        }
-
-        .tool-btn {
-            width: 38px;
-            height: 38px;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,.08);
-            background: rgba(255,255,255,.05);
-            color: white;
-            cursor: pointer;
-            font-size: 15px;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            white-space: nowrap;
             transition: all 0.2s;
+            font-weight: 500;
         }
 
-        .tool-btn:hover {
-            background: rgba(0,176,155,.15);
-            border-color: #00b09b;
-            transform: translateY(-1px);
+        .suggestion-chip:hover {
+            background: var(--accent-color);
+            color: #fff;
+            border-color: var(--accent-color);
         }
 
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,.7);
-            backdrop-filter: blur(8px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-            z-index: 100;
-            padding: 15px;
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .modal-card {
-            width: 100%;
-            max-width: 420px;
-            background: #161b2c;
-            border: 1px solid rgba(255,255,255,.1);
-            padding: 20px;
-            border-radius: 18px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-            transform: scale(0.95);
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-overlay.active .modal-card {
-            transform: scale(1);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .modal-header h3 {
-            color: white;
-            font-size: 16px;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            color: #9ca3af;
-            cursor: pointer;
-            font-size: 18px;
-            transition: color 0.2s;
-        }
-        .modal-close:hover {
-            color: white;
-        }
-
-        .modal-body p {
-            font-size: 12.5px;
-            color: #9ca3af;
-            margin-bottom: 10px;
-        }
-
-        .modal-input, .modal-textarea {
-            width: 100%;
-            padding: 10px 12px;
-            background: rgba(255,255,255,.05);
-            border: 1px solid rgba(255,255,255,.1);
-            border-radius: 10px;
-            color: white;
-            font-size: 13.5px;
-            outline: none;
-            margin-bottom: 10px;
-            font-family: inherit;
-            transition: border-color 0.2s;
-        }
-
-        .modal-input:focus, .modal-textarea:focus {
-            border-color: #00b09b;
-        }
-
-        .modal-textarea {
-            resize: vertical;
-            min-height: 70px;
-        }
-
-        .avatar-preview-container {
+        .chat-input-bar {
+            padding: 14px 20px;
+            background: var(--bg-sidebar);
+            border-top: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 12px;
-            background: rgba(255,255,255,0.02);
-            padding: 8px;
-            border-radius: 12px;
-            border: 1px dashed rgba(255,255,255,0.1);
         }
 
-        .avatar-preview-circle {
-            width: 50px;
-            height: 50px;
+        .chat-input-bar input {
+            flex: 1;
+            padding: 12px 18px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .chat-input-bar input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .action-icon-btn {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            background: #00b09b;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
-            font-weight: bold;
-            color: white;
-            font-size: 18px;
-            flex-shrink: 0;
-            border: 2px solid #00b09b;
-        }
-
-        .avatar-preview-circle img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .modal-footer {
-            margin-top: 14px;
-            display: flex;
-            justify-content: flex-end;
-            gap: 8px;
-        }
-
-        .modal-btn {
-            padding: 8px 14px;
-            border-radius: 9px;
+            font-size: 16px;
             cursor: pointer;
-            border: none;
-            font-size: 13px;
-            font-weight: 600;
-            transition: opacity 0.2s;
-        }
-        .modal-btn:hover {
-            opacity: 0.9;
-        }
-
-        .cancel {
-            background: transparent;
-            border: 1px solid rgba(255,255,255,.1);
-            color: white;
-        }
-
-        .confirm {
-            background: #00b09b;
-            color: white;
-        }
-
-        .invite {
-            background: rgba(255,255,255,.03);
-            border: 1px solid rgba(255,255,255,.07);
-            padding: 10px;
-            border-radius: 10px;
-            margin-bottom: 8px;
-        }
-
-        .invite-name {
-            font-size: 13.5px;
-            color: white;
-            font-weight: 600;
-        }
-
-        .invite-id {
-            font-family: monospace;
-            font-size: 10.5px;
-            color: #00b09b;
-            margin-top: 2px;
-        }
-
-        .invite-buttons {
-            margin-top: 8px;
-            display: flex;
-            gap: 6px;
-        }
-
-        .accept {
-            background: #10b981;
-            color: white;
-            border: none;
-            padding: 5px 9px;
-            font-size: 12px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        .reject {
-            background: #ef4444;
-            color: white;
-            border: none;
-            padding: 5px 9px;
-            font-size: 12px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        .back-home {
-            position: fixed;
-            top: 12px;
-            right: 16px;
-            background: rgba(255,255,255,.05);
-            border: 1px solid rgba(255,255,255,.1);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-size: 11.5px;
-            z-index: 1000;
             transition: all 0.2s;
         }
-        .back-home:hover {
-            background: rgba(0,176,155,0.2);
-            border-color: #00b09b;
+
+        .action-icon-btn:hover {
+            color: var(--text-primary);
+            background: var(--border-color);
         }
 
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #161b2c;
-            border: 1px solid rgba(255,255,255,.15);
+        .action-icon-btn.recording {
+            color: #ef4444;
+            border-color: #ef4444;
+            animation: pulseRecord 1.2s infinite ease-in-out;
+        }
+
+        .action-icon-btn.send-btn {
+            background: var(--accent-color);
             color: white;
-            padding: 10px 16px;
-            border-radius: 10px;
+            border-color: var(--accent-color);
+        }
+        .action-icon-btn.send-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .recording-indicator {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 6px 14px;
+            border-radius: 20px;
+            color: #ef4444;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .wave-bars {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            height: 14px;
+        }
+
+        .wave-bar {
+            width: 3px;
+            height: 100%;
+            background: #ef4444;
+            animation: waveAnim 0.8s infinite ease-in-out alternate;
+        }
+
+        .wave-bar:nth-child(2) { animation-delay: 0.2s; }
+        .wave-bar:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes waveAnim {
+            0% { transform: scaleY(0.3); }
+            100% { transform: scaleY(1); }
+        }
+
+        @keyframes pulseRecord {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.97); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes messagePop {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .back-home-link {
+            display: inline-block;
+            margin-top: 15px;
+            color: var(--text-secondary);
+            text-decoration: none;
             font-size: 13px;
-            z-index: 500;
-            max-width: 300px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            animation: toastSlide 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            text-align: center;
+            width: 100%;
+            font-weight: 500;
         }
-
-        @keyframes toastSlide {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        /* AJUSTES ESPECÍFICOS PARA DISPOSITIVOS MÓVILES */
-        @media(max-width: 767px) {
-            body {
-                align-items: stretch;
-                height: 100dvh;
-            }
-
-            .wchat-container {
-                height: 100dvh;
-                border-radius: 0;
-                flex-direction: row;
-            }
-
-            .wchat-sidebar {
-                width: 76px;
-                min-width: 76px;
-            }
-
-            .wchat-logo-text,
-            .wchat-search-box,
-            .wchat-chat-info,
-            .user-profile-info,
-            .settings-gear-btn {
-                display: none !important;
-            }
-
-            .wchat-sidebar-header {
-                padding: 12px 8px;
-                justify-content: center;
-            }
-
-            .wchat-logo {
-                justify-content: center;
-                gap: 0;
-            }
-
-            .wchat-logo-icon {
-                width: 34px;
-                height: 34px;
-                font-size: 14px;
-            }
-
-            .wchat-header-actions {
-                flex-direction: column;
-                gap: 4px;
-                width: 100%;
-                align-items: center;
-            }
-
-            .wchat-action-btn {
-                width: 100%;
-                padding: 5px 0;
-                text-align: center;
-                font-size: 10px;
-            }
-
-            .user-profile-summary {
-                justify-content: center;
-                padding: 8px 4px;
-            }
-
-            .user-profile-left {
-                justify-content: center;
-            }
-
-            .user-profile-avatar {
-                width: 38px;
-                height: 38px;
-                font-size: 13px;
-            }
-
-            .wchat-chats-list {
-                padding: 0 4px;
-            }
-
-            .wchat-chat-item {
-                justify-content: center;
-                padding: 10px 4px;
-                margin-bottom: 6px;
-            }
-
-            .wchat-avatar {
-                width: 40px;
-                height: 40px;
-                font-size: 13px;
-            }
-
-            .wchat-main {
-                flex: 1;
-                min-width: 0;
-            }
-
-            .wchat-main-header {
-                padding: 10px 12px;
-            }
-
-            .wchat-active-details h3 {
-                font-size: 13.5px;
-            }
-
-            .wchat-active-details p {
-                font-size: 11px;
-            }
-
-            .wchat-messages-scroll {
-                padding: 12px;
-            }
-
-            .wchat-msg {
-                max-width: 85%;
-                font-size: 13px;
-                padding: 9px 12px;
-            }
-
-            .back-home {
-                display: none;
-            }
-
-            .wchat-input-bar {
-                padding: 8px 10px;
-                gap: 5px;
-            }
-
-            .tool-btn {
-                width: 34px;
-                height: 34px;
-                font-size: 14px;
-                border-radius: 10px;
-            }
-
-            .wchat-text-input {
-                padding: 8px 10px;
-                font-size: 13px;
-                border-radius: 10px;
-            }
-
-            .wchat-send-btn {
-                padding: 8px 10px;
-                font-size: 12px;
-                border-radius: 10px;
-            }
-
-            .sticker-panel {
-                right: 8px;
-                bottom: 58px;
-                width: 260px;
-                max-height: 220px;
-            }
-
-            .sticker-option {
-                font-size: 22px;
-            }
-        }
+        .back-home-link:hover { color: var(--text-primary); }
     </style>
 </head>
+<body class="dark-theme">
 
-<body>
-
-<a href="../index.html" class="back-home">🏠 Inicio</a>
-
-<div class="wchat-container">
-
-    <aside class="wchat-sidebar">
-
-        <div class="wchat-sidebar-header">
-
-            <div class="wchat-logo">
-                <div class="wchat-logo-icon">W</div>
-
-                <div class="wchat-logo-text">
-                    W<span>chat</span>
+    <div id="auth-screen">
+        <div class="auth-card">
+            <h2>WitiIA & Chats WIBSIPROJECT</h2>
+            <form id="loginForm" onsubmit="iniciarSesion(event)">
+                <div class="form-group">
+                    <label>Tu Nombre</label>
+                    <input type="text" id="regName" placeholder="Ej. Anthony" required>
                 </div>
-            </div>
-
-            <div class="wchat-header-actions">
-
-                <button
-                    class="wchat-action-btn"
-                    onclick="abrirModalId()">
-                    ➕ ID
-                </button>
-
-                <button
-                    class="wchat-action-btn"
-                    onclick="abrirBuzon()">
-                    📥 <span class="badge-count" id="badgeCount" style="display:none;">0</span>
-                </button>
-
-            </div>
-
+                <div class="form-group">
+                    <label>Tu Correo Electrónico</label>
+                    <input type="email" id="regEmail" placeholder="tucorreo@dominio.com" required>
+                </div>
+                <button type="submit" class="btn-primary">Ingresar a mi cuenta</button>
+            </form>
+            <a href="../index.html" class="btn-primary" style="margin-top: 15px;">Ir al inicio</a>
         </div>
+    </div>
 
-        <!-- SECCIÓN DE TU CUENTA (FOTO, NOMBRE, DESCRIPCIÓN, ID Y AJUSTES) -->
-        <div class="user-profile-summary">
-            <div class="user-profile-left" onclick="abrirModalConfiguracion()" title="Ver y editar tu cuenta">
-                <div class="user-profile-avatar" id="myAvatarDisplay">
-                    U
-                </div>
-                <div class="user-profile-info">
-                    <div class="user-profile-name" id="myUserNameDisplay">Usuario</div>
-                    <div class="user-profile-desc" id="myUserDescDisplay">Sin descripción</div>
-                    <div class="user-profile-id" id="myUserIdDisplay">---</div>
-                </div>
-            </div>
-            <button class="settings-gear-btn" onclick="abrirModalConfiguracion()" title="Ajustes de cuenta">
-                ⚙️
-            </button>
-        </div>
-
-        <div class="wchat-search-box">
-
-            <input
-                id="searchChats"
-                class="wchat-search-input"
-                type="text"
-                placeholder="Buscar chats..."
-            >
-
-        </div>
-
-        <div
-            class="wchat-chats-list"
-            id="chatsList">
-
-            <div
-                class="wchat-chat-item active"
-                id="supportChat"
-                data-chat-id="soporte"
-                onclick="seleccionarChat('soporte','Soporte Wchat',this)">
-
-                <div class="wchat-avatar">
-                    SW
-                    <div class="wchat-status-dot"></div>
-                </div>
-
-                <div class="wchat-chat-info">
-
-                    <div class="wchat-chat-name-row">
-
-                        <span class="wchat-chat-name">
-                            Soporte Wchat
-                        </span>
-
+    <div id="chat-app">
+        <div class="app-layout">
+            
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <div class="user-profile-info">
+                        <h4 id="displayUserName">Usuario</h4>
+                        <span id="displayUserEmail">correo@dominio.com</span>
                     </div>
-
-                    <div class="wchat-chat-preview">
-                        Sistema de Wchat
+                    <div class="sidebar-actions">
+                        <a href="../index.html" class="btn-icon-top" title="Ir al inicio">🏠</a>
+                        <button class="btn-icon-top" onclick="alternarTemaVisual()" title="Cambiar Tema (Blanco/Negro)" id="themeToggleBtn">☀️</button>
+                        <button class="btn-new-chat" onclick="crearNuevoChat()">+ Nuevo</button>
                     </div>
-
                 </div>
 
+                <div class="chats-list" id="chatsList">
+                    <!-- Los chats se cargan aquí dinámicamente -->
+                </div>
             </div>
 
-        </div>
-
-    </aside>
-
-    <main class="wchat-main" id="wchatMainContainer">
-
-        <header class="wchat-main-header">
-
-            <div class="wchat-active-user">
-
-                <div
-                    class="wchat-avatar"
-                    id="activeChatAvatar">
-                    SW
+            <div class="chat-main">
+                <div class="chat-header-bar">
+                    <div class="chat-header-left">
+                        <div class="chat-avatar" id="activeChatAvatar">🤖</div>
+                        <div>
+                            <h4 id="activeChatName" style="font-size: 15px; font-weight: 600;">WitiIA - Asistente</h4>
+                            <span id="activeChatStatus" style="font-size: 12px; color: #10b981;">En línea</span>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="wchat-active-details">
-
-                    <h3 id="activeChatName">
-                        Soporte Wchat
-                    </h3>
-
-                    <p id="activeChatStatus">
-                        ● En línea
-                    </p>
-
+                <div class="messages-container" id="messagesContainer">
+                    <div class="typing-indicator" id="typingIndicator">
+                        <span>WitiIA está escribiendo (<span id="typingSeconds">0</span>s)</span>
+                        <div class="typing-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
                 </div>
 
-            </div>
+                <div class="suggestions-bar" id="suggestionsBar"></div>
 
-        </header>
+                <div id="recordingBox" style="padding: 0 20px; display: none;">
+                    <div class="recording-indicator">
+                        <span>Grabando audio...</span>
+                        <div class="wave-bars">
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                        </div>
+                    </div>
+                </div>
 
-        <div
-            class="wchat-messages-scroll"
-            id="messagesContainer">
-
-            <div class="empty-chat">
-                Selecciona un amigo para comenzar a conversar.
-            </div>
-
-        </div>
-
-        <div
-            class="typing-indicator-box"
-            id="typingIndicator">
-
-            <span id="typingText">alguien está escribiendo</span>
-            <div class="typing-dots">
-                <span></span>
-                <span></span>
-                <span></span>
+                <div class="chat-input-bar">
+                    <input type="text" id="messageInput" placeholder="Escribe un mensaje o pregunta matemática..." onkeypress="chequearEnter(event)">
+                    <button class="action-icon-btn" id="micBtn" onclick="toggleMicrofono()" title="Micrófono">🎤</button>
+                    <button class="action-icon-btn send-btn" onclick="enviarMensajeTexto()" title="Enviar">➤</button>
+                </div>
             </div>
 
         </div>
-
-        <div class="wchat-input-bar">
-
-            <button
-                class="tool-btn"
-                id="emojiBtn"
-                onclick="alternarPanelStickers()"
-                title="Emojis">
-                😀
-            </button>
-
-            <button
-                class="tool-btn"
-                onclick="document.getElementById('fileInput').click()"
-                title="Enviar documento (hasta 10,000 palabras / archivos permitidos)">
-                📎
-            </button>
-
-            <input
-                type="file"
-                id="fileInput"
-                style="display:none"
-                onchange="enviarDocumento(event)"
-            >
-
-            <input
-                type="text"
-                id="messageInput"
-                class="wchat-text-input"
-                placeholder="Escribe un mensaje..."
-                autocomplete="off"
-            >
-
-            <button
-                class="wchat-send-btn"
-                onclick="enviarMensaje()">
-                Enviar ➜
-            </button>
-
-            <div
-                class="sticker-panel"
-                id="stickerPanel">
-            </div>
-
-        </div>
-
-    </main>
-
-</div>
-
-<!-- MODAL AGREGAR AMIGO -->
-<div
-    class="modal-overlay"
-    id="friendModal">
-
-    <div class="modal-card">
-
-        <div class="modal-header">
-
-            <h3>
-                Agregar amigo
-            </h3>
-
-            <button
-                class="modal-close"
-                onclick="cerrarModalId()">
-                ✕
-            </button>
-
-        </div>
-
-        <div class="modal-body">
-
-            <p>
-                Escribe el WIB-ID de la persona que quieres agregar.
-            </p>
-
-            <input
-                id="targetIdInput"
-                class="modal-input"
-                placeholder="Ej: WIB-H4AUEA-6378"
-                autocomplete="off"
-            >
-
-        </div>
-
-        <div class="modal-footer">
-
-            <button
-                class="modal-btn cancel"
-                onclick="cerrarModalId()">
-                Cancelar
-            </button>
-
-            <button
-                class="modal-btn confirm"
-                onclick="enviarSolicitud()">
-                Enviar
-            </button>
-
-        </div>
-
     </div>
 
-</div>
-
-<!-- MODAL BUZÓN -->
-<div
-    class="modal-overlay"
-    id="mailboxModal">
-
-    <div class="modal-card">
-
-        <div class="modal-header">
-
-            <h3>
-                📥 Solicitudes
-            </h3>
-
-            <button
-                class="modal-close"
-                onclick="cerrarBuzon()">
-                ✕
-            </button>
-
-        </div>
-
-        <div
-            class="modal-body"
-            id="mailboxContent">
-
-            <p
-                style="text-align:center;color:#6b7280;">
-                No tienes solicitudes.
-            </p>
-
-        </div>
-
-        <div class="modal-footer">
-
-            <button
-                class="modal-btn confirm"
-                onclick="cerrarBuzon()">
-                Cerrar
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
-
-<!-- MODAL AJUSTES DE APARIENCIA Y CHAT -->
-<div
-    class="modal-overlay"
-    id="configModal">
-
-    <div class="modal-card">
-
-        <div class="modal-header">
-            <h3>🎨 Ajustes de Apariencia y Chat</h3>
-            <button class="modal-close" onclick="cerrarModalConfiguracion()">✕</button>
-        </div>
-
-        <div class="modal-body">
-            <!-- Selección de Foto de Perfil (URL) -->
-            <div class="avatar-preview-container">
-                <div class="avatar-preview-circle" id="modalAvatarPreview">U</div>
-                <div style="flex:1; min-width:0;">
-                    <p style="margin:0; font-size:12px; color:#fff; font-weight:600;">Foto de perfil (URL)</p>
-                    <p style="margin:0; font-size:10px; color:#9ca3af;">Pega el enlace de una imagen pública</p>
-                </div>
-            </div>
-
-            <p>Foto de Perfil (URL de imagen)</p>
-            <input
-                id="configAvatarInput"
-                class="modal-input"
-                placeholder="https://ejemplo.com/mi-foto.jpg"
-                autocomplete="off"
-                oninput="actualizarPrevisualizacionAvatar(this.value)"
-            >
-
-            <p>Nombre de usuario</p>
-            <input
-                id="configNameInput"
-                class="modal-input"
-                placeholder="Tu nombre"
-                autocomplete="off"
-            >
-
-            <p>Descripción / Estado</p>
-            <textarea
-                id="configDescInput"
-                class="modal-textarea"
-                placeholder="Escribe algo sobre ti..."
-            ></textarea>
-
-            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 15px 0;">
-
-            <p style="color: #00b09b; font-weight: 600; margin-bottom: 8px;">⚙️ Ajustes del Chat (6 Opciones)</p>
-
-            <!-- Ajuste 1: Fondo del chat -->
-            <p>1. Fondo del chat</p>
-            <select id="settingChatBg" class="modal-input">
-                <option value="#0d1019">Negro Oscuro (Por defecto)</option>
-                <option value="#000000">Negro Puro OLED</option>
-                <option value="#121826">Azul Noche Profundo</option>
-                <option value="#1a1119">Gris Oscuro Minimalista</option>
-            </select>
-
-            <!-- Ajuste 2: Color de acento/burbujas -->
-            <p>2. Color principal de burbujas</p>
-            <select id="settingAccentColor" class="modal-input">
-                <option value="teal">Verde Esmeralda / Teal (#00b09b)</option>
-                <option value="blue">Azul Moderno (#3b82f6)</option>
-                <option value="purple">Morado Neón (#8b5cf6)</option>
-                <option value="orange">Naranja Vibrante (#f97316)</option>
-            </select>
-
-            <!-- Ajuste 3: Tamaño de fuente -->
-            <p>3. Tamaño de letra en mensajes</p>
-            <select id="settingFontSize" class="modal-input">
-                <option value="13.5px">Normal (13.5px)</option>
-                <option value="12px">Pequeña (12px)</option>
-                <option value="15px">Grande (15px)</option>
-            </select>
-
-            <!-- Ajuste 4: Sonido de mensajes -->
-            <p>4. Efectos de Sonido</p>
-            <select id="settingSound" class="modal-input">
-                <option value="on">Activados</option>
-                <option value="off">Silenciados</option>
-            </select>
-
-            <!-- Ajuste 5: Modo compacto -->
-            <p>5. Densidad de la lista de chats</p>
-            <select id="settingDensity" class="modal-input">
-                <option value="normal">Espacioso (Normal)</option>
-                <option value="compact">Compacto</option>
-            </select>
-
-            <!-- Ajuste 6: Estado en línea visible -->
-            <p>6. Privacidad de presencia</p>
-            <select id="settingPresence" class="modal-input">
-                <option value="public">Mostrar siempre "En línea"</option>
-                <option value="hidden">Ocultar estado</option>
-            </select>
-
-            <p style="margin-top: 15px;">Tu WIB-ID (Fijo)</p>
-            <input
-                id="configIdInput"
-                class="modal-input"
-                readonly
-                style="color: #00b09b; font-family: monospace; background: rgba(0,176,155,0.05);"
-            >
-        </div>
-
-        <div class="modal-footer">
-            <button class="modal-btn cancel" onclick="cerrarModalConfiguracion()">Cancelar</button>
-            <button class="modal-btn confirm" onclick="guardarMiConfiguracion()">Guardar cambios</button>
-        </div>
-
-    </div>
-
-</div>
-
-
-<script type="module">
-
-/* ============================================================
-   FIREBASE
-============================================================ */
-
-import {
-    initializeApp
-} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
-
-import {
-    getAuth,
-    onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
-
-import {
-    getDatabase,
-    ref,
-    get,
-    set,
-    push,
-    update,
-    remove,
-    onValue,
-    onDisconnect,
-    serverTimestamp
-} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
-
-
-const firebaseConfig = {
-    apiKey: "AIzaSyAg8n3AcKE-0QDQYcswUBYZwI702TzPZIU",
-    authDomain: "anthonypg.firebaseapp.com",
-    databaseURL: "https://anthonypg-default-rtdb.firebaseio.com",
-    projectId: "anthonypg",
-    storageBucket: "anthonypg.firebasestorage.app",
-    messagingSenderId: "620424695699",
-    appId: "1:620424695699:web:429c9ace801a5bc75a6266",
-    measurementId: "G-YVFYEWDQ98"
-};
-
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getDatabase(app);
-
-
-/* ============================================================
-   VARIABLES
-============================================================ */
-
-let miUid = null;
-let miId = null;
-let miNombre = "Usuario";
-let miDescripcion = "";
-let miAvatarUrl = "";
-
-let chatActivoUid = null;
-let chatActivoId = null;
-let chatActivoNombre = null;
-
-let unsubscribeMensajes = null;
-let unsubscribeAmistades = null;
-let unsubscribeSolicitudes = null;
-let unsubscribeTyping = null;
-let unsubscribePreviews = {};
-let unsubscribePresencia = {};
-
-let amigos = {};
-let solicitudes = {};
-let typingTimer = null;
-let restauracionHecha = false;
-
-
-/* ============================================================
-   UTILIDADES
-============================================================ */
-
-function escapeHtml(text) {
-    return String(text ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
-
-
-function iniciales(nombre) {
-    if (!nombre) return "U";
-    return nombre
-        .trim()
-        .split(/\s+/)
-        .map(p => p[0])
-        .join("")
-        .substring(0, 2)
-        .toUpperCase();
-}
-
-
-function crearChatKey(uid1, uid2) {
-    return [uid1, uid2].sort().join("_");
-}
-
-
-function horaActual() {
-    return new Date().toLocaleTimeString(
-        "es-GT",
-        { hour: "2-digit", minute: "2-digit" }
-    );
-}
-
-
-function mostrarToast(texto) {
-    const anterior = document.querySelector(".toast");
-    if (anterior) anterior.remove();
-
-    const toast = document.createElement("div");
-    toast.className = "toast";
-    toast.textContent = texto;
-    document.body.appendChild(toast);
-
-    setTimeout(() => {
-        toast.style.opacity = "0";
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-}
-
-
-/* ============================================================
-   AUTENTICACIÓN
-============================================================ */
-
-onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-        alert("Debes iniciar sesión para utilizar Wchat.");
-        window.location.href = "cuenta.html";
-        return;
-    }
-
-    miUid = user.uid;
-    await cargarMiPerfil();
-
-    if (!miId) {
-        alert("No se encontró tu WIB-ID en Firebase.");
-        return;
-    }
-
-    await activarPresencia();
-    escucharSolicitudes();
-    escucharAmistades();
-    poblarStickers();
-    aplicarAjustesGuardados();
-});
-
-
-/* ============================================================
-   PERFIL (GUARDADO Y PERSISTENCIA)
-============================================================ */
-
-async function cargarMiPerfil() {
-    try {
-        const perfilRef = ref(db, "usuarios/" + miUid);
-        const snapshot = await get(perfilRef);
-
-        if (!snapshot.exists()) {
-            console.error("No existe usuarios/" + miUid);
-            return;
-        }
-
-        const datos = snapshot.val();
-
-        miId = datos.id || datos.wibId || datos.WIB_ID || "";
-        miNombre = datos.name || datos.nombre || datos.displayName || auth.currentUser.displayName || "Usuario";
-        miDescripcion = datos.description || datos.descripcion || "";
-        miAvatarUrl = datos.avatar || datos.foto || datos.photoURL || "";
-
-        renderizarMiPerfilUI();
-
-    } catch (error) {
-        console.error(error);
-        mostrarToast("No se pudo cargar tu perfil.");
-    }
-}
-
-function renderizarMiPerfilUI() {
-    document.getElementById("myUserIdDisplay").textContent = miId || "---";
-    document.getElementById("myUserNameDisplay").textContent = miNombre;
-    document.getElementById("myUserDescDisplay").textContent = miDescripcion || "Sin descripción";
-
-    const avatarContainer = document.getElementById("myAvatarDisplay");
-    if (miAvatarUrl && miAvatarUrl.trim() !== "") {
-        avatarContainer.innerHTML = `<img src="${escapeHtml(miAvatarUrl)}" alt="Avatar" onerror="this.parentElement.innerHTML='${escapeHtml(iniciales(miNombre))}'">`;
-    } else {
-        avatarContainer.textContent = iniciales(miNombre);
-    }
-}
-
-
-window.abrirModalConfiguracion = function() {
-    document.getElementById("configNameInput").value = miNombre;
-    document.getElementById("configDescInput").value = miDescripcion;
-    document.getElementById("configAvatarInput").value = miAvatarUrl;
-    document.getElementById("configIdInput").value = miId || "";
-    actualizarPrevisualizacionAvatar(miAvatarUrl);
-    cargarValoresAjustesUI();
-
-    document.getElementById("configModal").classList.add("active");
-};
-
-window.cerrarModalConfiguracion = function() {
-    document.getElementById("configModal").classList.remove("active");
-};
-
-window.actualizarPrevisualizacionAvatar = function(url) {
-    const preview = document.getElementById("modalAvatarPreview");
-    if (url && url.trim() !== "") {
-        preview.innerHTML = `<img src="${escapeHtml(url)}" alt="Preview" onerror="this.innerHTML='${escapeHtml(iniciales(miNombre))}'">`;
-    } else {
-        preview.textContent = iniciales(miNombre);
-    }
-};
-
-function cargarValoresAjustesUI() {
-    const bg = localStorage.getItem(`wchat_set_bg_${miUid}`) || "#0d1019";
-    const accent = localStorage.getItem(`wchat_set_accent_${miUid}`) || "teal";
-    const fontSize = localStorage.getItem(`wchat_set_fontsize_${miUid}`) || "13.5px";
-    const sound = localStorage.getItem(`wchat_set_sound_${miUid}`) || "on";
-    const density = localStorage.getItem(`wchat_set_density_${miUid}`) || "normal";
-    const presence = localStorage.getItem(`wchat_set_presence_${miUid}`) || "public";
-
-    document.getElementById("settingChatBg").value = bg;
-    document.getElementById("settingAccentColor").value = accent;
-    document.getElementById("settingFontSize").value = fontSize;
-    document.getElementById("settingSound").value = sound;
-    document.getElementById("settingDensity").value = density;
-    document.getElementById("settingPresence").value = presence;
-}
-
-function aplicarAjustesGuardados() {
-    if (!miUid) return;
-    const bg = localStorage.getItem(`wchat_set_bg_${miUid}`) || "#0d1019";
-    const fontSize = localStorage.getItem(`wchat_set_fontsize_${miUid}`) || "13.5px";
-
-    const mainContainer = document.getElementById("wchatMainContainer");
-    if (mainContainer) {
-        mainContainer.style.background = bg;
-    }
-
-    document.documentElement.style.setProperty("--chat-font-size", fontSize);
-}
-
-window.guardarMiConfiguracion = async function() {
-    const nuevoNombre = document.getElementById("configNameInput").value.trim();
-    const nuevaDesc = document.getElementById("configDescInput").value.trim();
-    const nuevoAvatar = document.getElementById("configAvatarInput").value.trim();
-
-    // Guardar los 6 ajustes en localStorage
-    const bg = document.getElementById("settingChatBg").value;
-    const accent = document.getElementById("settingAccentColor").value;
-    const fontSize = document.getElementById("settingFontSize").value;
-    const sound = document.getElementById("settingSound").value;
-    const density = document.getElementById("settingDensity").value;
-    const presence = document.getElementById("settingPresence").value;
-
-    localStorage.setItem(`wchat_set_bg_${miUid}`, bg);
-    localStorage.setItem(`wchat_set_accent_${miUid}`, accent);
-    localStorage.setItem(`wchat_set_fontsize_${miUid}`, fontSize);
-    localStorage.setItem(`wchat_set_sound_${miUid}`, sound);
-    localStorage.setItem(`wchat_set_density_${miUid}`, density);
-    localStorage.setItem(`wchat_set_presence_${miUid}`, presence);
-
-    aplicarAjustesGuardados();
-
-    if (!nuevoNombre) {
-        alert("El nombre no puede estar vacío.");
-        return;
-    }
-
-    try {
-        const perfilRef = ref(db, "usuarios/" + miUid);
-        await update(perfilRef, {
-            name: nuevoNombre,
-            description: nuevaDesc,
-            avatar: nuevoAvatar
-        });
-
-        const amigosRef = ref(db, `amistades`);
-        const snapshotAmigos = await get(amigosRef);
-        if (snapshotAmigos.exists()) {
-            const dataAmigos = snapshotAmigos.val();
-            const updates = {};
-            for (const uidAmigo in dataAmigos) {
-                if (dataAmigos[uidAmigo][miUid]) {
-                    updates[`amistades/${uidAmigo}/${miUid}/name`] = nuevoNombre;
+    <script>
+        const bancoPreguntasWitiIA = [
+            { q: "¿Por qué se llama WIBSIPROJECT?", r: "WIBSIPROJECT nace de la fusión entre innovación multimedia y un espacio libre para creadores." },
+            { q: "¿Cómo funcionan las categorías Phonk y Gaming?", r: "Filtran multimedia al instante según tus gustos y videos en tendencia." },
+            { q: "¿Qué encuentro en el Panel de Videos Añadidos?", r: "Tu panel de control personal para monitorear archivos multimedia de tu sesión." },
+            { q: "¿Por qué cada cuenta registrada es independiente?", r: "Porque adapta el historial, el reloj de actividad y las preferencias por separado." },
+            { q: "¿Cómo uso el botón 'Sorpréndeme'?", r: "Te transporta de manera aleatoria a contenido exclusivo de la plataforma." },
+            { q: "¿Por qué este proyecto es tal?", r: "Este proyecto es una plataforma web completa creada para centralizar multimedia, herramientas de chat y dinamismo en un solo lugar." },
+            { q: "¿Por qué funciona tan bien?", r: "Funciona eficientemente gracias al uso de tecnologías web puras, estructuras modulares y sincronización fluida en el lado del cliente." },
+            { q: "¿Por qué hay errores?", r: "Los errores pueden ocurrir por incompatibilidades de navegador, fallos en localStorage o interrupciones en la red al cargar recursos." },
+            { q: "¿Para qué sirve esto y dónde está?", r: "Esto sirve como un centro de entretenimiento y herramientas de interacción; se aloja y ejecuta directamente en tu navegador web." },
+            { q: "¿Quién lo creó y para qué?", r: "Fue creado por Anthony Merlos para centralizar proyectos interactivos, herramientas multimedia y gestión de usuarios." },
+            { q: "¿Qué errores puede llevar probablemente?", r: "Podría presentar pérdida de datos si se limpia el localStorage, problemas con permisos de micrófono o conflictos de renderizado CSS en pantallas muy pequeñas." },
+            { q: "¿Cómo te llamas?", r: "Me llamo WitiIA, tu asistente virtual dedicado dentro de WIBSIPROJECT." },
+            { q: "Explícame un algoritmo básico", r: "Un algoritmo es una secuencia de pasos lógicos y finitos para resolver un problema informático o matemático." },
+            { q: "¿Qué es una función en programación?", r: "Es un bloque de código reutilizable que realiza una tarea específica cuando es invocado." },
+            { q: "Dime conceptos de geometría y código", r: "En geometría calculamos áreas, perímetros y coordenadas (como vectores en HTML5 Canvas), mientras que en código estructuramos lógica condicional y bucles." },
+            { q: "¿Qué es la programación orientada a objetos?", r: "Es un paradigma de programación que utiliza clases y objetos para encapsular datos y comportamientos reutilizables." },
+            { q: "¿Cómo optimizar una consulta SQL?", r: "Se pueden utilizar índices adecuados, evitar consultas anidadas innecesarias y seleccionar únicamente las columnas requeridas." },
+            { q: "¿Para qué sirve HTML semántico?", r: "Permite estructurar el contenido web de manera significativa para navegadores, motores de búsqueda y tecnologías de asistencia." },
+            { q: "¿Qué es un framework de desarrollo?", r: "Es un conjunto de herramientas, librerías y convenciones predefinidas que facilitan y aceleran la construcción de software." },
+            { q: "¿Cómo funciona el control de versiones con Git?", r: "Permite rastrear cambios en el código fuente, colaborar con otros desarrolladores y fusionar diferentes ramas de trabajo de forma segura." }
+        ];
+
+        let usuarioActual = { nombre: "", correo: "" };
+        let chatActivoId = "";
+        let esGrabandoVoz = false;
+        let recognition = null;
+        let typingInterval = null;
+
+        let listaChats = {};
+        let conversaciones = {};
+        let temaActual = "dark"; // 'dark' o 'light'
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const usuarioGuardado = localStorage.getItem('witiia_usuario');
+            const chatsGuardados = localStorage.getItem('witiia_lista_chats');
+            const mensajesGuardados = localStorage.getItem('witiia_conversaciones');
+            const temaGuardado = localStorage.getItem('witiia_tema');
+
+            if (temaGuardado) {
+                temaActual = temaGuardado;
+                aplicarTemaVisual(temaActual);
+            }
+
+            if (chatsGuardados) listaChats = JSON.parse(chatsGuardados);
+            if (mensajesGuardados) conversaciones = JSON.parse(mensajesGuardados);
+
+            if (usuarioGuardado) {
+                usuarioActual = JSON.parse(usuarioGuardado);
+                document.getElementById('displayUserName').innerText = usuarioActual.nombre;
+                document.getElementById('displayUserEmail').innerText = usuarioActual.correo;
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('chat-app').style.display = 'block';
+
+                if (Object.keys(listaChats).length === 0) {
+                    crearNuevoChatInicial();
+                } else {
+                    renderizarListaChats();
+                    seleccionarChat(Object.keys(listaChats)[0]);
                 }
+                inicializarReconocimientoVoz();
             }
-            if (Object.keys(updates).length > 0) {
-                await update(ref(db), updates);
+
+            // Cerrar menú de 3 puntos al hacer clic fuera
+            window.addEventListener('click', () => {
+                document.querySelectorAll('.dropdown-menu').forEach(menu => menu.classList.remove('show'));
+            });
+        });
+
+        function alternarTemaVisual() {
+            temaActual = temaActual === 'dark' ? 'light' : 'dark';
+            aplicarTemaVisual(temaActual);
+            localStorage.setItem('witiia_tema', temaActual);
+        }
+
+        function aplicarTemaVisual(tema) {
+            const btn = document.getElementById('themeToggleBtn');
+            if (tema === 'light') {
+                document.body.classList.remove('dark-theme');
+                if (btn) btn.innerText = "🌙";
+            } else {
+                document.body.classList.add('dark-theme');
+                if (btn) btn.innerText = "☀️";
             }
         }
 
-        miNombre = nuevoNombre;
-        miDescripcion = nuevaDesc;
-        miAvatarUrl = nuevoAvatar;
+        function iniciarSesion(e) {
+            e.preventDefault();
+            const nombre = document.getElementById('regName').value.trim();
+            const correo = document.getElementById('regEmail').value.trim().toLowerCase();
 
-        renderizarMiPerfilUI();
-        cerrarModalConfiguracion();
-        mostrarToast("¡Configuración y perfil guardados con éxito!");
+            if (!nombre || !correo) return;
 
-    } catch (error) {
-        console.error("Error guardando configuración:", error);
-        alert("No se pudo guardar la configuración.");
-    }
-};
+            usuarioActual = { nombre, correo };
+            localStorage.setItem('witiia_usuario', JSON.stringify(usuarioActual));
 
+            document.getElementById('displayUserName').innerText = nombre;
+            document.getElementById('displayUserEmail').innerText = correo;
 
-/* ============================================================
-   PRESENCIA
-============================================================ */
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('chat-app').style.display = 'block';
 
-async function activarPresencia() {
-    const presenciaRef = ref(db, "presencia/" + miUid);
-    try {
-        await onDisconnect(presenciaRef).set({
-            online: false,
-            lastSeen: serverTimestamp()
-        });
-        await set(presenciaRef, {
-            online: true,
-            lastSeen: serverTimestamp()
-        });
-    } catch (error) {
-        console.error("Error presencia:", error);
-    }
-}
-
-
-/* ============================================================
-   MODAL AMIGOS
-============================================================ */
-
-window.abrirModalId = function() {
-    document.getElementById("friendModal").classList.add("active");
-    document.getElementById("targetIdInput").focus();
-};
-
-window.cerrarModalId = function() {
-    document.getElementById("friendModal").classList.remove("active");
-    document.getElementById("targetIdInput").value = "";
-};
-
-
-async function buscarUidPorWibId(wibId) {
-    const wibRef = ref(db, "wibToUid/" + wibId);
-    const snapshot = await get(wibRef);
-    if (!snapshot.exists()) return null;
-    return snapshot.val();
-}
-
-
-window.enviarSolicitud = async function() {
-    const input = document.getElementById("targetIdInput");
-    const targetId = input.value.trim().toUpperCase();
-
-    if (!targetId) {
-        alert("Escribe un WIB-ID.");
-        return;
-    }
-    if (!miId) {
-        alert("Tu cuenta todavía no está cargada.");
-        return;
-    }
-    if (targetId === miId.toUpperCase()) {
-        alert("No puedes agregarte a ti mismo.");
-        return;
-    }
-
-    try {
-        const destinoUid = await buscarUidPorWibId(targetId);
-        if (!destinoUid) {
-            alert("No existe ningún usuario con ese WIB-ID.");
-            return;
-        }
-        if (destinoUid === miUid) {
-            alert("Ese WIB-ID pertenece a tu propia cuenta.");
-            return;
+            if (Object.keys(listaChats).length === 0) {
+                crearNuevoChatInicial();
+            } else {
+                renderizarListaChats();
+                seleccionarChat(Object.keys(listaChats)[0]);
+            }
+            inicializarReconocimientoVoz();
         }
 
-        const amistadRef = ref(db, `amistades/${miUid}/${destinoUid}`);
-        const amistad = await get(amistadRef);
-        if (amistad.exists()) {
-            alert("Ya tienes agregado a este usuario.");
-            cerrarModalId();
-            return;
+        function crearNuevoChatInicial() {
+            const idUnico = 'chat_' + Date.now();
+            listaChats[idUnico] = { id: idUnico, titulo: "WitiIA - Asistente", avatar: "🤖", fecha: obtenerHoraActual() };
+            conversaciones[idUnico] = [
+                { remitente: "ia", texto: "¡Hola! ¿Qué tal? ¿Cómo te va? Soy WitiIA. Pregúntame lo que sea sobre código, matemáticas, el proyecto o charla general.", hora: obtenerHoraActual() }
+            ];
+            guardarEnLocalStorage();
+            renderizarListaChats();
+            seleccionarChat(idUnico);
         }
 
-        const solicitudRef = ref(db, `solicitudes/${destinoUid}/${miUid}`);
-        const solicitud = await get(solicitudRef);
-        if (solicitud.exists()) {
-            alert("Ya enviaste una solicitud a este usuario.");
-            cerrarModalId();
-            return;
+        function crearNuevoChat() {
+            const idUnico = 'chat_' + Date.now();
+            const numeroChat = Object.keys(listaChats).length + 1;
+            listaChats[idUnico] = { id: idUnico, titulo: `Chat #${numeroChat}`, avatar: "💬", fecha: obtenerHoraActual() };
+            conversaciones[idUnico] = [
+                { remitente: "ia", texto: `Nuevo chat iniciado. ¿En qué te puedo ayudar hoy?`, hora: obtenerHoraActual() }
+            ];
+            guardarEnLocalStorage();
+            renderizarListaChats();
+            seleccionarChat(idUnico);
         }
 
-        await set(solicitudRef, {
-            fromUid: miUid,
-            fromId: miId,
-            fromName: miNombre,
-            toUid: destinoUid,
-            toId: targetId,
-            createdAt: Date.now()
-        });
-
-        mostrarToast("Solicitud enviada correctamente.");
-        cerrarModalId();
-
-    } catch (error) {
-        console.error("Error solicitud:", error);
-        alert("No se pudo enviar la solicitud.\n\n" + error.message);
-    }
-};
-
-
-function escucharSolicitudes() {
-    if (unsubscribeSolicitudes) unsubscribeSolicitudes();
-    const solicitudesRef = ref(db, "solicitudes/" + miUid);
-
-    unsubscribeSolicitudes = onValue(solicitudesRef, snapshot => {
-        solicitudes = snapshot.val() || {};
-        actualizarBadge();
-        renderizarBuzon();
-    });
-}
-
-
-function actualizarBadge() {
-    const cantidad = Object.keys(solicitudes).length;
-    const badge = document.getElementById("badgeCount");
-    badge.textContent = cantidad;
-    badge.style.display = cantidad > 0 ? "inline-block" : "none";
-}
-
-
-window.abrirBuzon = function() {
-    renderizarBuzon();
-    document.getElementById("mailboxModal").classList.add("active");
-};
-
-window.cerrarBuzon = function() {
-    document.getElementById("mailboxModal").classList.remove("active");
-};
-
-
-function renderizarBuzon() {
-    const contenedor = document.getElementById("mailboxContent");
-    const lista = Object.entries(solicitudes);
-
-    if (lista.length === 0) {
-        contenedor.innerHTML = `<p style="text-align:center;color:#6b7280;padding:20px 0;">No tienes solicitudes pendientes.</p>`;
-        return;
-    }
-
-    contenedor.innerHTML = lista.map(([uid, solicitud]) => {
-        return `
-            <div class="invite">
-                <div class="invite-name">${escapeHtml(solicitud.fromName || "Usuario")}</div>
-                <div class="invite-id">ID: ${escapeHtml(solicitud.fromId || "---")}</div>
-                <div class="invite-buttons">
-                    <button class="accept" onclick="aceptarSolicitud('${uid}')">Aceptar</button>
-                    <button class="reject" onclick="rechazarSolicitud('${uid}')">Rechazar</button>
-                </div>
-            </div>
-        `;
-    }).join("");
-}
-
-
-window.aceptarSolicitud = async function(uidAmigo) {
-    const solicitud = solicitudes[uidAmigo];
-    if (!solicitud) return;
-
-    try {
-        const updates = {};
-        updates[`amistades/${miUid}/${uidAmigo}`] = {
-            uid: uidAmigo,
-            id: solicitud.fromId,
-            name: solicitud.fromName || "Usuario",
-            addedAt: Date.now()
-        };
-        updates[`amistades/${uidAmigo}/${miUid}`] = {
-            uid: miUid,
-            id: miId,
-            name: miNombre,
-            addedAt: Date.now()
-        };
-        updates[`solicitudes/${miUid}/${uidAmigo}`] = null;
-
-        await update(ref(db), updates);
-
-        const key = crearChatKey(miUid, uidAmigo);
-        await update(ref(db), {
-            [`chats/${key}/users/${miUid}`]: true,
-            [`chats/${key}/users/${uidAmigo}`]: true
-        });
-
-        cerrarBuzon();
-        mostrarToast("Ahora son amigos en Wchat.");
-
-    } catch (error) {
-        console.error(error);
-        alert("No se pudo aceptar la solicitud.\n\n" + error.message);
-    }
-};
-
-
-window.rechazarSolicitud = async function(uidAmigo) {
-    try {
-        await remove(ref(db, `solicitudes/${miUid}/${uidAmigo}`));
-        mostrarToast("Solicitud rechazada.");
-    } catch (error) {
-        console.error(error);
-        alert("No se pudo rechazar la solicitud.");
-    }
-};
-
-
-function escucharAmistades() {
-    if (unsubscribeAmistades) unsubscribeAmistades();
-    const amigosRef = ref(db, `amistades/${miUid}`);
-
-    unsubscribeAmistades = onValue(amigosRef, snapshot => {
-        amigos = snapshot.val() || {};
-        renderizarAmigos();
-    });
-}
-
-
-function renderizarAmigos() {
-    Object.values(unsubscribePreviews).forEach(fn => fn && fn());
-    Object.values(unsubscribePresencia).forEach(fn => fn && fn());
-    unsubscribePreviews = {};
-    unsubscribePresencia = {};
-
-    const lista = document.getElementById("chatsList");
-    const soporte = document.getElementById("supportChat");
-    lista.innerHTML = "";
-    lista.appendChild(soporte);
-
-    Object.entries(amigos).forEach(([uid, amigo]) => {
-        const item = document.createElement("div");
-        item.className = "wchat-chat-item";
-        if (chatActivoUid === uid) item.classList.add("active");
-        item.dataset.chatId = uid;
-
-        item.innerHTML = `
-            <div class="wchat-avatar">
-                ${escapeHtml(iniciales(amigo.name))}
-                <div class="wchat-status-dot offline" id="status-${uid}"></div>
-            </div>
-            <div class="wchat-chat-info">
-                <div class="wchat-chat-name-row">
-                    <span class="wchat-chat-name">${escapeHtml(amigo.name || "Usuario")}</span>
-                    <span class="wchat-chat-time" id="time-${uid}"></span>
-                </div>
-                <div class="wchat-chat-preview" id="preview-${uid}">ID: ${escapeHtml(amigo.id || "---")}</div>
-            </div>
-        `;
-
-        item.onclick = () => seleccionarChat(uid, amigo.name || "Usuario", item);
-        lista.appendChild(item);
-
-        unsubscribePresencia[uid] = escucharEstadoAmigo(uid);
-        unsubscribePreviews[uid] = escucharUltimoMensaje(uid);
-    });
-
-    filtrarChats();
-    restaurarChatGuardado();
-}
-
-
-function escucharEstadoAmigo(uid) {
-    const presenciaRef = ref(db, `presencia/${uid}`);
-    return onValue(presenciaRef, snapshot => {
-        const estado = snapshot.val();
-        const elemento = document.getElementById(`status-${uid}`);
-        if (!elemento) return;
-        if (estado && estado.online === true) {
-            elemento.classList.remove("offline");
-        } else {
-            elemento.classList.add("offline");
-        }
-    });
-}
-
-
-function escucharUltimoMensaje(uid) {
-    const key = crearChatKey(miUid, uid);
-    const lastMessageRef = ref(db, `chats/${key}`);
-
-    return onValue(lastMessageRef, snapshot => {
-        const chat = snapshot.val() || {};
-        const preview = document.getElementById(`preview-${uid}`);
-        const time = document.getElementById(`time-${uid}`);
-        if (!preview) return;
-
-        if (chat.lastMessage) {
-            preview.textContent = chat.lastMessage;
-        } else {
-            const amigo = amigos[uid];
-            preview.textContent = "ID: " + (amigo?.id || "---");
+        function guardarEnLocalStorage() {
+            localStorage.setItem('witiia_lista_chats', JSON.stringify(listaChats));
+            localStorage.setItem('witiia_conversaciones', JSON.stringify(conversaciones));
         }
 
-        if (chat.updatedAt) {
-            const fecha = new Date(chat.updatedAt);
-            time.textContent = fecha.toLocaleTimeString("es-GT", { hour: "2-digit", minute: "2-digit" });
-        }
-    });
-}
+        function renderizarListaChats() {
+            const contenedor = document.getElementById('chatsList');
+            contenedor.innerHTML = '';
 
+            Object.values(listaChats).forEach(chat => {
+                const div = document.createElement('div');
+                div.className = `chat-item ${chat.id === chatActivoId ? 'active' : ''}`;
 
-document.getElementById("searchChats").addEventListener("input", filtrarChats);
+                const ultimosMensajes = conversaciones[chat.id];
+                const ultimoTexto = ultimosMensajes && ultimosMensajes.length > 0 ? ultimosMensajes[ultimosMensajes.length - 1].texto : "Sin mensajes";
 
-function filtrarChats() {
-    const texto = document.getElementById("searchChats").value.toLowerCase().trim();
-    document.querySelectorAll(".wchat-chat-item").forEach(item => {
-        const nombre = item.querySelector(".wchat-chat-name")?.textContent.toLowerCase() || "";
-        if (!texto || nombre.includes(texto)) {
-            item.style.display = "flex";
-        } else {
-            item.style.display = "none";
-        }
-    });
-}
-
-
-async function asegurarUsuariosChat(uid) {
-    if (!miUid || !uid) return false;
-    const key = crearChatKey(miUid, uid);
-    try {
-        await update(ref(db), {
-            [`chats/${key}/users/${miUid}`]: true,
-            [`chats/${key}/users/${uid}`]: true
-        });
-        return true;
-    } catch (error) {
-        console.error("Error preparando chat:", error);
-        return false;
-    }
-}
-
-
-window.seleccionarChat = async function(uid, nombre, elemento) {
-    detenerTyping();
-    detenerEscuchasChat();
-
-    document.querySelectorAll(".wchat-chat-item").forEach(el => el.classList.remove("active"));
-    if (elemento) elemento.classList.add("active");
-
-    chatActivoUid = uid === "soporte" ? null : uid;
-    chatActivoNombre = nombre;
-    chatActivoId = chatActivoUid ? (amigos[chatActivoUid]?.id || "---") : null;
-
-    document.getElementById("activeChatName").textContent = nombre;
-    document.getElementById("activeChatAvatar").textContent = iniciales(nombre);
-
-    if (uid === "soporte") {
-        localStorage.setItem(`wchat_chat_activo_${miUid}`, "soporte");
-        document.getElementById("activeChatStatus").textContent = "● En línea";
-        mostrarSoporte();
-        return;
-    }
-
-    localStorage.setItem(`wchat_chat_activo_${miUid}`, uid);
-    document.getElementById("activeChatStatus").textContent = "● Conectando...";
-
-    const preparado = await asegurarUsuariosChat(uid);
-    if (chatActivoUid !== uid) return;
-
-    if (!preparado) {
-        document.getElementById("activeChatStatus").textContent = "● No disponible";
-        mostrarToast("No se pudo preparar el chat.");
-        return;
-    }
-
-    document.getElementById("activeChatStatus").textContent = "● En línea";
-    escucharMensajes();
-    escucharTyping();
-};
-
-
-function restaurarChatGuardado() {
-    if (restauracionHecha || !miUid) return;
-    const guardado = localStorage.getItem(`wchat_chat_activo_${miUid}`);
-    restauracionHecha = true;
-
-    if (guardado && guardado !== "soporte" && amigos[guardado]) {
-        const elemento = document.querySelector(`[data-chat-id="${guardado}"]`);
-        seleccionarChat(guardado, amigos[guardado].name || "Usuario", elemento);
-        return;
-    }
-
-    const soporte = document.getElementById("supportChat");
-    seleccionarChat("soporte", "Soporte Wchat", soporte);
-}
-
-
-function mostrarSoporte() {
-    const fontSize = localStorage.getItem(`wchat_set_fontsize_${miUid}`) || "13.5px";
-    document.getElementById("messagesContainer").innerHTML = `
-        <div class="wchat-msg incoming" style="font-size: ${fontSize};">
-            👋 Bienvenido a Wchat.
-            <br><br>
-            Tu WIB-ID es: <strong style="color:#00b09b;">${escapeHtml(miId)}</strong>
-            <br><br>
-            Usa el botón <strong>➕ ID</strong> para agregar a otros usuarios.
-            <br><br>
-            ¡Ya puedes chatear mediante texto, emojis y mandar documentos/archivos de forma segura!
-            <div class="wchat-msg-time">${horaActual()}</div>
-        </div>
-    `;
-}
-
-
-function detenerEscuchasChat() {
-    if (unsubscribeMensajes) { unsubscribeMensajes(); unsubscribeMensajes = null; }
-    if (unsubscribeTyping) { unsubscribeTyping(); unsubscribeTyping = null; }
-    document.getElementById("typingIndicator").classList.remove("active");
-}
-
-
-function escucharMensajes() {
-    if (!chatActivoUid) return;
-    const key = crearChatKey(miUid, chatActivoUid);
-    const mensajesRef = ref(db, `chats/${key}/messages`);
-
-    unsubscribeMensajes = onValue(mensajesRef, snapshot => {
-        const datos = snapshot.val() || {};
-        renderizarMensajes(datos);
-    });
-}
-
-
-function renderizarMensajes(datos) {
-    const container = document.getElementById("messagesContainer");
-    const mensajes = Object.entries(datos).sort((a, b) => (a[1].timestamp || 0) - (b[1].timestamp || 0));
-    const fontSize = localStorage.getItem(`wchat_set_fontsize_${miUid}`) || "13.5px";
-
-    if (mensajes.length === 0) {
-        container.innerHTML = `
-            <div class="empty-chat">
-                👋<br><br>Todavía no hay mensajes.<br>¡Escribe el primero!
-            </div>
-        `;
-        return;
-    }
-
-    container.innerHTML = "";
-
-    mensajes.forEach(([id, mensaje]) => {
-        const div = document.createElement("div");
-        const mio = mensaje.fromUid === miUid;
-        div.className = "wchat-msg " + (mio ? "outgoing" : "incoming");
-        div.style.fontSize = fontSize;
-
-        if (mensaje.type === "sticker") {
-            div.classList.add("sticker");
-            const contenido = document.createElement("div");
-            contenido.textContent = mensaje.text || "";
-            div.appendChild(contenido);
-        } else if (mensaje.type === "file") {
-            const fileCard = document.createElement("div");
-            fileCard.className = "wchat-file-card";
-            fileCard.innerHTML = `
-                <div class="wchat-file-icon">📄</div>
-                <div class="wchat-file-info">
-                    <span class="wchat-file-name">${escapeHtml(mensaje.fileName || "Archivo")}</span>
-                    <a href="${escapeHtml(mensaje.fileData)}" download="${escapeHtml(mensaje.fileName || "archivo")}" class="wchat-file-download" target="_blank">📥 Descargar / Ver archivo</a>
-                </div>
-            `;
-            div.appendChild(fileCard);
-        } else {
-            const texto = document.createTextNode(mensaje.text || "");
-            div.appendChild(texto);
+                div.innerHTML = `
+                    <div class="chat-item-left" onclick="seleccionarChat('${chat.id}')">
+                        <div class="chat-avatar">${chat.avatar}</div>
+                        <div class="chat-info">
+                            <h5>${chat.titulo}</h5>
+                            <p>${ultimoTexto}</p>
+                        </div>
+                    </div>
+                    <div class="chat-options-container" onclick="event.stopPropagation()">
+                        <button class="btn-three-dots" onclick="toggleMenuChat(event, '${chat.id}')">⋮</button>
+                        <div class="dropdown-menu" id="menu_${chat.id}">
+                            <div class="dropdown-item" onclick="renombrarChat('${chat.id}')">✏️ Renombrar</div>
+                            <div class="dropdown-item danger" onclick="eliminarChat('${chat.id}')">🗑️ Eliminar</div>
+                        </div>
+                    </div>
+                `;
+                contenedor.appendChild(div);
+            });
         }
 
-        const time = document.createElement("div");
-        time.className = "wchat-msg-time";
-        time.textContent = mensaje.hora || "";
-        div.appendChild(time);
-
-        container.appendChild(div);
-    });
-
-    container.scrollTop = container.scrollHeight;
-}
-
-
-window.enviarMensaje = async function() {
-    if (!chatActivoUid) {
-        mostrarToast("Selecciona un amigo primero.");
-        return;
-    }
-
-    const input = document.getElementById("messageInput");
-    const texto = input.value.trim();
-
-    if (!texto) return;
-
-    const cantidadPalabras = texto.split(/\s+/).length;
-    if (cantidadPalabras > 10000) {
-        alert("El mensaje supera el límite permitido de 10,000 palabras.");
-        return;
-    }
-
-    const preparado = await asegurarUsuariosChat(chatActivoUid);
-    if (!preparado) {
-        mostrarToast("No se pudo preparar el chat.");
-        return;
-    }
-
-    const key = crearChatKey(miUid, chatActivoUid);
-
-    try {
-        const mensajesRef = ref(db, `chats/${key}/messages`);
-        const nuevoMensaje = push(mensajesRef);
-
-        await set(nuevoMensaje, {
-            fromUid: miUid,
-            fromName: miNombre,
-            toUid: chatActivoUid,
-            text: texto,
-            type: "text",
-            hora: horaActual(),
-            timestamp: Date.now()
-        });
-
-        await update(ref(db), {
-            [`chats/${key}/lastMessage`]: texto,
-            [`chats/${key}/lastSender`]: miUid,
-            [`chats/${key}/updatedAt`]: Date.now()
-        });
-
-        input.value = "";
-        detenerTyping();
-
-    } catch (error) {
-        console.error(error);
-        alert("No se pudo enviar el mensaje.\n\n" + error.message);
-    }
-};
-
-
-document.getElementById("messageInput").addEventListener("keydown", event => {
-    if (event.key === "Enter" && !event.shiftKey) {
-        event.preventDefault();
-        enviarMensaje();
-    }
-});
-
-
-document.getElementById("messageInput").addEventListener("input", notificarEscribiendo);
-
-function notificarEscribiendo() {
-    if (!chatActivoUid) return;
-    const key = crearChatKey(miUid, chatActivoUid);
-
-    set(ref(db, `escribiendo/${key}/${miUid}`), {
-        name: miNombre,
-        timestamp: Date.now()
-    }).catch(() => {});
-
-    clearTimeout(typingTimer);
-    typingTimer = setTimeout(detenerTyping, 2000);
-}
-
-
-function detenerTyping() {
-    clearTimeout(typingTimer);
-    if (!chatActivoUid) return;
-    const key = crearChatKey(miUid, chatActivoUid);
-    remove(ref(db, `escribiendo/${key}/${miUid}`)).catch(() => {});
-}
-
-
-function escucharTyping() {
-    if (!chatActivoUid) return;
-    const key = crearChatKey(miUid, chatActivoUid);
-    const typingRef = ref(db, `escribiendo/${key}/${chatActivoUid}`);
-
-    unsubscribeTyping = onValue(typingRef, snapshot => {
-        const data = snapshot.val();
-        if (data && Date.now() - data.timestamp < 4000) {
-            document.getElementById("typingText").textContent = `${chatActivoNombre || "Alguien"} está escribiendo`;
-            document.getElementById("typingIndicator").classList.add("active");
-        } else {
-            document.getElementById("typingIndicator").classList.remove("active");
+        function toggleMenuChat(event, id) {
+            event.stopPropagation();
+            document.querySelectorAll('.dropdown-menu').forEach(m => {
+                if (m.id !== `menu_${id}`) m.classList.remove('show');
+            });
+            const menu = document.getElementById(`menu_${id}`);
+            menu.classList.toggle('show');
         }
-    });
-}
 
+        function renombrarChat(id) {
+            const nuevoNombre = prompt("Ingresa el nuevo nombre para este chat:", listaChats[id].titulo);
+            if (nuevoNombre && nuevoNombre.trim() !== "") {
+                listaChats[id].titulo = nuevoNombre.trim();
+                guardarEnLocalStorage();
+                renderizarListaChats();
+            }
+        }
 
-/* ============================================================
-   ENVIAR DOCUMENTOS / ARCHIVOS
-============================================================ */
+        function eliminarChat(id) {
+            if (Object.keys(listaChats).length <= 1) {
+                alert("Debes tener al menos un chat activo.");
+                return;
+            }
+            if (confirm("¿Estás seguro de eliminar este chat?")) {
+                delete listaChats[id];
+                delete conversaciones[id];
+                guardarEnLocalStorage();
+                
+                const remainingIds = Object.keys(listaChats);
+                if (remainingIds.length > 0) {
+                    seleccionarChat(remainingIds[0]);
+                }
+                renderizarListaChats();
+            }
+        }
 
-window.enviarDocumento = async function(event) {
-    if (!chatActivoUid) {
-        mostrarToast("Selecciona un amigo primero.");
-        event.target.value = "";
-        return;
-    }
+        function seleccionarChat(id) {
+            chatActivoId = id;
+            const chatInfo = listaChats[id];
+            if (!chatInfo) return;
 
-    const archivo = event.target.files[0];
-    event.target.value = "";
-    if (!archivo) return;
+            document.getElementById('activeChatName').innerText = chatInfo.titulo;
+            document.getElementById('activeChatAvatar').innerText = chatInfo.avatar;
+            document.getElementById('activeChatStatus').innerText = "En línea • Guardado localmente";
+            document.getElementById('suggestionsBar').style.display = 'flex';
 
-    if (archivo.size > 5 * 1024 * 1024) {
-        alert("El archivo es demasiado pesado (máximo 5MB).");
-        return;
-    }
+            renderizarListaChats();
+            actualizarVistaMensajes();
+        }
 
-    const preparado = await asegurarUsuariosChat(chatActivoUid);
-    if (!preparado) {
-        mostrarToast("No se pudo preparar el chat.");
-        return;
-    }
+        function cargarPreguntasAleatorias() {
+            const container = document.getElementById('suggestionsBar');
+            container.innerHTML = '';
+            const seleccionadas = [...bancoPreguntasWitiIA].sort(() => 0.5 - Math.random()).slice(0, 5);
 
-    mostrarToast("Leyendo archivo...");
+            seleccionadas.forEach(item => {
+                const chip = document.createElement('div');
+                chip.className = 'suggestion-chip';
+                chip.innerText = item.q;
+                chip.onclick = () => enviarPreguntaRapida(item.q, item.r);
+                container.appendChild(chip);
+            });
+        }
 
-    const reader = new FileReader();
-    reader.onload = async function(e) {
-        const base64Data = e.target.result;
-        const key = crearChatKey(miUid, chatActivoUid);
+        function enviarPreguntaRapida(pregunta, respuesta) {
+            agregarMensajeAConversacion(chatActivoId, 'outgoing', pregunta);
+            simularEscrituraIA(respuesta);
+        }
 
-        try {
-            const mensajesRef = ref(db, `chats/${key}/messages`);
-            const nuevo = push(mensajesRef);
-            const previewText = `📁 Archivo: ${archivo.name}`;
+        function evaluarMatematicasTexto(texto) {
+            const limpio = texto.replace(/[^0-9+\-*/().]/g, '');
+            if (/[0-9]/.test(limpio) && /[+\-*/]/.test(limpio)) {
+                try {
+                    const resultado = Function('"use strict"; return (' + limpio + ')')();
+                    if (!isNaN(resultado) && isFinite(resultado)) {
+                        return `Resultado del cálculo matemático:\n Expresión: [ ${limpio} ]\n 🧮 Valor exacto: ${resultado}`;
+                    }
+                } catch (e) {}
+            }
+            return null;
+        }
 
-            await set(nuevo, {
-                fromUid: miUid,
-                fromName: miNombre,
-                toUid: chatActivoUid,
-                text: previewText,
-                type: "file",
-                fileName: archivo.name,
-                fileData: base64Data,
-                hora: horaActual(),
-                timestamp: Date.now()
+        function enviarMensajeTexto() {
+            const input = document.getElementById('messageInput');
+            const texto = input.value.trim();
+            if (!texto) return;
+
+            if (listaChats[chatActivoId].titulo.startsWith("Chat #") || listaChats[chatActivoId].titulo === "WitiIA - Asistente") {
+                listaChats[chatActivoId].titulo = texto.length > 22 ? texto.substring(0, 22) + '...' : texto;
+            }
+
+            agregarMensajeAConversacion(chatActivoId, 'outgoing', texto);
+            input.value = "";
+
+            let respuestaIa = "Entendido. Sigo dedicado a ayudarte con cualquier duda sobre el proyecto, código o algoritmos matemáticos.";
+            const textoLower = texto.toLowerCase();
+
+            const resultadoMatematico = evaluarMatematicasTexto(texto);
+            if (resultadoMatematico) {
+                respuestaIa = resultadoMatematico;
+            } else if (textoLower.includes("hola") || textoLower.includes("ola") || textoLower.includes("que tal") || textoLower.includes("como te va") || textoLower.includes("cm estas") || textoLower.includes("como estas") || textoLower.includes("todo bien")) {
+                respuestaIa = "¡Hola! Todo bien por aquí, con excelente energía. ¿Qué tal te va a ti? ¿De qué tema de programación, algoritmos o matemáticas platicamos hoy?";
+            } else if (textoLower.includes("k paso") || textoLower.includes("no mames") || textoLower.includes("mams paso") || textoLower.includes("mira este error") || textoLower.includes("error raro")) {
+                respuestaIa = "¡Vaya! Parece que encontraste un comportamiento extraño o un error raro. Analicemos el código o la consola para solucionarlo de inmediato.";
+            } else if (textoLower.includes("como te llamas") || textoLower.includes("quien eres")) {
+                respuestaIa = "Me llamo WitiIA, tu asistente virtual dedicado dentro de WIBSIPROJECT.";
+            } else {
+                let encontrado = false;
+                bancoPreguntasWitiIA.forEach(item => {
+                    const keywords = item.q.toLowerCase().replace(/[¿?]/g, '').split(' ');
+                    const matchCount = keywords.filter(kw => kw.length > 3 && textoLower.includes(kw)).length;
+                    if (!encontrado && (matchCount > 0 || textoLower.includes(item.q.toLowerCase().slice(3, 10)))) {
+                        respuestaIa = item.r;
+                        encontrado = true;
+                    }
+                });
+            }
+
+            simularEscrituraIA(respuestaIa);
+        }
+
+        function simularEscrituraIA(respuesta) {
+            const typingIndicator = document.getElementById('typingIndicator');
+            const typingSeconds = document.getElementById('typingSeconds');
+            const container = document.getElementById('messagesContainer');
+            
+            typingIndicator.style.display = 'flex';
+            container.scrollTop = container.scrollHeight;
+
+            let segundos = 0;
+            typingSeconds.innerText = segundos;
+
+            if (typingInterval) clearInterval(typingInterval);
+            typingInterval = setInterval(() => {
+                segundos++;
+                typingSeconds.innerText = segundos;
+            }, 1000);
+
+            const tiempoEspera = Math.max(1200, respuesta.length * 15);
+
+            setTimeout(() => {
+                clearInterval(typingInterval);
+                typingIndicator.style.display = 'none';
+                agregarMensajeAConversacion(chatActivoId, 'incoming', respuesta);
+                cargarPreguntasAleatorias();
+            }, tiempoEspera);
+        }
+
+        function agregarMensajeAConversacion(idChat, tipo, texto) {
+            if (!conversaciones[idChat]) conversaciones[idChat] = [];
+            conversaciones[idChat].push({
+                remitente: tipo === 'outgoing' ? 'user' : 'ia',
+                texto: texto,
+                hora: obtenerHoraActual()
+            });
+            guardarEnLocalStorage();
+            renderizarListaChats();
+            actualizarVistaMensajes();
+        }
+
+        function actualizarVistaMensajes() {
+            const container = document.getElementById('messagesContainer');
+            const typingIndicator = document.getElementById('typingIndicator');
+            
+            container.innerHTML = '';
+            const mensagens = conversaciones[chatActivoId] || [];
+            
+            mensagens.forEach(msg => {
+                const div = document.createElement('div');
+                const esSaliente = (msg.remitente === 'user');
+                div.className = `message ${esSaliente ? 'outgoing' : 'incoming'}`;
+                div.innerHTML = `
+                    <div>${msg.texto}</div>
+                    <div class="message-time">${msg.hora}</div>
+                `;
+                container.appendChild(div);
             });
 
-            await update(ref(db), {
-                [`chats/${key}/lastMessage`]: previewText,
-                [`chats/${key}/lastSender`]: miUid,
-                [`chats/${key}/updatedAt`]: Date.now()
-            });
-
-            mostrarToast("Archivo enviado con éxito.");
-        } catch (err) {
-            console.error(err);
-            alert("No se pudo enviar el archivo.");
+            container.appendChild(typingIndicator);
+            container.scrollTop = container.scrollHeight;
+            cargarPreguntasAleatorias();
         }
-    };
 
-    reader.onerror = function() {
-        alert("Error al leer el archivo.");
-    };
+        function chequearEnter(e) {
+            if (e.key === 'Enter') enviarMensajeTexto();
+        }
 
-    reader.readAsDataURL(archivo);
-};
+        function obtenerHoraActual() {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            return hours + ':' + minutes + ' ' + ampm;
+        }
 
+        function inicializarReconocimientoVoz() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                recognition = new SpeechRecognition();
+                recognition.lang = 'es-ES';
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
 
-/* ============================================================
-   EMOJIS / STICKERS (AMPLIADO CON MÁS EMOJIS)
-============================================================ */
+                recognition.onresult = (event) => {
+                    const speechResult = event.results[0][0].transcript;
+                    document.getElementById('messageInput').value = speechResult;
+                    detenerGrabacionVisual();
+                    enviarMensajeTexto();
+                };
 
-const stickers = [
-    "😀","😃","😄","😁","😆","😅","😂","🤣","😊","😇","🙂","🙃",
-    "😉","😌","😍","🥰","😘","😗","😙","😚","😋","😛","😝","😜",
-    "🤪","🤨","🧐","🤓","😎","🥸","🤩","🥳","😏","😒","😞","😔",
-    "😟","😕","🙁","☹️","😣","😖","😫","😩","🥺","😢","😭","😮‍💨",
-    "😤","😠","😡","🤬","🤯","😳","🥵","🥶","😱","😨","😰","😥",
-    "😓","🤗","🤔","🤭","🤫","🤥","😶","😐","😑","😬","🙄",
-    "😯","😦","😧","😴","🤤","😪","😷","🤒","🤕","🤢","🤮","🤧",
-    "🥵","🥶","🥴","😵","😵‍💫","🤯","🤠","🥳","😎","🤓","🧐","😕",
-    "👍","👎","👊","✊","🤛","🤜","🤞","✌️","🫰","🫶","👈","👉",
-    "👆","👇","☝️","✋","🤚","🖐️","🖖","👋","🤙","💪","🦾","🖕",
-    "✍️","🙏","🤝","👏","🙌","👐","🤲","🤝","❤️","🧡","💛","💚",
-    "💙","💜","🖤","🤍","🤎","💔","❤️‍🔥","❤️‍🩹","❣️","💕","💞","💓",
-    "💗","💖","💘","💝","💌","💤","💢","💣","💬","👁️‍🗨️","🗨️","🗯️",
-    "🐶","🐱","🐭","🐹","🐰","🦊","🐻","🐼","🐨","🐯","🦁","🐮",
-    "🐷","🐸","🐵","🐔","🐧","🐦","🐤","🦆","🦅","🦉","🦇","🐺",
-    "🐗","🐴","🦄","🐝","🪱","🐛","🦋","🐌","🐞","🐜","🪰","🪲",
-    "🍎","🍏","🍐","🍊","🍋","🍌","🍉","🍇","🍓","🫐","🍈","🍒",
-    "🍑","🥭","🍍","🥥","🥝","🍅","🍆","🥑","🥦","🥬","🥒","🌶️",
-    "🍞","🥐","🥖","🫓","🥨","🥯","🥞","🧇","🧀","🍖","🍗","🥩",
-    "⚽","🏀","🏈","⚾","🥎","🎾","🏐","🏉","🥏","🎱","🪀","🏓",
-    "🚗","🚕","🚙","🚌","🚎","🏎️","🚓","🚑","🚒","🚐","🛻","🚚"
-];
+                recognition.onerror = () => detenerGrabacionVisual();
+                recognition.onend = () => detenerGrabacionVisual();
+            }
+        }
 
-window.alternarPanelStickers = function() {
-    const panel = document.getElementById("stickerPanel");
-    panel.classList.toggle("active");
-};
+        function toggleMicrofono() {
+            if (!recognition) {
+                alert("Tu navegador no soporta el reconocimiento de voz.");
+                return;
+            }
 
-function poblarStickers() {
-    const panel = document.getElementById("stickerPanel");
-    panel.innerHTML = stickers.map(emoji => `
-        <div class="sticker-option" onclick="enviarSticker('${emoji}')">${emoji}</div>
-    `).join("");
-}
+            const micBtn = document.getElementById('micBtn');
+            const recordingBox = document.getElementById('recordingBox');
 
-window.enviarSticker = async function(emoji) {
-    if (!chatActivoUid) {
-        mostrarToast("Selecciona un amigo primero.");
-        return;
-    }
-    const preparado = await asegurarUsuariosChat(chatActivoUid);
-    if (!preparado) return;
+            if (!esGrabandoVoz) {
+                try {
+                    recognition.start();
+                    esGrabandoVoz = true;
+                    micBtn.classList.add('recording');
+                    recordingBox.style.display = 'block';
+                } catch (err) {
+                    console.log(err);
+                }
+            } else {
+                recognition.stop();
+                detenerGrabacionVisual();
+            }
+        }
 
-    const key = crearChatKey(miUid, chatActivoUid);
-    try {
-        const mensajesRef = ref(db, `chats/${key}/messages`);
-        const nuevo = push(mensajesRef);
-        await set(nuevo, {
-            fromUid: miUid,
-            fromName: miNombre,
-            toUid: chatActivoUid,
-            text: emoji,
-            type: "sticker",
-            hora: horaActual(),
-            timestamp: Date.now()
-        });
-        await update(ref(db), {
-            [`chats/${key}/lastMessage`]: "Sticker " + emoji,
-            [`chats/${key}/lastSender`]: miUid,
-            [`chats/${key}/updatedAt`]: Date.now()
-        });
-        document.getElementById("stickerPanel").classList.remove("active");
-    } catch (err) {
-        console.error(err);
-    }
-};
-
-document.addEventListener("click", (e) => {
-    const panel = document.getElementById("stickerPanel");
-    const btn = document.getElementById("emojiBtn");
-    if (!panel.contains(e.target) && !btn.contains(e.target)) {
-        panel.classList.remove("active");
-    }
-});
-
-</script>
+        function detenerGrabacionVisual() {
+            esGrabandoVoz = false;
+            document.getElementById('micBtn').classList.remove('recording');
+            document.getElementById('recordingBox').style.display = 'none';
+        }
+    </script>
 </body>
 </html>

@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0d1b2a">
+<title>Wchat - Estados</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+ --bg:#09131d;--panel:#111f2c;--panel-hover:#162a3c;--border:#1f364b;
+ --text:#f0f6fc;--muted:#8b9eb0;--accent:#00d284;--accent-hover:#00b06e;
+ --danger:#ff4d6d;--shadow:0 16px 48px rgba(0,0,0,0.5);
+ --radius:22px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:radial-gradient(circle at top,#112233,#070e17);color:var(--text);min-height:100vh;overflow-x:hidden}
+button,input,textarea{font:inherit}
+button{cursor:pointer;border:0;background:none}
+
+.app{min-height:100vh;display:flex;flex-direction:column}
+.topbar{height:76px;background:rgba(13,27,42,0.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;gap:18px;position:sticky;top:0;z-index:30}
+.logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--accent),#0084ff);display:grid;place-items:center;font-weight:900;font-size:22px;color:#04130e;box-shadow:0 8px 24px rgba(0,210,132,0.3);animation:pulseLogo 3s infinite ease-in-out}
+@keyframes pulseLogo{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.topbar h1{font-size:20px;letter-spacing:-0.3px}.topbar p{font-size:12px;color:var(--muted);margin-top:2px}
+.top-actions{margin-left:auto;display:flex;gap:10px}
+.icon-btn{width:44px;height:44px;border-radius:14px;background:var(--panel);color:var(--text);font-size:18px;border:1px solid var(--border);transition:all 0.25s cubic-bezier(0.4,0,0.2,1)}
+.icon-btn:hover{background:var(--accent);color:#04130e;border-color:var(--accent);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,210,132,0.3)}
+
+.layout{width:min(1160px,100%);margin:0 auto;padding:28px 20px;display:grid;grid-template-columns:400px 1fr;gap:28px}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;animation:fadeIn 0.5s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.panel-head{padding:22px 24px;border-bottom:1px solid var(--border);background:rgba(25,41,59,0.5)}
+.panel-head h2{font-size:17px;font-weight:700}.panel-head span{color:var(--muted);font-size:12px;display:block;margin-top:4px}
+
+.profile{display:flex;align-items:center;gap:16px;padding:20px 24px;background:rgba(7,14,23,0.4);border-bottom:1px solid var(--border)}
+.avatar{width:56px;height:56px;border-radius:50%;object-fit:cover;background:#1a2e40;display:grid;place-items:center;font-weight:bold;color:#fff;flex:none;border:2px solid var(--accent);box-shadow:0 0 15px rgba(0,210,132,0.2)}
+.profile-info{min-width:0}.profile-info strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:15px}.profile-info small{color:var(--muted);font-size:12px}
+
+.form{padding:24px}
+.field{margin-bottom:18px}.field label{font-size:12px;color:var(--muted);display:block;margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+.field input, .field textarea{width:100%;background:#070e17;border:1px solid var(--border);border-radius:14px;color:white;padding:14px 16px;outline:none;font-size:14px;transition:all 0.25s}
+.field input:focus, .field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,210,132,0.15)}
+.field textarea{resize:vertical;min-height:90px}
+.file-drop{border:2px dashed var(--border);padding:18px;border-radius:14px;text-align:center;background:#070e17;cursor:pointer;transition:border-color 0.2s}
+.file-drop:hover{border-color:var(--accent)}
+.file-drop input{display:none}
+.file-drop span{font-size:13px;color:var(--muted)}
+
+.primary{width:100%;padding:16px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent-hover));color:#04130e;font-weight:800;font-size:15px;box-shadow:0 8px 25px rgba(0,210,132,0.3);transition:all 0.25s}
+.primary:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,210,132,0.4)}
+
+.notice{font-size:11px;color:var(--muted);line-height:1.6;margin-top:16px;text-align:center}
+
+.status-list{padding:12px;max-height:420px;overflow-y:auto}
+.status-item{display:flex;align-items:center;gap:14px;padding:14px;border-radius:16px;margin-bottom:8px;cursor:pointer;transition:all 0.2s;background:rgba(25,41,59,0.3);border:1px solid transparent}
+.status-item:hover{background:var(--panel-hover);border-color:var(--border);transform:translateX(4px)}
+.status-item .avatar{width:48px!important;height:48px!important}
+.status-main{min-width:0;flex:1}.status-main strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+.status-main small{color:var(--muted);display:block;margin-top:4px;font-size:12px}
+.badge{font-size:10px;background:rgba(0,210,132,0.12);color:var(--accent);border-radius:20px;padding:5px 10px;font-weight:700;border:1px solid rgba(0,210,132,0.2)}
+
+.empty{padding:48px 20px;text-align:center;color:var(--muted)}
+.empty .big{font-size:42px;margin-bottom:10px;opacity:0.6}
+
+.feed{padding:28px}
+.feed-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.feed-title h2{font-size:18px}.feed-title span{font-size:12px;color:var(--muted)}
+
+.card{background:var(--panel);border:1px solid var(--border);border-radius:20px;overflow:hidden;margin-bottom:24px;box-shadow:0 10px 30px rgba(0,0,0,0.3);transition:transform 0.3s}
+.card-head{display:flex;align-items:center;gap:14px;padding:18px 22px;background:rgba(25,41,59,0.4)}
+.card-head .avatar{width:46px!important;height:46px!important}
+.card-user{flex:1;min-width:0}.card-user strong{display:block;font-size:15px}.card-user small{color:var(--muted);font-size:12px}
+.more{background:none;color:var(--muted);font-size:24px;padding:6px;border-radius:10px;transition:all 0.2s}
+.more:hover{color:var(--danger);background:rgba(255,77,109,0.1)}
+
+.description{padding:16px 22px;line-height:1.6;color:#e2e8f0;white-space:pre-wrap;font-size:14px}
+.media-wrap{background:#04090e;position:relative;max-height:620px;display:flex;justify-content:center;align-items:center;overflow:hidden}
+.media-wrap img, .media-wrap video{width:100%;max-height:620px;object-fit:contain}
+
+.video-embed-wrap{position:relative;width:100%;padding-bottom:56.25%;background:#000;height:0;overflow:hidden}
+.video-embed-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
+
+.stats{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;color:var(--muted);font-size:13px;border-top:1px solid var(--border);background:rgba(7,14,23,0.3)}
+.actions{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid var(--border);background:#070e17}
+.action{padding:14px 6px;background:none;color:#a0b2c6;font-size:13px;font-weight:600;transition:all 0.2s}
+.action:hover{background:var(--panel-hover);color:white}
+
+.reactions{padding:12px 22px;display:flex;gap:8px;flex-wrap:wrap;background:rgba(13,27,42,0.6);border-top:1px solid var(--border)}
+.reaction{background:#1a2e40;border:1px solid var(--border);border-radius:20px;color:white;padding:7px 14px;font-size:13px;transition:all 0.2s;display:flex;align-items:center;gap:6px}
+.reaction:hover{border-color:var(--accent);transform:translateY(-1px)}
+.reaction.active{border-color:var(--accent);background:rgba(0,210,132,0.15);color:var(--accent);box-shadow:0 0 12px rgba(0,210,132,0.2)}
+
+.reply{display:flex;gap:10px;padding:14px 22px;background:#070e17;border-top:1px solid var(--border)}
+.reply input{flex:1;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:12px 16px;color:white;min-width:0;font-size:13px;transition:all 0.2s}
+.reply input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,210,132,0.15)}
+.reply button{width:46px;border-radius:14px;background:var(--accent);color:#04130e;font-weight:bold;transition:all 0.2s;display:grid;place-items:center;font-size:16px}
+.reply button:hover{opacity:0.9;transform:scale(1.05)}
+
+.comments{padding:6px 22px 18px;background:#070e17}.comment{padding:12px 14px;background:var(--panel);border-radius:12px;margin-top:8px;font-size:13px;border:1px solid var(--border)}.comment b{margin-right:8px;color:var(--accent)}
+
+.modal{position:fixed;inset:0;background:rgba(4,9,14,0.8);display:none;align-items:center;justify-content:center;padding:20px;z-index:50;backdrop-filter:blur(6px);animation:fadeInModal 0.3s ease}
+@keyframes fadeInModal{from{opacity:0}to{opacity:1}}
+.modal.show{display:flex}.modal-box{width:min(500px,100%);max-height:85vh;overflow:auto;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+.modal-head{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;background:rgba(25,41,59,0.6)}.modal-head h3{flex:1;font-size:16px}.close{background:none;color:var(--muted);font-size:26px;cursor:pointer;transition:color 0.2s}
+.close:hover{color:var(--text)}
+.viewer{padding:20px}.viewer-list{margin-top:12px}.viewer-row{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border)}.viewer-row:last-child{border-bottom:none}.viewer-row .avatar{width:40px!important;height:40px!important}
+
+.toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(20px);background:var(--panel);border:1px solid var(--accent);padding:14px 22px;border-radius:14px;opacity:0;pointer-events:none;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);z-index:100;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,0.6);color:var(--text);font-weight:600}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:860px){
+ .layout{grid-template-columns:1fr;padding:14px;gap:20px}
+ .topbar{height:66px;padding:0 18px}.topbar h1{font-size:18px}
+ .topbar p{display:none}.logo{width:40px;height:40px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+ <div class="logo">W</div>
+ <div><h1>Estados</h1><p>Comparte videos de cualquier duración con selector de archivos o enlaces</p></div>
+ <div class="top-actions">
+  <button class="icon-btn" onclick="recargarEstadosFirebase()" title="Sincronizar estados">↻</button>
+ </div>
+</header>
+
+<main class="layout">
+<section class="panel creator">
+ <div class="panel-head"><h2>Crear estado</h2><span>Sin límites de duración para tus videos .mp4</span></div>
+ <div class="profile">
+  <img id="miAvatar" class="avatar" alt="Perfil">
+  <div class="profile-info"><strong id="miNombre">Usuario Wchat</strong><small>Tu estado conectado</small></div>
+ </div>
+ <div class="form">
+  <div class="field"><label>Nombre</label><input id="nombre" maxlength="50" placeholder="Nombre del usuario"></div>
+  <div class="field"><label>Descripción / Mensaje</label><textarea id="descripcion" maxlength="1000" placeholder="¿Qué quieres compartir hoy?"></textarea></div>
+  
+  <div class="field">
+   <label>Seleccionar video de tu dispositivo (.mp4)</label>
+   <div class="file-drop" onclick="document.getElementById('archivoVideo').click()">
+    <input type="file" id="archivoVideo" accept="video/mp4,video/*" onchange="manejarSeleccionArchivo(this)">
+    <span id="textoArchivo">📁 Haz clic aquí para elegir tu video pesado (+1 hora)</span>
+   </div>
+  </div>
+
+  <div class="field">
+   <label>O pega un enlace externo (YouTube / Drive / MP4 directo)</label>
+   <input id="enlace" type="url" placeholder="https://... o enlace de YouTube / Drive">
+  </div>
+
+  <button class="primary" onclick="publicarEstadoFirebase()">Publicar estado</button>
+  <div class="notice">💡 Puedes seleccionar cualquier archivo local de video de gran tamaño o pegar enlaces externos sin restricciones de tiempo.</div>
+ </div>
+</section>
+
+<section class="panel statuses">
+ <div class="panel-head"><h2>Estados recientes</h2><span id="contador">0 estados activos</span></div>
+ <div id="listaEstados" class="status-list"></div>
+</section>
+
+<section class="panel" style="grid-column:1/-1">
+ <div class="feed">
+  <div class="feed-title"><h2>Publicaciones en vivo</h2><span>Actualización en tiempo real</span></div>
+  <div id="feed"></div>
+ </div>
+</section>
+</main>
+</div>
+
+<div id="modalVistas" class="modal" onclick="cerrarModal(event)">
+ <div class="modal-box">
+  <div class="modal-head"><h3>👁️ Personas que vieron el estado</h3><button class="close" onclick="cerrarModal()">×</button></div>
+  <div id="listaVistas" class="viewer"></div>
+ </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+import { getDatabase, ref, get, push, update, onValue, remove } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyAg8n3AcKE-0QDQYcswUBYZwI702TzPZIU",
+    authDomain: "anthonypg.firebaseapp.com",
+    databaseURL: "https://anthonypg-default-rtdb.firebaseio.com",
+    projectId: "anthonypg",
+    storageBucket: "anthonypg.firebasestorage.app",
+    messagingSenderId: "620424695699",
+    appId: "1:620424695699:web:429c9ace801a5bc75a6266",
+    measurementId: "G-YVFYEWDQ98"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+let miUid = null;
+let miNombre = "Usuario Wchat";
+let miAvatarUrl = "";
+let archivoSeleccionadoLocal = null;
+const MAX_AGE = 48 * 60 * 60 * 1000;
+const REACCIONES = ["❤️","😂","😮","😢","👍"];
+let cacheEstados = [];
+const videoUrlsCache = {}; // Mantiene los object URLs activos en memoria de la sesión
+
+// Manejo de Base de Datos Local IndexedDB para persistir videos locales tras recargar
+function abrirIndexedDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open("WchatDB", 1);
+        request.onupgradeneeded = e => {
+            const db = e.target.result;
+            if(!db.objectStoreNames.contains("videos")) {
+                db.createObjectStore("videos");
+            }
+        };
+        request.onsuccess = e => resolve(e.target.result);
+        request.onerror = e => reject(e.target.error);
+    });
+}
+
+async function guardarVideoLocalDB(id, file) {
+    try {
+        const dbIdb = await abrirIndexedDB();
+        const tx = dbIdb.transaction("videos", "readwrite");
+        tx.objectStore("videos").put(file, id);
+    } catch(e) {
+        console.error("Error guardando video en IndexedDB", e);
+    }
+}
+
+async function obtenerVideoLocalDB(id) {
+    try {
+        const dbIdb = await abrirIndexedDB();
+        return new Promise(resolve => {
+            const tx = dbIdb.transaction("videos", "readonly");
+            const req = tx.objectStore("videos").get(id);
+            req.onsuccess = () => resolve(req.result || null);
+            req.onerror = () => resolve(null);
+        });
+    } catch(e) {
+        return null;
+    }
+}
+
+async function eliminarVideoLocalDB(id) {
+    try {
+        const dbIdb = await abrirIndexedDB();
+        const tx = dbIdb.transaction("videos", "readwrite");
+        tx.objectStore("videos").delete(id);
+    } catch(e) {}
+}
+
+onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+        alert("Debes iniciar sesión para publicar y ver estados.");
+        window.location.href = "cuenta.html";
+        return;
+    }
+    miUid = user.uid;
+    await cargarPerfilFirebase();
+    escucharEstadosFirebase();
+});
+
+async function cargarPerfilFirebase() {
+    try {
+        const snapshot = await get(ref(db, "usuarios/" + miUid));
+        if (snapshot.exists()) {
+            const datos = snapshot.val();
+            miNombre = datos.name || datos.nombre || datos.displayName || auth.currentUser.displayName || "Usuario Wchat";
+            miAvatarUrl = datos.avatar || datos.foto || datos.photoURL || auth.currentUser.photoURL || "";
+
+            document.getElementById("nombre").value = miNombre;
+            document.getElementById("miNombre").textContent = miNombre;
+            actualizarAvatarUI(miAvatarUrl, miNombre);
+        } else {
+            miNombre = auth.currentUser.displayName || "Usuario Wchat";
+            miAvatarUrl = auth.currentUser.photoURL || "";
+            document.getElementById("nombre").value = miNombre;
+            document.getElementById("miNombre").textContent = miNombre;
+            actualizarAvatarUI(miAvatarUrl, miNombre);
+        }
+    } catch (e) {
+        console.error("Error al cargar perfil:", e);
+    }
+}
+
+function actualizarAvatarUI(url, nombre) {
+    const avatarImg = document.getElementById("miAvatar");
+    if (url && url.trim() !== "") {
+        avatarImg.src = url;
+    } else {
+        avatarImg.src = avatarInicial(nombre);
+    }
+}
+
+function avatarInicial(nombre) {
+    return "data:image/svg+xml;charset=UTF-8,"+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" rx="50" fill="#1b2e40"/><text x="50" y="59" text-anchor="middle" font-size="42" fill="white" font-family="Arial">${esc((nombre||"U")[0].toUpperCase())}</text></svg>`);
+}
+
+window.manejarSeleccionArchivo = function(input) {
+    if(input.files && input.files[0]) {
+        archivoSeleccionadoLocal = input.files[0];
+        document.getElementById("textoArchivo").textContent = "✔️ Archivo listo: " + archivoSeleccionadoLocal.name;
+        document.getElementById("enlace").value = "";
+    }
+}
+
+function parsearEnlaceVideo(url) {
+    const regExpYt = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const matchYt = url.match(regExpYt);
+    if (matchYt && matchYt[2].length === 11) {
+        return { tipo: "youtube", url: matchYt[2] };
+    }
+    if (url.includes("drive.google.com")) {
+        const matchDrive = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        if (matchDrive && matchDrive[1]) {
+            return { tipo: "video_directo", url: `https://drive.google.com/uc?export=download&id=${matchDrive[1]}` };
+        }
+    }
+    return { tipo: "video_directo", url: url };
+}
+
+window.publicarEstadoFirebase = async function() {
+    const nombreInput = (document.getElementById("nombre").value || miNombre).trim();
+    const descripcion = document.getElementById("descripcion").value.trim();
+    const enlaceUrl = document.getElementById("enlace").value.trim();
+
+    if(!descripcion && !enlaceUrl && !archivoSeleccionadoLocal){
+        toast("Agrega un mensaje, un video local o un enlace.");
+        return;
+    }
+
+    let contenidoObj = null;
+    let archivoAGuardar = null;
+
+    if(archivoSeleccionadoLocal) {
+        archivoAGuardar = archivoSeleccionadoLocal;
+        contenidoObj = { tipo: "video_local", url: "" }; // Marcador interno local
+    } else if(enlaceUrl) {
+        const infoVideo = parsearEnlaceVideo(enlaceUrl);
+        if(infoVideo.tipo === "youtube") {
+            contenidoObj = { tipo: "youtube", url: infoVideo.url };
+        } else {
+            contenidoObj = { tipo: "video", url: infoVideo.url };
+        }
+    }
+
+    await enviarEstadoADatabase({
+        uid: miUid,
+        nombre: nombreInput,
+        avatar: miAvatarUrl || avatarInicial(nombreInput),
+        descripcion,
+        contenido: contenidoObj
+    }, archivoAGuardar);
+}
+
+async function enviarEstadoADatabase(nuevoEstado, archivoLocal) {
+    try {
+        const estadosRef = ref(db, "estados");
+        const nuevoRef = push(estadosRef);
+        const idGenerado = nuevoRef.key;
+
+        if (archivoLocal) {
+            await guardarVideoLocalDB(idGenerado, archivoLocal);
+        }
+
+        await update(ref(db, "estados/" + idGenerado), {
+            ...nuevoEstado,
+            fecha: Date.now(),
+            vistas: {},
+            reacciones: {},
+            comentarios: {}
+        });
+
+        resetForm();
+        toast("¡Estado publicado con éxito!");
+    } catch(e) {
+        console.error(e);
+        toast("Error al publicar el estado.");
+    }
+}
+
+function resetForm() {
+    document.getElementById("descripcion").value = "";
+    document.getElementById("enlace").value = "";
+    document.getElementById("archivoVideo").value = "";
+    archivoSeleccionadoLocal = null;
+    document.getElementById("textoArchivo").textContent = "📁 Haz clic aquí para elegir tu video pesado (+1 hora)";
+}
+
+function escucharEstadosFirebase() {
+    const estadosRef = ref(db, "estados");
+    onValue(estadosRef, async snapshot => {
+        const data = snapshot.val() || {};
+        const ahora = Date.now();
+        
+        cacheEstados = Object.entries(data)
+            .map(([id, item]) => ({ id, ...item }))
+            .filter(item => ahora - item.fecha < MAX_AGE)
+            .sort((a, b) => b.fecha - a.fecha);
+
+        await renderizarUI(false);
+    });
+}
+
+window.recargarEstadosFirebase = async function() {
+    toast("Estados sincronizados.");
+    await renderizarUI(true);
+}
+
+async function renderizarUI(forzarCompleto = false) {
+    document.getElementById("contador").textContent = cacheEstados.length + " estado" + (cacheEstados.length === 1 ? " activo" : "s activos");
+    
+    const lista = document.getElementById("listaEstados");
+    lista.innerHTML = cacheEstados.length ? cacheEstados.map(x => `
+        <div class="status-item" onclick="verEstado('${x.id}')">
+            <img class="avatar" src="${x.avatar || avatarInicial(x.nombre)}" alt="">
+            <div class="status-main"><strong>${esc(x.nombre)}</strong><small>${esc(x.descripcion||"Publicación multimedia")}</small></div>
+            <span class="badge">${tiempoRestante(x.fecha)}</span>
+        </div>`).join("") : `<div class="empty"><div class="big">◌</div>No hay estados activos.</div>`;
+
+    const feed = document.getElementById("feed");
+    
+    // Renderizamos cada tarjeta de manera asíncrona para asegurar que los videos locales carguen desde IndexedDB
+    const cardsHtmlPromises = cacheEstados.map(async x => await renderCard(x));
+    const cardsHtml = await Promise.all(cardsHtmlPromises);
+
+    if (forzarCompleto || feed.children.length === 0) {
+        feed.innerHTML = cardsHtml.length ? cardsHtml.join("") : `<div class="empty"><div class="big">📱</div>Aquí aparecerán las publicaciones en tiempo real.</div>`;
+    } else {
+        cacheEstados.forEach(async (x, index) => {
+            const cardExistente = document.getElementById("card-" + x.id);
+            if (cardExistente) {
+                const vistasEl = cardExistente.querySelector('.stats span:nth-child(1)');
+                if(vistasEl) vistasEl.textContent = `👁️ ${Object.keys(x.vistas || {}).length} vistas`;
+
+                const reaccionesEl = cardExistente.querySelector('.stats span:nth-child(2)');
+                if(reaccionesEl) reaccionesEl.textContent = `❤️ ${totalReacciones(x)}`;
+
+                const misReacciones = x.reacciones || {};
+                const contenedorReacciones = cardExistente.querySelector('.reactions');
+                if(contenedorReacciones) {
+                    contenedorReacciones.innerHTML = REACCIONES.map(e => `<button class="reaction ${misReacciones[miUid] === e ? "active" : ""}" onclick="reaccionarFirebase('${x.id}','${e}')">${e} <span>${Object.values(x.reacciones || {}).filter(val => val === e).length || ''}</span></button>`).join("");
+                }
+
+                const comentariosObj = x.comentarios || {};
+                const comentariosArr = Object.values(comentariosObj);
+                let commentsContainer = cardExistente.querySelector('.comments');
+                
+                if(comentariosArr.length) {
+                    const htmlComentarios = comentariosArr.slice(-5).map(c => `<div class="comment"><b>${esc(c.nombre)}:</b>${esc(c.text)}</div>`).join("");
+                    if(commentsContainer) {
+                        commentsContainer.innerHTML = htmlComentarios;
+                    } else {
+                        const replyDiv = cardExistente.querySelector('.reply');
+                        const nuevoDiv = document.createElement('div');
+                        nuevoDiv.className = 'comments';
+                        nuevoDiv.innerHTML = htmlComentarios;
+                        replyDiv.insertAdjacentElement('afterend', nuevoDiv);
+                    }
+                } else if(commentsContainer) {
+                    commentsContainer.remove();
+                }
+            } else {
+                feed.innerHTML = cardsHtml.length ? cardsHtml.join("") : `<div class="empty"><div class="big">📱</div>Aquí aparecerán las publicaciones en tiempo real.</div>`;
+            }
+        });
+    }
+}
+
+async function renderContenidoAsync(x) {
+    const c = x.contenido;
+    if(!c) return "";
+    
+    if(c.tipo === "video_local" || (c.tipo === "video" && c.url === "")) {
+        if(!videoUrlsCache[x.id]) {
+            const fileBlob = await obtenerVideoLocalDB(x.id);
+            if(fileBlob) {
+                videoUrlsCache[x.id] = URL.createObjectURL(fileBlob);
+            }
+        }
+        const blobUrl = videoUrlsCache[x.id] || "";
+        if(blobUrl) {
+            return `<div class="media-wrap"><video src="${blobUrl}" controls playsinline preload="metadata" style="width:100%;max-height:620px;object-fit:contain"></video></div>`;
+        }
+        return `<div class="media-wrap" style="padding:20px;color:var(--muted);text-align:center;">Video local no disponible en este dispositivo (o expiró el almacenamiento local).</div>`;
+    }
+
+    if(c.tipo === "video") {
+        return `<div class="media-wrap"><video src="${c.url}" controls playsinline preload="metadata" style="width:100%;max-height:620px;object-fit:contain"></video></div>`;
+    }
+    if(c.tipo === "youtube") {
+        return `<div class="video-embed-wrap"><iframe src="https://www.youtube-nocookie.com/embed/${c.url}" title="Reproductor de YouTube" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
+    }
+    return "";
+}
+
+function totalReacciones(x) {
+    const reac = x.reacciones || {};
+    return Object.values(reac).reduce((a, b) => a + b, 0);
+}
+
+async function renderCard(x) {
+    const misReacciones = x.reacciones || {};
+    const comentariosObj = x.comentarios || {};
+    const comentariosArr = Object.values(comentariosObj);
+    const esDueño = x.uid === miUid;
+    const contenidoHtml = await renderContenidoAsync(x);
+
+    return `<article class="card" id="card-${x.id}">
+        <div class="card-head">
+            <img class="avatar" src="${x.avatar || avatarInicial(x.nombre)}" alt="">
+            <div class="card-user"><strong>${esc(x.nombre)}</strong><small>${fechaTexto(x.fecha)} · ${tiempoRestante(x.fecha)}</small></div>
+            ${esDueño ? `<button class="more" onclick="eliminarEstadoFirebase('${x.id}')" title="Eliminar estado">×</button>` : ''}
+        </div>
+        ${x.descripcion ? `<div class="description">${esc(x.descripcion)}</div>` : ""}
+        ${contenidoHtml}
+        <div class="stats"><span>👁️ ${Object.keys(x.vistas || {}).length} vistas</span><span>❤️ ${totalReacciones(x)} reacciones</span></div>
+        <div class="reactions">${REACCIONES.map(e => `<button class="reaction ${misReacciones[miUid] === e ? "active" : ""}" onclick="reaccionarFirebase('${x.id}','${e}')">${e} <span>${Object.values(x.reacciones || {}).filter(val => val === e).length || ''}</span></button>`).join("")}</div>
+        <div class="actions">
+            <button class="action" onclick="registrarVistaFirebase('${x.id}')">👁️ Ver</button>
+            <button class="action" onclick="mostrarVistasFirebase('${x.id}')">👥 Vistas</button>
+            <button class="action" onclick="responder('${x.id}')">💬 Responder</button>
+        </div>
+        <div class="reply"><input id="reply-${x.id}" maxlength="300" placeholder="Escribe una respuesta a ${esc(x.nombre)}..."><button onclick="enviarComentarioFirebase('${x.id}')">➤</button></div>
+        ${comentariosArr.length ? `<div class="comments">${comentariosArr.slice(-5).map(c => `<div class="comment"><b>${esc(c.nombre)}:</b>${esc(c.text)}</div>`).join("")}</div>` : ""}
+    </article>`;
+}
+
+window.registrarVistaFirebase = async function(id) {
+    if(!miUid) return;
+    const x = cacheEstados.find(a => a.id === id);
+    if(!x) return;
+    const vistas = x.vistas || {};
+    if(!vistas[miUid]) {
+        vistas[miUid] = { nombre: miNombre, avatar: miAvatarUrl || avatarInicial(miNombre), fecha: Date.now() };
+        await update(ref(db, `estados/${id}`), { vistas });
+    }
+}
+
+window.verEstado = function(id) {
+    registrarVistaFirebase(id);
+    document.getElementById("card-"+id)?.scrollIntoView({behavior:"smooth", block:"center"});
+}
+
+window.reaccionarFirebase = async function(id, emoji) {
+    if(!miUid) return;
+    const x = cacheEstados.find(a => a.id === id);
+    if(!x) return;
+    let reacciones = x.reacciones || {};
+    const claveReaccion = miUid;
+
+    if(reacciones[claveReaccion] === emoji) {
+        delete reacciones[claveReaccion];
+    } else {
+        reacciones[claveReaccion] = emoji;
+    }
+    await update(ref(db, `estados/${id}`), { reacciones });
+}
+
+window.mostrarVistasFirebase = function(id) {
+    registrarVistaFirebase(id);
+    const x = cacheEstados.find(a => a.id === id);
+    if(!x) return;
+    const vistasArr = Object.values(x.vistas || {});
+    
+    document.getElementById("listaVistas").innerHTML = vistasArr.length ?
+        `<div><b>${vistasArr.length}</b> persona(s) han visto este estado.</div><div class="viewer-list">${vistasArr.map(v => `<div class="viewer-row"><img class="avatar" src="${v.avatar || avatarInicial(v.nombre)}"><div><b>${esc(v.nombre)}</b><small style="display:block;color:var(--muted)">${fechaTexto(v.fecha)}</small></div></div>`).join("")}</div>`:
+        "<div class='empty'>Todavía nadie ha visto este estado.</div>";
+    document.getElementById("modalVistas").classList.add("show");
+}
+
+window.enviarComentarioFirebase = async function(id) {
+    const input = document.getElementById("reply-"+id);
+    const text = input.value.trim();
+    if(!text) return;
+    const x = cacheEstados.find(a => a.id === id);
+    if(!x) return;
+
+    const nuevoComentarioRef = push(ref(db, `estados/${id}/comentarios`));
+    await update(ref(db, `estados/${id}/comentarios/${nuevoComentarioRef.key}`), {
+        nombre: miNombre,
+        text,
+        fecha: Date.now()
+    });
+    input.value = "";
+    toast("Respuesta enviada.");
+}
+
+window.eliminarEstadoFirebase = async function(id) {
+    if(!confirm("¿Estás seguro de eliminar este estado?")) return;
+    try {
+        await remove(ref(db, `estados/${id}`));
+        await eliminarVideoLocalDB(id);
+        if(videoUrlsCache[id]) {
+            URL.revokeObjectURL(videoUrlsCache[id]);
+            delete videoUrlsCache[id];
+        }
+        toast("Estado eliminado correctamente.");
+    } catch(e) {
+        toast("No se pudo eliminar el estado.");
+    }
+}
+
+window.responder = function(id) { document.getElementById("reply-"+id)?.focus(); }
+window.cerrarModal = function(e) { if(!e || e.target === document.getElementById("modalVistas")) document.getElementById("modalVistas").classList.remove("show"); }
+
+function fechaTexto(t) {
+    const d = new Date(t);
+    return d.toLocaleString("es-GT",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"});
+}
+function tiempoRestante(t) {
+    const ms = MAX_AGE - (Date.now() - t);
+    if(ms <= 0) return "Expirado";
+    const h = Math.floor(ms/3600000), m = Math.floor((ms%3600000)/60000);
+    return h+"h "+m+"m restantes";
+}
+function esc(s) {
+    return String(s ?? "").replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[m]));
+}
+function toast(msg) {
+    const t = document.getElementById("toast"); t.textContent = msg; t.classList.add("show");
+    clearTimeout(window.__toast); window.__toast = setTimeout(() => t.classList.remove("show"), 2500);
+}
+
+document.getElementById("nombre").addEventListener("input", e => {
+    const n = e.target.value.trim() || "Usuario Wchat";
+    document.getElementById("miNombre").textContent = n;
+    actualizarAvatarUI(miAvatarUrl, n);
+});
+</script>
+</body>
+</html>

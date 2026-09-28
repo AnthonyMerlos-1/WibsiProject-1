@@ -1,5103 +1,646 @@
 <!DOCTYPE html>
-
 <html lang="es">
-
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>WIBSIPROJECT — Tendencias</title>
-
 <link rel="icon" type="image/png" href="../assets/img/tendencias.png">
-
 <style>
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-:root{
-    --bg:#050509;
-    --panel:#0d0d15;
-    --panel2:#12121c;
-    --line:rgba(255,255,255,.08);
-
-    --purple:#8b5cf6;
-    --blue:#3b82f6;
-    --cyan:#22d3ee;
-    --pink:#ec4899;
-
-    --text:#f8fafc;
-    --muted:#7d8799;
-}
-
-body{
-    min-height:100vh;
-    font-family:Arial,Helvetica,sans-serif;
-    color:var(--text);
-
-    background:
-        radial-gradient(
-            circle at 20% 0%,
-            rgba(139,92,246,.18),
-            transparent 28%
-        ),
-        radial-gradient(
-            circle at 90% 20%,
-            rgba(34,211,238,.10),
-            transparent 25%
-        ),
-        var(--bg);
-
-    overflow-x:hidden;
-}
-
-button{
-    font-family:inherit;
-}
-
-/* =====================================================
-   BARRA SUPERIOR
-===================================================== */
-
-.topbar{
-    height:70px;
-
-    position:sticky;
-    top:0;
-    z-index:1000;
-
-    display:flex;
-    align-items:center;
-    gap:20px;
-
-    padding:0 24px;
-
-    background:rgba(5,5,9,.88);
-    backdrop-filter:blur(20px);
-
-    border-bottom:1px solid var(--line);
-
-    overflow:hidden;
-}
-
-/* Línea animada */
-
-.topbar::before{
-    content:"";
-
-    position:absolute;
-    top:0;
-    left:-30%;
-
-    width:30%;
-    height:2px;
-
-    background:linear-gradient(
-        90deg,
-        transparent,
-        var(--purple),
-        var(--cyan),
-        var(--pink),
-        transparent
-    );
-
-    animation:topbarMove 5s linear infinite;
-}
-
-@keyframes topbarMove{
-    0%{
-        left:-30%;
-    }
-
-    100%{
-        left:100%;
-    }
-}
-
-/* brillo */
-
-.topbar::after{
-    content:"";
-
-    position:absolute;
-    width:220px;
-    height:220px;
-
-    left:20%;
-    top:-170px;
-
-    background:rgba(139,92,246,.08);
-
-    filter:blur(60px);
-
-    border-radius:50%;
-
-    animation:topGlow 7s ease-in-out infinite;
-}
-
-@keyframes topGlow{
-
-    0%,100%{
-        transform:translateX(-100px);
-    }
-
-    50%{
-        transform:translateX(350px);
-    }
-
-}
-
-/* =====================================================
-   LOGO
-===================================================== */
-
-.logo{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    min-width:210px;
-
-    position:relative;
-    z-index:2;
-}
-
-.logo-box{
-    width:42px;
-    height:42px;
-
-    display:grid;
-    place-items:center;
-
-    border-radius:13px;
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--purple),
-            var(--blue)
-        );
-
-    font-weight:900;
-
-    box-shadow:
-        0 0 25px rgba(139,92,246,.35);
-
-    animation:logoFloat 3s ease-in-out infinite;
-}
-
-@keyframes logoFloat{
-
-    0%,100%{
-        transform:translateY(0);
-    }
-
-    50%{
-        transform:translateY(-3px) rotate(2deg);
-    }
-
-}
-
-.logo strong{
-    font-size:16px;
-}
-
-.logo small{
-    display:block;
-    margin-top:3px;
-
-    color:var(--muted);
-
-    font-size:8px;
-    letter-spacing:2px;
-}
-
-/* =====================================================
-   BUSCADOR
-===================================================== */
-
-.search{
-    flex:1;
-    max-width:650px;
-
-    height:42px;
-
-    display:flex;
-    align-items:center;
-
-    padding:0 14px;
-
-    border:1px solid var(--line);
-    border-radius:12px;
-
-    background:rgba(255,255,255,.035);
-
-    transition:.3s;
-
-    position:relative;
-    z-index:2;
-}
-
-.search:focus-within{
-    border-color:rgba(139,92,246,.65);
-
-    box-shadow:
-        0 0 0 3px rgba(139,92,246,.08),
-        0 0 25px rgba(139,92,246,.12);
-}
-
-.search span{
-    color:#687386;
-    font-size:20px;
-    margin-right:9px;
-}
-
-.search input{
-    width:100%;
-
-    border:0;
-    outline:0;
-
-    background:transparent;
-    color:white;
-}
-
-/* =====================================================
-   ACCIONES
-===================================================== */
-
-.actions{
-    margin-left:auto;
-
-    display:flex;
-    gap:8px;
-
-    position:relative;
-    z-index:2;
-}
-
-.action{
-    height:40px;
-
-    padding:0 14px;
-
-    border:1px solid var(--line);
-    border-radius:10px;
-
-    background:#0d0d15;
-    color:white;
-
-    cursor:pointer;
-
-    transition:.25s;
-}
-
-.action:hover{
-    border-color:rgba(139,92,246,.5);
-    transform:translateY(-2px);
-
-    box-shadow:
-        0 8px 25px rgba(0,0,0,.25);
-}
-
-.profile{
-    width:40px;
-    height:40px;
-
-    border:0;
-    border-radius:50%;
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--purple),
-            var(--pink)
-        );
-
-    color:white;
-
-    font-weight:bold;
-
-    cursor:pointer;
-
-    transition:.25s;
-}
-
-.profile:hover{
-    transform:scale(1.08) rotate(5deg);
-}
-
-/* =====================================================
-   LAYOUT
-===================================================== */
-
-.layout{
-    display:flex;
-    min-height:calc(100vh - 70px);
-}
-
-/* =====================================================
-   SIDEBAR
-===================================================== */
-
-.sidebar{
-    width:230px;
-
-    position:sticky;
-    top:70px;
-
-    height:calc(100vh - 70px);
-
-    padding:24px 13px;
-
-    border-right:1px solid var(--line);
-
-    background:rgba(7,7,11,.65);
-}
-
-.label{
-    padding:0 12px;
-    margin:0 0 9px;
-
-    color:#626c7d;
-
-    font-size:9px;
-    font-weight:bold;
-
-    letter-spacing:2px;
-}
-
-.side{
-    width:100%;
-    height:44px;
-
-    display:flex;
-    align-items:center;
-
-    gap:11px;
-
-    padding:0 12px;
-
-    border:0;
-    border-radius:11px;
-
-    background:transparent;
-
-    color:#929caf;
-
-    cursor:pointer;
-
-    text-align:left;
-
-    transition:.2s;
-}
-
-.side:hover{
-    color:white;
-
-    background:rgba(139,92,246,.10);
-
-    transform:translateX(3px);
-}
-
-.side.active{
-    color:white;
-
-    background:
-        linear-gradient(
-            90deg,
-            rgba(139,92,246,.22),
-            rgba(59,130,246,.08)
-        );
-}
-
-.side span{
-    width:23px;
-    text-align:center;
-    font-size:17px;
-}
-
-/* =====================================================
-   MAIN
-===================================================== */
-
-.main{
-    flex:1;
-
-    padding:30px 36px 120px;
-
-    min-width:0;
-}
-
-/* =====================================================
-   HERO
-===================================================== */
-
-.hero{
-    position:relative;
-    overflow:hidden;
-
-    min-height:290px;
-
-    padding:42px;
-
-    border:1px solid var(--line);
-    border-radius:28px;
-
-    background:
-        linear-gradient(
-            120deg,
-            rgba(139,92,246,.20),
-            rgba(59,130,246,.08),
-            rgba(236,72,153,.08)
-        );
-}
-
-.hero::before{
-    content:"";
-
-    position:absolute;
-
-    width:350px;
-    height:350px;
-
-    right:-100px;
-    top:-150px;
-
-    border-radius:50%;
-
-    border:1px solid rgba(139,92,246,.2);
-
-    animation:heroRotate 12s linear infinite;
-}
-
-@keyframes heroRotate{
-    from{
-        transform:rotate(0deg);
-    }
-
-    to{
-        transform:rotate(360deg);
-    }
-}
-
-.hero-image{
-    position:absolute;
-
-    right:0;
-    top:0;
-
-    width:46%;
-    height:100%;
-
-    object-fit:cover;
-
-    opacity:.45;
-
-    mask-image:
-        linear-gradient(
-            90deg,
-            transparent,
-            black
-        );
-}
-
-.hero-content{
-    position:relative;
-    z-index:2;
-
-    max-width:650px;
-}
-
-.badge{
-    display:inline-block;
-
-    padding:7px 12px;
-
-    border-radius:30px;
-
-    background:rgba(139,92,246,.15);
-
-    border:1px solid rgba(139,92,246,.25);
-
-    color:#d8ccff;
-
-    font-size:9px;
-
-    font-weight:bold;
-
-    letter-spacing:1.5px;
-}
-
-.hero h1{
-    margin-top:17px;
-
-    font-size:clamp(40px,6vw,67px);
-
-    line-height:.95;
-
-    letter-spacing:-3px;
-}
-
-.hero h1 span{
-    background:
-        linear-gradient(
-            90deg,
-            #c4b5fd,
-            #60a5fa,
-            #67e8f9
-        );
-
-    -webkit-background-clip:text;
-
-    color:transparent;
-}
-
-.hero p{
-    margin-top:17px;
-
-    max-width:590px;
-
-    color:#9aa4b6;
-
-    line-height:1.6;
-
-    font-size:13px;
-}
-
-.hero-buttons{
-    display:flex;
-
-    gap:10px;
-
-    margin-top:25px;
-}
-
-.hero-button{
-    padding:11px 17px;
-
-    border:0;
-
-    border-radius:10px;
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--purple),
-            var(--blue)
-        );
-
-    color:white;
-
-    font-weight:bold;
-
-    cursor:pointer;
-
-    transition:.25s;
-}
-
-.hero-button:hover{
-    transform:translateY(-3px);
-
-    box-shadow:
-        0 12px 30px rgba(139,92,246,.25);
-}
-
-.hero-button.secondary{
-    background:rgba(255,255,255,.07);
-
-    border:1px solid var(--line);
-}
-
-/* =====================================================
-   PLAYLISTS
-===================================================== */
-
-.playlists-section{
-    margin-top:35px;
-}
-
-.playlist-header{
-    display:flex;
-
-    align-items:end;
-
-    justify-content:space-between;
-
-    margin-bottom:18px;
-}
-
-.playlist-header small{
-    color:#657083;
-
-    font-size:9px;
-
-    letter-spacing:2px;
-}
-
-.playlist-header h2{
-    margin-top:5px;
-
-    font-size:25px;
-}
-
-.playlist-grid{
-    display:grid;
-
-    grid-template-columns:
-        repeat(
-            4,
-            minmax(150px,1fr)
-        );
-
-    gap:15px;
-}
-
-.playlist-card{
-    position:relative;
-
-    overflow:hidden;
-
-    min-height:145px;
-
-    padding:18px;
-
-    border:1px solid var(--line);
-
-    border-radius:18px;
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(255,255,255,.055),
-            rgba(255,255,255,.015)
-        );
-
-    cursor:pointer;
-
-    transition:.3s;
-}
-
-.playlist-card:hover{
-    transform:translateY(-5px);
-
-    border-color:
-        rgba(139,92,246,.45);
-
-    box-shadow:
-        0 18px 40px rgba(0,0,0,.35);
-}
-
-.playlist-card::before{
-    content:"";
-
-    position:absolute;
-
-    width:110px;
-    height:110px;
-
-    right:-35px;
-    bottom:-35px;
-
-    border-radius:50%;
-
-    background:
-        rgba(139,92,246,.14);
-
-    filter:blur(8px);
-}
-
-.playlist-icon{
-    width:43px;
-    height:43px;
-
-    display:grid;
-    place-items:center;
-
-    border-radius:13px;
-
-    background:
-        rgba(139,92,246,.14);
-
-    font-size:22px;
-
-    margin-bottom:15px;
-}
-
-.playlist-card h3{
-    font-size:15px;
-
-    position:relative;
-}
-
-.playlist-card p{
-    margin-top:7px;
-
-    color:#697386;
-
-    font-size:10px;
-
-    position:relative;
-}
-
-.playlist-count{
-    position:absolute;
-
-    right:14px;
-    top:14px;
-
-    padding:5px 8px;
-
-    border-radius:20px;
-
-    background:rgba(0,0,0,.35);
-
-    color:#aeb7c8;
-
-    font-size:9px;
-}
-
-/* =====================================================
-   PLAYLIST VIEW
-===================================================== */
-
-.playlist-view{
-    display:none;
-
-    margin-top:28px;
-
-    padding:22px;
-
-    border:1px solid var(--line);
-
-    border-radius:20px;
-
-    background:rgba(255,255,255,.025);
-}
-
-.playlist-view.active{
-    display:block;
-}
-
-.playlist-view-top{
-    display:flex;
-
-    align-items:center;
-
-    justify-content:space-between;
-
-    margin-bottom:20px;
-}
-
-.playlist-view-top h2{
-    font-size:21px;
-}
-
-.close-playlist{
-    border:1px solid var(--line);
-
-    background:rgba(255,255,255,.04);
-
-    color:white;
-
-    padding:8px 12px;
-
-    border-radius:9px;
-
-    cursor:pointer;
-}
-
-/* =====================================================
-   FILTERS
-===================================================== */
-
-.filters{
-    display:flex;
-
-    gap:9px;
-
-    margin:30px 0 25px;
-
-    overflow-x:auto;
-}
-
-.filter{
-    white-space:nowrap;
-
-    padding:10px 16px;
-
-    border-radius:30px;
-
-    border:1px solid var(--line);
-
-    background:#0d0d15;
-
-    color:#8993a4;
-
-    cursor:pointer;
-
-    transition:.2s;
-}
-
-.filter.active,
-.filter:hover{
-    color:white;
-
-    border-color:
-        rgba(139,92,246,.5);
-
-    background:
-        rgba(139,92,246,.14);
-}
-
-/* =====================================================
-   SECTION TITLE
-===================================================== */
-
-.section-title{
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:end;
-
-    margin:35px 0 18px;
-}
-
-.section-title small{
-    color:#657083;
-
-    font-size:9px;
-
-    letter-spacing:2px;
-}
-
-.section-title h2{
-    margin-top:5px;
-
-    font-size:25px;
-}
-
-/* =====================================================
-   VIDEO GRID
-===================================================== */
-
-.grid{
-    display:grid;
-
-    grid-template-columns:
-        repeat(
-            auto-fill,
-            minmax(250px,1fr)
-        );
-
-    gap:20px;
-}
-
-.card{
-    position:relative;
-
-    overflow:hidden;
-
-    border:1px solid var(--line);
-
-    border-radius:18px;
-
-    background:var(--panel);
-
-    transition:.3s;
-}
-
-.card:hover{
-    transform:translateY(-6px);
-
-    border-color:
-        rgba(139,92,246,.4);
-
-    box-shadow:
-        0 20px 45px rgba(0,0,0,.4);
-}
-
-.thumb{
-    position:relative;
-
-    aspect-ratio:16/9;
-
-    overflow:hidden;
-}
-
-.thumb img{
-    width:100%;
-    height:100%;
-
-    object-fit:cover;
-
-    transition:.4s;
-}
-
-.card:hover .thumb img{
-    transform:scale(1.06);
-}
-
-.overlay{
-    position:absolute;
-
-    inset:0;
-
-    background:
-        linear-gradient(
-            to bottom,
-            transparent 40%,
-            rgba(0,0,0,.82)
-        );
-}
-
-/* =====================================================
-   PLAY
-===================================================== */
-
-.play{
-    position:absolute;
-
-    left:50%;
-    top:50%;
-
-    width:52px;
-    height:52px;
-
-    transform:
-        translate(-50%,-50%)
-        scale(.8);
-
-    border:0;
-
-    border-radius:50%;
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--purple),
-            var(--blue)
-        );
-
-    color:white;
-
-    font-size:18px;
-
-    opacity:0;
-
-    cursor:pointer;
-
-    transition:.25s;
-}
-
-.card:hover .play{
-    opacity:1;
-
-    transform:
-        translate(-50%,-50%)
-        scale(1);
-}
-
-/* =====================================================
-   BOTÓN PLAYLIST
-===================================================== */
-
-.playlist-add{
-    position:absolute;
-
-    right:10px;
-    top:57px;
-
-    z-index:5;
-
-    width:38px;
-    height:38px;
-
-    border:1px solid
-        rgba(255,255,255,.12);
-
-    border-radius:50%;
-
-    background:
-        rgba(0,0,0,.68);
-
-    backdrop-filter:blur(8px);
-
-    color:white;
-
-    cursor:pointer;
-
-    font-size:17px;
-
-    transition:.2s;
-}
-
-.playlist-add:hover{
-    transform:scale(1.1);
-
-    background:
-        rgba(139,92,246,.28);
-
-    border-color:
-        rgba(139,92,246,.55);
-}
-
-.playlist-add.saved{
-    color:#67e8f9;
-
-    background:
-        rgba(34,211,238,.12);
-
-    border-color:
-        rgba(34,211,238,.35);
-}
-
-/* =====================================================
-   CORAZÓN
-===================================================== */
-
-.heart{
-    position:absolute;
-
-    right:10px;
-    top:10px;
-
-    z-index:5;
-
-    width:38px;
-    height:38px;
-
-    border:1px solid
-        rgba(255,255,255,.12);
-
-    border-radius:50%;
-
-    background:
-        rgba(0,0,0,.65);
-
-    backdrop-filter:blur(8px);
-
-    color:white;
-
-    cursor:pointer;
-
-    font-size:18px;
-
-    transition:.2s;
-}
-
-.heart:hover{
-    transform:scale(1.1);
-
-    background:
-        rgba(236,72,153,.2);
-}
-
-.heart.active{
-    color:#ff4fa3;
-
-    background:
-        rgba(236,72,153,.16);
-}
-
-/* =====================================================
-   PLAYLIST BADGE
-===================================================== */
-
-.playlist-badge{
-    position:absolute;
-
-    left:10px;
-    top:10px;
-
-    z-index:4;
-
-    padding:6px 9px;
-
-    border-radius:7px;
-
-    background:
-        rgba(0,0,0,.7);
-
-    backdrop-filter:blur(8px);
-
-    color:#d9e0ec;
-
-    font-size:9px;
-
-    font-weight:bold;
-}
-
-/* =====================================================
-   QUALITY
-===================================================== */
-
-.quality{
-    position:absolute;
-
-    left:10px;
-    bottom:10px;
-
-    padding:5px 8px;
-
-    border-radius:6px;
-
-    background:
-        rgba(0,0,0,.75);
-
-    font-size:9px;
-
-    font-weight:bold;
-}
-
-/* =====================================================
-   INFO
-===================================================== */
-
-.info{
-    padding:14px;
-}
-
-.title{
-    min-height:38px;
-
-    font-size:14px;
-
-    line-height:1.35;
-
-    font-weight:bold;
-}
-
-.creator{
-    display:flex;
-
-    align-items:center;
-
-    gap:8px;
-
-    margin-top:12px;
-
-    color:#a6afbf;
-
-    font-size:11px;
-}
-
-.avatar{
-    width:26px;
-    height:26px;
-
-    display:grid;
-    place-items:center;
-
-    border-radius:50%;
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--purple),
-            var(--blue)
-        );
-
-    color:white;
-
-    font-weight:bold;
-}
-
-.meta{
-    margin-top:9px;
-
-    color:#606b7d;
-
-    font-size:10px;
-}
-
-/* =====================================================
-   EMPTY
-===================================================== */
-
-.empty{
-    display:none;
-
-    text-align:center;
-
-    padding:80px;
-
-    color:#697386;
-}
-
-/* =====================================================
-   TOAST
-===================================================== */
-
-.toast{
-    position:fixed;
-
-    right:25px;
-    bottom:100px;
-
-    z-index:9000;
-
-    max-width:330px;
-
-    padding:14px 18px;
-
-    border:1px solid
-        rgba(139,92,246,.35);
-
-    border-radius:13px;
-
-    background:
-        rgba(14,14,23,.95);
-
-    backdrop-filter:blur(15px);
-
-    box-shadow:
-        0 15px 45px rgba(0,0,0,.45);
-
-    color:white;
-
-    font-size:12px;
-
-    transform:
-        translateY(30px);
-
-    opacity:0;
-
-    pointer-events:none;
-
-    transition:.3s;
-}
-
-.toast.show{
-    transform:translateY(0);
-
-    opacity:1;
-}
-
-/* =====================================================
-   MODAL PLAYLIST
-===================================================== */
-
-.modal{
-    position:fixed;
-
-    inset:0;
-
-    z-index:8000;
-
-    display:none;
-
-    align-items:center;
-
-    justify-content:center;
-
-    padding:20px;
-
-    background:
-        rgba(0,0,0,.75);
-
-    backdrop-filter:blur(10px);
-}
-
-.modal.active{
-    display:flex;
-}
-
-.modal-box{
-    width:min(450px,100%);
-
-    padding:25px;
-
-    border:1px solid
-        rgba(139,92,246,.3);
-
-    border-radius:22px;
-
-    background:
-        linear-gradient(
-            145deg,
-            #11111b,
-            #08080d
-        );
-
-    box-shadow:
-        0 30px 100px rgba(0,0,0,.7);
-
-    animation:modalIn .25s ease;
-}
-
-@keyframes modalIn{
-
-    from{
-        opacity:0;
-        transform:translateY(20px) scale(.96);
-    }
-
-    to{
-        opacity:1;
-        transform:translateY(0) scale(1);
-    }
-
-}
-
-.modal-box h2{
-    font-size:21px;
-}
-
-.modal-box > p{
-    margin-top:8px;
-
-    color:#7d8799;
-
-    font-size:11px;
-}
-
-.detected{
-    margin-top:17px;
-
-    padding:13px;
-
-    border-radius:13px;
-
-    background:
-        rgba(139,92,246,.1);
-
-    border:1px solid
-        rgba(139,92,246,.2);
-
-    font-size:12px;
-}
-
-.playlist-options{
-    display:grid;
-
-    grid-template-columns:1fr 1fr;
-
-    gap:10px;
-
-    margin-top:15px;
-}
-
-.playlist-option{
-    padding:15px;
-
-    border:1px solid var(--line);
-
-    border-radius:13px;
-
-    background:rgba(255,255,255,.035);
-
-    color:white;
-
-    cursor:pointer;
-
-    text-align:left;
-
-    transition:.2s;
-}
-
-.playlist-option:hover{
-    border-color:
-        rgba(139,92,246,.5);
-
-    background:
-        rgba(139,92,246,.1);
-
-    transform:translateY(-2px);
-}
-
-.playlist-option.selected{
-    border-color:
-        var(--cyan);
-
-    background:
-        rgba(34,211,238,.08);
-}
-
-.playlist-option strong{
-    display:block;
-
-    font-size:12px;
-}
-
-.playlist-option small{
-    display:block;
-
-    margin-top:5px;
-
-    color:#687386;
-
-    font-size:9px;
-}
-
-.modal-actions{
-    display:flex;
-
-    justify-content:flex-end;
-
-    gap:8px;
-
-    margin-top:18px;
-}
-
-.modal-btn{
-    padding:10px 15px;
-
-    border-radius:10px;
-
-    border:1px solid var(--line);
-
-    background:rgba(255,255,255,.05);
-
-    color:white;
-
-    cursor:pointer;
-}
-
-.modal-btn.primary{
-    border:0;
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--purple),
-            var(--blue)
-        );
-}
-
-/* =====================================================
-   MUSIC BAR
-===================================================== */
-
-#musicBar{
-    position:fixed;
-
-    left:0;
-    right:0;
-    bottom:0;
-
-    height:76px;
-
-    z-index:5000;
-
-    display:none;
-
-    align-items:center;
-
-    padding:0 18px;
-
-    background:
-        rgba(9,9,15,.96);
-
-    backdrop-filter:blur(20px);
-
-    border-top:
-        1px solid rgba(139,92,246,.3);
-}
-
-#musicBar.active{
-    display:flex;
-}
-
-.progress{
-    position:absolute;
-
-    top:0;
-    left:0;
-
-    width:100%;
-    height:3px;
-
-    background:
-        rgba(255,255,255,.08);
-
-    cursor:pointer;
-}
-
-.progress-fill{
-    height:100%;
-
-    width:0;
-
-    background:
-        linear-gradient(
-            90deg,
-            var(--purple),
-            var(--cyan),
-            var(--pink)
-        );
-}
-
-.music-left{
-    display:flex;
-
-    align-items:center;
-
-    gap:7px;
-
-    min-width:250px;
-}
-
-.music-btn{
-    width:37px;
-    height:37px;
-
-    border:0;
-
-    border-radius:50%;
-
-    background:transparent;
-
-    color:#cbd5e1;
-
-    cursor:pointer;
-}
-
-.music-btn:hover{
-    background:
-        rgba(255,255,255,.08);
-}
-
-.play-main{
-    width:43px;
-    height:43px;
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--purple),
-            var(--blue)
-        );
-
-    color:white;
-}
-
-.music-info{
-    flex:1;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    gap:12px;
-}
-
-#barThumb{
-    width:48px;
-    height:48px;
-
-    border-radius:9px;
-
-    object-fit:cover;
-}
-
-.music-text{
-    max-width:350px;
-}
-
-#barTitle{
-    font-size:13px;
-
-    font-weight:bold;
-
-    white-space:nowrap;
-
-    overflow:hidden;
-
-    text-overflow:ellipsis;
-}
-
-#barCreator{
-    margin-top:4px;
-
-    color:#657083;
-
-    font-size:10px;
-}
-
-.music-right{
-    min-width:250px;
-
-    display:flex;
-
-    justify-content:flex-end;
-
-    gap:5px;
-}
-
-.bar-action{
-    height:37px;
-
-    padding:0 11px;
-
-    border:1px solid transparent;
-
-    border-radius:9px;
-
-    background:transparent;
-
-    color:#cbd5e1;
-
-    cursor:pointer;
-}
-
-.bar-action:hover{
-    background:
-        rgba(255,255,255,.07);
-}
-
-.favorite.active{
-    color:#ff4fa3;
-}
-
-/* =====================================================
-   RESPONSIVE
-===================================================== */
-
-@media(max-width:1000px){
-
-    .playlist-grid{
-        grid-template-columns:
-            repeat(2,1fr);
-    }
-
-}
-
-@media(max-width:900px){
-
-    .sidebar{
-        display:none;
-    }
-
-    .main{
-        padding:
-            20px 15px 110px;
-    }
-
-    .logo{
-        min-width:auto;
-    }
-
-    .logo-text{
-        display:none;
-    }
-
-    .topbar{
-        padding:0 13px;
-    }
-
-    .music-left,
-    .music-right{
-        min-width:auto;
-    }
-
-}
-
-@media(max-width:700px){
-
-    .playlist-grid{
-        grid-template-columns:1fr 1fr;
-    }
-
-    .actions .action:first-child{
-        display:none;
-    }
-
-}
-
-@media(max-width:600px){
-
-    .search{
-        display:none;
-    }
-
-    .hero{
-        padding:27px;
-    }
-
-    .hero-image{
-        width:100%;
-        opacity:.18;
-    }
-
-    .grid{
-        grid-template-columns:
-            repeat(2,1fr);
-
-        gap:10px;
-    }
-
-    .info{
-        padding:9px;
-    }
-
-    .title{
-        font-size:11px;
-    }
-
-    .creator{
-        font-size:9px;
-    }
-
-    .music-info{
-        justify-content:flex-start;
-    }
-
-    .music-text{
-        max-width:150px;
-    }
-
-    .playlist-grid{
-        grid-template-columns:1fr;
-    }
-
-}
-
-@media(max-width:430px){
-
-    .grid{
-        grid-template-columns:1fr;
-    }
-
-    .music-right .bar-action span{
-        display:none;
-    }
-
-    .playlist-options{
-        grid-template-columns:1fr;
-    }
-
-}
-
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#050509;--panel:#0d0d15;--line:rgba(255,255,255,.08);--purple:#8b5cf6;--blue:#3b82f6;--cyan:#22d3ee;--pink:#ec4899;--text:#f8fafc;--muted:#7d8799}
+html{scrollbar-gutter:stable;overflow-anchor:none}
+body{min-height:100vh;font-family:Arial,Helvetica,sans-serif;color:var(--text);background:radial-gradient(circle at 20% 0%,rgba(139,92,246,.18),transparent 28%),radial-gradient(circle at 90% 20%,rgba(34,211,238,.10),transparent 25%),var(--bg);background-attachment:fixed;overflow-x:hidden}
+button,input,select{font-family:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+
+/* TOPBAR */
+.topbar{height:70px;position:sticky;top:0;z-index:1000;display:flex;align-items:center;gap:20px;padding:0 24px;background:rgba(5,5,9,.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--line);overflow:hidden}
+.topbar::before{content:"";position:absolute;top:0;left:-30%;width:30%;height:2px;background:linear-gradient(90deg,transparent,var(--purple),var(--cyan),var(--pink),transparent);animation:tb 5s linear infinite}
+@keyframes tb{to{left:100%}}
+.logo{display:flex;align-items:center;gap:10px;min-width:210px;position:relative;z-index:2}
+.logo-box{width:42px;height:42px;display:grid;place-items:center;border-radius:13px;background:linear-gradient(135deg,var(--purple),var(--blue));font-weight:900;box-shadow:0 0 25px rgba(139,92,246,.35);animation:lf 3s ease-in-out infinite}
+@keyframes lf{50%{transform:translateY(-3px) rotate(2deg)}}
+.logo strong{font-size:16px}
+.logo small{display:block;margin-top:3px;color:var(--muted);font-size:8px;letter-spacing:2px}
+.search{flex:1;max-width:650px;height:42px;display:flex;align-items:center;padding:0 14px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.035);transition:.3s;position:relative;z-index:2}
+.search:focus-within{border-color:rgba(139,92,246,.65);box-shadow:0 0 0 3px rgba(139,92,246,.08),0 0 25px rgba(139,92,246,.12)}
+.search span{color:#687386;font-size:20px;margin-right:9px}
+.search input{width:100%;border:0;outline:0;background:transparent;color:#fff}
+.actions{margin-left:auto;display:flex;gap:8px;position:relative;z-index:2}
+.action{height:40px;padding:0 14px;border:1px solid var(--line);border-radius:10px;background:#0d0d15;color:#fff;transition:.25s}
+.action:hover{border-color:rgba(139,92,246,.5);transform:translateY(-2px)}
+.profile{width:40px;height:40px;border:0;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff;font-weight:bold;transition:.25s}
+.profile:hover{transform:scale(1.08) rotate(5deg)}
+.menu{position:absolute;right:0;top:50px;width:220px;padding:8px;border:1px solid rgba(139,92,246,.3);border-radius:14px;background:#0e0e17;box-shadow:0 20px 60px rgba(0,0,0,.6);display:none}
+.menu.open{display:block;animation:pop .2s ease}
+.menu p{padding:8px 10px 10px;font-size:12px;color:#aeb7c8;border-bottom:1px solid var(--line);margin-bottom:6px;word-break:break-all}
+.menu button{width:100%;text-align:left;padding:10px;border:0;border-radius:8px;background:transparent;color:#dbe2ee;font-size:13px}
+.menu button:hover{background:rgba(139,92,246,.14)}
+@keyframes pop{from{opacity:0;transform:translateY(-6px) scale(.97)}}
+
+/* LAYOUT */
+.layout{display:flex;min-height:calc(100vh - 70px)}
+.sidebar{width:230px;flex:none;position:sticky;top:70px;height:calc(100vh - 70px);padding:24px 13px;border-right:1px solid var(--line);background:rgba(7,7,11,.65)}
+.label{padding:0 12px;margin:14px 0 9px;color:#626c7d;font-size:9px;font-weight:bold;letter-spacing:2px}
+.side{width:100%;height:44px;display:flex;align-items:center;gap:11px;padding:0 12px;border:0;border-radius:11px;background:transparent;color:#929caf;text-align:left;transition:.2s}
+.side:hover{color:#fff;background:rgba(139,92,246,.10);transform:translateX(3px)}
+.side.active{color:#fff;background:linear-gradient(90deg,rgba(139,92,246,.22),rgba(59,130,246,.08))}
+.side span{width:23px;text-align:center;font-size:17px}
+.main{flex:1;padding:30px 36px 120px;min-width:0}
+
+/* HERO */
+.hero{position:relative;overflow:hidden;min-height:290px;padding:42px;border:1px solid var(--line);border-radius:28px;background:linear-gradient(120deg,rgba(139,92,246,.20),rgba(59,130,246,.08),rgba(236,72,153,.08))}
+.hero::before{content:"";position:absolute;width:350px;height:350px;right:-100px;top:-150px;border-radius:50%;border:1px solid rgba(139,92,246,.2);animation:hr 12s linear infinite}
+@keyframes hr{to{transform:rotate(360deg)}}
+.hero-image{position:absolute;right:0;top:0;width:46%;height:100%;object-fit:cover;opacity:.45;-webkit-mask-image:linear-gradient(90deg,transparent,#000);mask-image:linear-gradient(90deg,transparent,#000)}
+.hero-content{position:relative;z-index:2;max-width:650px}
+.badge{display:inline-block;padding:7px 12px;border-radius:30px;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.25);color:#d8ccff;font-size:9px;font-weight:bold;letter-spacing:1.5px}
+.hero h1{margin-top:17px;font-size:clamp(40px,6vw,67px);line-height:.95;letter-spacing:-3px}
+.hero h1 span{background:linear-gradient(90deg,#c4b5fd,#60a5fa,#67e8f9);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{margin-top:17px;max-width:590px;color:#9aa4b6;line-height:1.6;font-size:13px}
+.hero-buttons{display:flex;gap:10px;margin-top:25px;flex-wrap:wrap}
+.hero-button{padding:11px 17px;border:0;border-radius:10px;background:linear-gradient(135deg,var(--purple),var(--blue));color:#fff;font-weight:bold;transition:.25s}
+.hero-button:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(139,92,246,.25)}
+.hero-button.secondary{background:rgba(255,255,255,.07);border:1px solid var(--line)}
+
+/* PLAYLISTS */
+.playlists-section{margin-top:35px}
+.playlist-header,.section-title{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:18px}
+.section-title{margin:35px 0 18px}
+.playlist-header small,.section-title small{color:#657083;font-size:9px;letter-spacing:2px}
+.playlist-header h2,.section-title h2{margin-top:5px;font-size:25px}
+.playlist-grid{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:15px}
+.playlist-card{position:relative;overflow:hidden;min-height:145px;padding:18px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.015));transition:.3s;text-align:left;color:#fff}
+.playlist-card:hover{transform:translateY(-4px);border-color:rgba(139,92,246,.45);box-shadow:0 18px 40px rgba(0,0,0,.35)}
+.playlist-card::before{content:"";position:absolute;width:110px;height:110px;right:-35px;bottom:-35px;border-radius:50%;background:rgba(139,92,246,.14);filter:blur(8px)}
+.playlist-icon{width:43px;height:43px;display:grid;place-items:center;border-radius:13px;background:rgba(139,92,246,.14);font-size:22px;margin-bottom:15px}
+.playlist-card h3{font-size:15px;position:relative}
+.playlist-card p{margin-top:7px;color:#697386;font-size:10px;position:relative}
+.playlist-count{position:absolute;right:14px;top:14px;padding:5px 8px;border-radius:20px;background:rgba(0,0,0,.35);color:#aeb7c8;font-size:9px}
+
+/* FILTERS */
+.filters{display:flex;gap:9px;margin:30px 0 0;overflow-x:auto;padding-bottom:6px}
+.filter{white-space:nowrap;padding:10px 16px;border-radius:30px;border:1px solid var(--line);background:#0d0d15;color:#8993a4;transition:.2s}
+.filter.active,.filter:hover{color:#fff;border-color:rgba(139,92,246,.5);background:rgba(139,92,246,.14)}
+
+/* GRID / CARDS */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px}
+.card{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:18px;background:var(--panel);transition:transform .25s,border-color .25s,box-shadow .25s;cursor:pointer;animation:cardIn .5s both;animation-delay:calc(var(--i)*60ms)}
+@keyframes cardIn{from{opacity:0;transform:translateY(16px)}}
+.card:hover{transform:translateY(-4px);border-color:rgba(139,92,246,.4);box-shadow:0 20px 45px rgba(0,0,0,.4)}
+.card.playing{border-color:var(--cyan);box-shadow:0 0 0 1px var(--cyan),0 0 30px rgba(34,211,238,.15)}
+.thumb{position:relative;aspect-ratio:16/9;overflow:hidden;background:#12121c}
+.thumb img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+.card:hover .thumb img{transform:scale(1.06)}
+.overlay{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(0,0,0,.82));pointer-events:none}
+.play{position:absolute;left:50%;top:50%;width:52px;height:52px;transform:translate(-50%,-50%) scale(.8);border:0;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--blue));color:#fff;font-size:18px;opacity:0;transition:.25s}
+.card:hover .play{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.round{position:absolute;z-index:5;width:38px;height:38px;border:1px solid rgba(255,255,255,.12);border-radius:50%;background:rgba(0,0,0,.66);backdrop-filter:blur(8px);color:#fff;font-size:17px;transition:.2s}
+.round:hover{transform:scale(1.1);background:rgba(139,92,246,.28)}
+.heart{right:10px;top:10px}.heart.active{color:#ff4fa3;background:rgba(236,72,153,.16)}
+.playlist-add{right:10px;top:57px}.playlist-add.saved{color:#67e8f9;background:rgba(34,211,238,.12);border-color:rgba(34,211,238,.35)}
+.del{right:10px;bottom:10px;font-size:15px}.del:hover{background:rgba(239,68,68,.35)}
+.del.second{right:54px}
+.playlist-badge{position:absolute;left:10px;top:10px;z-index:4;padding:6px 9px;border-radius:7px;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);color:#d9e0ec;font-size:9px;font-weight:bold}
+.quality{position:absolute;left:10px;bottom:10px;padding:5px 8px;border-radius:6px;background:rgba(0,0,0,.75);font-size:9px;font-weight:bold}
+.info{padding:14px}
+.title{min-height:38px;font-size:14px;line-height:1.35;font-weight:bold}
+.creator{display:flex;align-items:center;gap:8px;margin-top:12px;color:#a6afbf;font-size:11px}
+.avatar{width:26px;height:26px;display:grid;place-items:center;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--blue));color:#fff;font-weight:bold}
+.meta{margin-top:9px;color:#606b7d;font-size:10px}
+.empty{display:none;text-align:center;padding:60px 20px;color:#697386}
+.empty h3{color:#aeb7c8;margin-bottom:8px}
+.empty button{margin-top:16px}
+.eq{position:absolute;right:12px;bottom:12px;display:none;gap:2px;align-items:flex-end;height:16px}
+.card.playing .eq{display:flex}.card.playing .del{display:none}
+.eq i,.bars i{width:3px;background:var(--cyan);border-radius:2px;animation:eq .8s ease-in-out infinite;height:4px}
+.eq i:nth-child(2),.bars i:nth-child(2){animation-delay:.2s}.eq i:nth-child(3),.bars i:nth-child(3){animation-delay:.4s}
+@keyframes eq{50%{height:16px}}
+.paused .eq i,.paused .bars i{animation-play-state:paused}
+
+/* DRAWER */
+.drawer-bg{position:fixed;inset:0;z-index:7000;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:.3s}
+.drawer-bg.open{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;z-index:7001;width:min(560px,100%);display:flex;flex-direction:column;background:#0a0a11;border-left:1px solid rgba(139,92,246,.3);transform:translateX(100%);transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.drawer.open{transform:none}
+.drawer-top{display:flex;justify-content:space-between;align-items:center;padding:20px 22px 10px}
+.drawer-top h2{font-size:21px}.drawer-top small{color:#657083;font-size:10px}
+.x{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.05);color:#fff}
+.tabs{display:flex;gap:8px;padding:8px 22px 14px;overflow-x:auto;flex:none}
+.drawer-body{flex:1;overflow-y:auto;padding:4px 22px 100px}
+.drawer-body .grid{grid-template-columns:1fr 1fr;gap:14px}
+.drawer-body .card{animation-duration:.3s}
+.gate{text-align:center;padding:50px 20px;color:#8993a4;line-height:1.6}
+.gate .hero-button{margin-top:16px}
+
+/* MODAL */
+.modal{position:fixed;inset:0;z-index:8000;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.75);backdrop-filter:blur(10px)}
+.modal.active{display:flex}
+.modal-box{width:min(450px,100%);max-height:92vh;overflow-y:auto;padding:25px;border:1px solid rgba(139,92,246,.3);border-radius:22px;background:linear-gradient(145deg,#11111b,#08080d);box-shadow:0 30px 100px rgba(0,0,0,.7);animation:modalIn .25s ease}
+@keyframes modalIn{from{opacity:0;transform:translateY(20px) scale(.96)}}
+.modal-box h2{font-size:21px}
+.modal-box>p{margin-top:8px;color:#7d8799;font-size:12px;line-height:1.5}
+.detected{margin-top:17px;padding:13px;border-radius:13px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);font-size:12px}
+.playlist-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px}
+.playlist-option{padding:15px;border:1px solid var(--line);border-radius:13px;background:rgba(255,255,255,.035);color:#fff;text-align:left;transition:.2s}
+.playlist-option:hover{border-color:rgba(139,92,246,.5);transform:translateY(-2px)}
+.playlist-option.selected{border-color:var(--cyan);background:rgba(34,211,238,.08)}
+.playlist-option strong{display:block;font-size:12px}
+.playlist-option small{display:block;margin-top:5px;color:#687386;font-size:9px}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.modal-btn{padding:10px 15px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:#fff}
+.modal-btn.primary{border:0;background:linear-gradient(135deg,var(--purple),var(--blue))}
+.field{display:block;margin-top:14px;font-size:11px;color:#8993a4}
+.field input,.field select{width:100%;margin-top:6px;height:42px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.04);color:#fff;outline:0}
+.field select option{background:#12121c}
+.field input:focus,.field select:focus{border-color:rgba(139,92,246,.65)}
+.err{margin-top:12px;color:#fca5a5;font-size:12px;min-height:16px}
+.switch{margin-top:14px;font-size:12px;color:#8993a4}.switch button{border:0;background:none;color:#a78bfa;text-decoration:underline}
+
+/* TOAST */
+.toast{position:fixed;right:25px;bottom:100px;z-index:9000;max-width:330px;padding:14px 18px;border:1px solid rgba(139,92,246,.35);border-radius:13px;background:rgba(14,14,23,.95);backdrop-filter:blur(15px);box-shadow:0 15px 45px rgba(0,0,0,.45);font-size:12px;transform:translateY(30px);opacity:0;pointer-events:none;transition:.3s}
+.toast.show{transform:none;opacity:1}
+
+/* MUSIC BAR */
+#musicBar{position:fixed;left:0;right:0;bottom:0;height:76px;z-index:6000;display:flex;align-items:center;padding:0 18px;background:rgba(9,9,15,.96);backdrop-filter:blur(20px);border-top:1px solid rgba(139,92,246,.3);transform:translateY(100%);transition:transform .35s}
+#musicBar.active{transform:none}
+.progress{position:absolute;top:-4px;left:0;width:100%;height:11px;cursor:pointer}
+.progress::before{content:"";position:absolute;top:4px;left:0;right:0;height:3px;background:rgba(255,255,255,.08)}
+.progress-fill{position:absolute;top:4px;height:3px;width:0;background:linear-gradient(90deg,var(--purple),var(--cyan),var(--pink))}
+.music-left{display:flex;align-items:center;gap:7px;min-width:250px}
+.music-btn{width:37px;height:37px;border:0;border-radius:50%;background:transparent;color:#cbd5e1}
+.music-btn:hover{background:rgba(255,255,255,.08)}
+.play-main{width:43px;height:43px;background:linear-gradient(135deg,var(--purple),var(--blue));color:#fff}
+.music-info{flex:1;display:flex;justify-content:center;align-items:center;gap:12px;min-width:0}
+#barThumb{width:48px;height:48px;border-radius:9px;object-fit:cover}
+.music-text{max-width:350px;min-width:0}
+#barTitle{font-size:13px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#barCreator{margin-top:4px;color:#657083;font-size:10px}
+.bars{display:flex;gap:2px;align-items:flex-end;height:16px}
+.music-right{min-width:250px;display:flex;justify-content:flex-end;gap:5px}
+.bar-action{height:37px;padding:0 11px;border:1px solid transparent;border-radius:9px;background:transparent;color:#cbd5e1}
+.bar-action:hover{background:rgba(255,255,255,.07)}
+.favorite.active{color:#ff4fa3}
+
+@media(max-width:1000px){.playlist-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){.sidebar{display:none}.main{padding:20px 15px 110px}.logo{min-width:auto}.logo-text{display:none}.topbar{padding:0 13px}.music-left,.music-right{min-width:auto}}
+@media(max-width:700px){.actions .hide-s{display:none}}
+@media(max-width:600px){.search{display:none}.hero{padding:27px}.hero-image{width:100%;opacity:.18}.grid{grid-template-columns:repeat(2,1fr);gap:10px}.info{padding:9px}.title{font-size:11px}.creator{font-size:9px}.music-info{justify-content:flex-start}.music-text{max-width:150px}.playlist-grid{grid-template-columns:1fr}.drawer-body .grid{grid-template-columns:1fr}}
+@media(max-width:430px){.grid{grid-template-columns:1fr}.bar-action span{display:none}.playlist-options{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
-
 </head>
-
 <body>
 
-<!-- =====================================================
-     BARRA SUPERIOR
-===================================================== -->
-
 <header class="topbar">
-
-
-<div class="logo">
-
-    <div class="logo-box">
-        W
-    </div>
-
-    <div class="logo-text">
-
-        <strong>
-            WIBSIPROJECT.
-        </strong>
-
-        <small>
-            VIDEO NETWORK
-        </small>
-
-    </div>
-
-</div>
-
-<div class="search">
-
-    <span>⌕</span>
-
-    <input
-        id="searchInput"
-        type="text"
-        placeholder="Buscar tendencias, música..."
-    >
-
-</div>
-
-<div class="actions">
-
-    <button
-        class="action"
-        id="randomButton"
-    >
-        ✦ Sorpréndeme
-    </button>
-
-    <button
-        class="action"
-        id="topPlaylistButton"
-    >
-        ▣ Mis playlists
-    </button>
-
-    <button
-        class="profile"
-        onclick="window.location.href='cuenta.html'"
-    >
-        AM
-    </button>
-
-</div>
-
-
+  <div class="logo"><div class="logo-box">W</div><div class="logo-text"><strong>WIBSIPROJECT.</strong><small>VIDEO NETWORK</small></div></div>
+  <div class="search"><span>⌕</span><input id="searchInput" type="text" placeholder="Buscar tendencias, música..."></div>
+  <div class="actions">
+    <button class="action hide-s" id="randomButton">✦ Sorpréndeme</button>
+    <button class="action" id="uploadButton">⬆ Subir</button>
+    <button class="action hide-s" id="topPlaylistButton">▣ Mis playlists</button>
+    <button class="profile" id="profileButton" aria-label="Cuenta">👤</button>
+    <div class="menu" id="menu"></div>
+  </div>
 </header>
 
 <div class="layout">
-
-<!-- =====================================================
-     SIDEBAR
-===================================================== -->
-
 <aside class="sidebar">
-
-
-<div class="label">
-    EXPLORAR
-</div>
-
-<button
-    class="side"
-    onclick="window.location.href='../index.html'"
->
-    <span>🏠</span>
-    Inicio
-</button>
-
-<button class="side active">
-    <span>🔥</span>
-    Tendencias
-</button>
-
-<br>
-
-<div class="label">
-    TU ESPACIO
-</div>
-
-<button
-    class="side"
-    id="sidebarPlaylist"
->
-    <span>💿</span>
-    Mis playlists
-</button>
-
-
-<button
-    class="side"
-    onclick="window.location.href='historial.html'"
->
-
-
-
-
+  <div class="label">EXPLORAR</div>
+  <button class="side" onclick="location.href='../index.html'"><span>🏠</span>Inicio</button>
+  <button class="side active"><span>🔥</span>Tendencias</button>
+  <button class="side" id="randomSide"><span>✦</span>Sorpréndeme</button>
+  <div class="label">TU ESPACIO</div>
+  <button class="side" id="sidebarPlaylist"><span>💿</span>Mis playlists</button>
+  <button class="side" id="sideFavs"><span>♥</span>Favoritos</button>
+  <button class="side" id="sideMine"><span>🎞</span>Mis videos</button>
+  <button class="side" onclick="location.href='historial.html'"><span>🕘</span>Historial</button>
 </aside>
 
-<!-- =====================================================
-     CONTENIDO
-===================================================== -->
-
 <main class="main">
-
-<!-- =====================================================
-     HERO
-===================================================== -->
-
-<section class="hero">
-
-
-<img
-    class="hero-image"
-    src="../assets/img/tortuga.jpg"
-    alt=""
->
-
-<div class="hero-content">
-
-    <div class="badge">
-        🔥 WIBSIPROJECT / GLOBAL
+  <section class="hero">
+    <img class="hero-image" src="../assets/img/tortuga.jpg" alt="">
+    <div class="hero-content">
+      <div class="badge">🔥 WIBSIPROJECT / GLOBAL</div>
+      <h1>Lo que todos están <span>viendo.</span></h1>
+      <p>Descubre las tendencias del momento, guarda tus videos y deja que WIBSIPROJECT los organice automáticamente en tus playlists. Inicia sesión para que todo quede guardado en tu cuenta.</p>
+      <div class="hero-buttons">
+        <button class="hero-button" id="heroPlay">▶ Reproducir algo</button>
+        <button class="hero-button secondary" id="heroPlaylistButton">▣ Mis playlists</button>
+      </div>
     </div>
+  </section>
 
-    <h1>
-        Lo que todos están
-        <span>viendo.</span>
-    </h1>
-
-    <p>
-        Descubre las tendencias del momento,
-        guarda tus videos y deja que WIBSIPROJECT
-        los organice automáticamente en tus
-        playlists.
-    </p>
-
-    <div class="hero-buttons">
-
-        <button
-            class="hero-button"
-            onclick="randomVideo()"
-        >
-            ▶ Reproducir algo
-        </button>
-
-        <button
-            class="hero-button secondary"
-            id="heroPlaylistButton"
-        >
-            ▣ Mis playlists
-        </button>
-
+  <section class="playlists-section" id="playlistsSection">
+    <div class="playlist-header">
+      <div><small>TU CONTENIDO</small><h2>Mis playlists</h2></div>
+      <small id="playlistTotal">0 GUARDADOS</small>
     </div>
-
-</div>
-
-
-</section>
-
-<!-- =====================================================
-     PLAYLISTS
-===================================================== -->
-
-<section
-    class="playlists-section"
-    id="playlistsSection"
->
-
-```
-<div class="playlist-header">
-
-    <div>
-
-        <small>
-            TU CONTENIDO
-        </small>
-
-        <h2>
-            Mis playlists
-        </h2>
-
+    <div class="playlist-grid">
+      <button class="playlist-card" data-open="entrenamiento"><span class="playlist-count" id="count-entrenamiento">0</span><div class="playlist-icon">🏋️</div><h3>Entrenamiento</h3><p>Rutinas, gimnasio y fitness</p></button>
+      <button class="playlist-card" data-open="yoga"><span class="playlist-count" id="count-yoga">0</span><div class="playlist-icon">🧘</div><h3>Yoga</h3><p>Yoga, relajación y meditación</p></button>
+      <button class="playlist-card" data-open="fiestas"><span class="playlist-count" id="count-fiestas">0</span><div class="playlist-icon">🎉</div><h3>Fiestas</h3><p>Música, baile y fiestas</p></button>
+      <button class="playlist-card" data-open="tendencias"><span class="playlist-count" id="count-tendencias">0</span><div class="playlist-icon">🔥</div><h3>Tendencias</h3><p>Videos virales y populares</p></button>
     </div>
+  </section>
 
-    <small id="playlistTotal">
-        0 GUARDADOS
-    </small>
+  <div class="filters" id="filters"></div>
 
-</div>
+  <div class="section-title">
+    <div><small>DESCUBRIMIENTO</small><h2>Tendencias actuales</h2></div>
+    <small id="countText">0 VIDEOS</small>
+  </div>
 
-
-<div class="playlist-grid">
-
-    <div
-        class="playlist-card"
-        data-playlist-view="entrenamiento"
-    >
-
-        <span class="playlist-count"
-              id="count-entrenamiento">
-            0
-        </span>
-
-        <div class="playlist-icon">
-            🏋️
-        </div>
-
-        <h3>
-            Entrenamiento
-        </h3>
-
-        <p>
-            Rutinas, gimnasio y fitness
-        </p>
-
-    </div>
-
-
-    <div
-        class="playlist-card"
-        data-playlist-view="yoga"
-    >
-
-        <span class="playlist-count"
-              id="count-yoga">
-            0
-        </span>
-
-        <div class="playlist-icon">
-            🧘
-        </div>
-
-        <h3>
-            Yoga
-        </h3>
-
-        <p>
-            Yoga, relajación y meditación
-        </p>
-
-    </div>
-
-
-    <div
-        class="playlist-card"
-        data-playlist-view="fiestas"
-    >
-
-        <span class="playlist-count"
-              id="count-fiestas">
-            0
-        </span>
-
-        <div class="playlist-icon">
-            🎉
-        </div>
-
-        <h3>
-            Fiestas
-        </h3>
-
-        <p>
-            Música, baile y fiestas
-        </p>
-
-    </div>
-
-
-    <div
-        class="playlist-card"
-        data-playlist-view="tendencias"
-    >
-
-        <span class="playlist-count"
-              id="count-tendencias">
-            0
-        </span>
-
-        <div class="playlist-icon">
-            🔥
-        </div>
-
-        <h3>
-            Tendencias
-        </h3>
-
-        <p>
-            Videos virales y populares
-        </p>
-
-    </div>
-
-</div>
-
-
-</section>
-
-<!-- =====================================================
-     PLAYLIST ABIERTA
-===================================================== -->
-
-<section
-    class="playlist-view"
-    id="playlistView"
->
-
-<div class="playlist-view-top">
-
-    <div>
-
-        <small
-            id="playlistViewLabel"
-            style="
-                color:#657083;
-                font-size:9px;
-                letter-spacing:2px;
-            "
-        >
-            PLAYLIST
-        </small>
-
-        <h2 id="playlistViewTitle">
-            Selecciona una playlist
-        </h2>
-
-    </div>
-
-    <button
-        class="close-playlist"
-        id="closePlaylist"
-    >
-        ✕ Cerrar
-    </button>
-
-</div>
-
-<div
-    class="grid"
-    id="playlistGrid"
-></div>
-
-<div
-    class="empty"
-    id="playlistEmpty"
-    style="display:none;"
->
-
-    <h3>
-        Esta playlist está vacía
-    </h3>
-
-    <p>
-        Agrega videos usando el botón ➕ de cada tarjeta.
-    </p>
-
-</div>
-
-
-</section>
-
-<!-- =====================================================
-     FILTROS
-===================================================== -->
-
-<div class="filters">
-
-
-<button
-    class="filter active"
-    data-category="Todos"
->
-    🔥 Todo
-</button>
-</div>
-
-<!-- =====================================================
-     TÍTULO
-===================================================== -->
-
-<div class="section-title">
-
-
-<div>
-
-    <small>
-        DESCUBRIMIENTO
-    </small>
-
-    <h2>
-        Tendencias actuales
-    </h2>
-
-</div>
-
-<small id="countText">
-    6 VIDEOS
-</small>
-
-
-</div>
-
-<!-- =====================================================
-     VIDEOS
-===================================================== -->
-
-<div
-    class="grid"
-    id="videoGrid"
->
-
-<!-- VIDEO 1 -->
-
-<article
-    class="card"
-    data-id="music001"
-    data-category="Musica"
-    data-title="AGRESSIVE DRIFT PHONK MIX"
-    data-video="https://www.youtube.com/watch?v=DgTJXfsgPi8"
-    data-image="../assets/img/tortuga.jpg"
-    data-creator="Phonk Nation"
->
-
-<div class="thumb">
-
-    <img
-        src="../assets/img/tortuga.jpg"
-        alt="Phonk"
-    >
-
-    <div class="overlay"></div>
-
-    <span class="playlist-badge">
-        🎉 Fiestas
-    </span>
-
-    <button
-        class="heart"
-        title="Guardar en favoritos"
-    >
-        ♡
-    </button>
-
-    <button
-        class="playlist-add"
-        title="Agregar a playlist"
-    >
-        ＋
-    </button>
-
-    <button class="play">
-        ▶
-    </button>
-
-    <span class="quality">
-        HD
-    </span>
-
-</div>
-
-<div class="info">
-
-    <div class="title">
-        AGRESSIVE DRIFT PHONK MIX
-    </div>
-
-    <div class="creator">
-
-        <div class="avatar">
-            P
-        </div>
-
-        Phonk Nation
-
-    </div>
-
-    <div class="meta">
-        180K vistas • hace 1 día
-    </div>
-
-</div>
-
-</article>
-
-<!-- VIDEO 2 -->
-
-<article
-    class="card"
-    data-id="music002"
-    data-category="Tecnología"
-    data-title="Dentro del futuro digital"
-    data-video="https://www.youtube.com/watch?v=pBUlV7rZp_c"
-    data-image="../assets/img/paisaje.jpg"
-    data-creator="Wibsiproject Lab"
->
-
-<div class="thumb">
-
-    <img
-        src="../assets/img/paisaje.jpg"
-        alt="Futuro digital"
-    >
-
-    <div class="overlay"></div>
-
-    <span class="playlist-badge">
-        🔥 Tendencias
-    </span>
-
-    <button class="heart">
-        ♡
-    </button>
-
-    <button
-        class="playlist-add"
-        title="Agregar a playlist"
-    >
-        ＋
-    </button>
-
-    <button class="play">
-        ▶
-    </button>
-
-    <span class="quality">
-        4K
-    </span>
-
-</div>
-
-<div class="info">
-
-    <div class="title">
-        Dentro del futuro digital
-    </div>
-
-    <div class="creator">
-
-        <div class="avatar">
-            W
-        </div>
-
-        Wibsiproject Lab
-
-    </div>
-
-    <div class="meta">
-        250K vistas • hace 4 h
-    </div>
-
-</div>
-
-
-</article>
-
-<!-- VIDEO 3 -->
-
-<article
-    class="card"
-    data-id="music003"
-    data-category="Gaming"
-    data-title="Gameplay Black Ops II"
-    data-video="https://youtu.be/c95WGXY42jo"
-    data-image="../assets/img/phonk1.jpg"
-    data-creator="Night Archive"
->
-
-
-<div class="thumb">
-
-    <img
-        src="../assets/img/phonk1.jpg"
-        alt="Gaming"
-    >
-
-    <div class="overlay"></div>
-
-    <span class="playlist-badge">
-        🔥 Tendencias
-    </span>
-
-    <button class="heart">
-        ♡
-    </button>
-
-    <button
-        class="playlist-add"
-        title="Agregar a playlist"
-    >
-        ＋
-    </button>
-
-    <button class="play">
-        ▶
-    </button>
-
-    <span class="quality">
-        HD
-    </span>
-
-</div>
-
-<div class="info">
-
-    <div class="title">
-        Gameplay Black Ops II — Partida Épica
-    </div>
-
-    <div class="creator">
-
-        <div class="avatar">
-            N
-        </div>
-
-        Night Archive
-
-    </div>
-
-    <div class="meta">
-        310K vistas • ayer
-    </div>
-
-</div>
-
-
-</article>
-
-<!-- VIDEO 4 -->
-
-<article
-    class="card"
-    data-id="music004"
-    data-category="Tecnología"
-    data-title="Innovación en Inteligencia Artificial"
-    data-video="https://youtu.be/CiGVMIErCDw"
-    data-image="../assets/img/portada1.jpg"
-    data-creator="Tech Global"
->
-
-
-<div class="thumb">
-
-    <img
-        src="../assets/img/portada1.jpg"
-        alt="IA"
-    >
-
-    <div class="overlay"></div>
-
-    <span class="playlist-badge">
-        🔥 Tendencias
-    </span>
-
-    <button class="heart">
-        ♡
-    </button>
-
-    <button
-        class="playlist-add"
-        title="Agregar a playlist"
-    >
-        ＋
-    </button>
-
-    <button class="play">
-        ▶
-    </button>
-
-    <span class="quality">
-        4K
-    </span>
-
-</div>
-
-<div class="info">
-
-    <div class="title">
-        Innovación en Inteligencia Artificial
-    </div>
-
-    <div class="creator">
-
-        <div class="avatar">
-            T
-        </div>
-
-        Tech Global
-
-    </div>
-
-    <div class="meta">
-        420K vistas • hace 6 h
-    </div>
-
-</div>
-
-
-</article>
-
-<!-- VIDEO 5 -->
-
-<article
-    class="card"
-    data-id="music005"
-    data-category="Musica"
-    data-title="Dark Phonk Night Drive"
-    data-video="https://youtu.be/8dOMXfWmghg"
-    data-image="../assets/img/tortuga.jpg"
-    data-creator="Dark Audio"
->
-
-
-<div class="thumb">
-
-    <img
-        src="../assets/img/tortuga.jpg"
-        alt="Dark Phonk"
-    >
-
-    <div class="overlay"></div>
-
-    <span class="playlist-badge">
-        🎉 Fiestas
-    </span>
-
-    <button class="heart">
-        ♡
-    </button>
-
-    <button
-        class="playlist-add"
-        title="Agregar a playlist"
-    >
-        ＋
-    </button>
-
-    <button class="play">
-        ▶
-    </button>
-
-    <span class="quality">
-        HD
-    </span>
-
-</div>
-
-<div class="info">
-
-    <div class="title">
-        Dark Phonk Night Drive
-    </div>
-
-    <div class="creator">
-
-        <div class="avatar">
-            D
-        </div>
-
-        Dark Audio
-
-    </div>
-
-    <div class="meta">
-        350K vistas • hace 3 días
-    </div>
-
-</div>
-
-
-</article>
-
-<!-- VIDEO 6 -->
-
-<article
-    class="card"
-    data-id="music006"
-    data-category="Gaming"
-    data-title="Black Ops II El regreso"
-    data-video="https://youtu.be/yEbhDfZ6WD0"
-    data-image="../assets/img/phonk1.jpg"
-    data-creator="Gaming Archive"
->
-
-
-<div class="thumb">
-
-    <img
-        src="../assets/img/phonk1.jpg"
-        alt="Gaming"
-    >
-
-    <div class="overlay"></div>
-
-    <span class="playlist-badge">
-        🔥 Tendencias
-    </span>
-
-    <button class="heart">
-        ♡
-    </button>
-
-    <button
-        class="playlist-add"
-        title="Agregar a playlist"
-    >
-        ＋
-    </button>
-
-    <button class="play">
-        ▶
-    </button>
-
-    <span class="quality">
-        HD
-    </span>
-
-</div>
-
-<div class="info">
-
-    <div class="title">
-        Black Ops II — El regreso
-    </div>
-
-    <div class="creator">
-
-        <div class="avatar">
-            G
-        </div>
-
-        Gaming Archive
-
-    </div>
-
-    <div class="meta">
-        275K vistas • hace 3 días
-    </div>
-
-</div>
-
-
-</article>
-
-</div>
-
-<div
-    class="empty"
-    id="empty"
->
-
-
-<h3>
-    No encontramos resultados
-</h3>
-
-<p>
-    Prueba otra búsqueda.
-</p>
-
-
-</div>
-
+  <div class="grid" id="videoGrid"></div>
+  <div class="empty" id="empty"><h3>No encontramos resultados</h3><p>Prueba otra búsqueda o cambia el filtro.</p></div>
 </main>
-
 </div>
 
-<!-- =====================================================
-     MODAL PLAYLIST
-===================================================== -->
+<!-- DRAWER (playlists, favoritos, mis videos) -->
+<div class="drawer-bg" id="drawerBg"></div>
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="drawer-top"><div><h2>Tu biblioteca</h2><small id="drawerSub"></small></div><button class="x" id="drawerClose" aria-label="Cerrar">✕</button></div>
+  <div class="tabs filters" id="tabs"></div>
+  <div class="drawer-body" id="drawerBody"></div>
+</aside>
 
-<div
-    class="modal"
-    id="playlistModal"
->
+<!-- MODAL PLAYLIST -->
+<div class="modal" id="playlistModal"><div class="modal-box">
+  <h2>➕ Agregar a playlist</h2>
+  <p id="modalVideoTitle"></p>
+  <div class="detected" id="detectedText"></div>
+  <div class="playlist-options">
+    <button class="playlist-option" data-po="entrenamiento"><strong>🏋️ Entrenamiento</strong><small>Fitness, gym y rutinas</small></button>
+    <button class="playlist-option" data-po="yoga"><strong>🧘 Yoga</strong><small>Yoga y relajación</small></button>
+    <button class="playlist-option" data-po="fiestas"><strong>🎉 Fiestas</strong><small>Música y baile</small></button>
+    <button class="playlist-option" data-po="tendencias"><strong>🔥 Tendencias</strong><small>Videos populares</small></button>
+  </div>
+  <p style="margin-top:12px">Puedes marcar varias. Desmarca una para quitar el video de ella.</p>
+  <div class="modal-actions"><button class="modal-btn" data-close>Cancelar</button><button class="modal-btn primary" id="savePlaylist">Guardar</button></div>
+</div></div>
 
+<!-- MODAL SUBIR -->
+<div class="modal" id="uploadModal"><div class="modal-box">
+  <h2>⬆ Subir video</h2>
+  <p>Pega el enlace de YouTube o de un archivo de video (.mp4). Se guardará solo en tu cuenta.</p>
+  <label class="field">Título<input id="uTitle" maxlength="90"></label>
+  <label class="field">Enlace<input id="uUrl" type="url" placeholder="https://..."></label>
+  <label class="field">Categoría<select id="uCat"><option>Musica</option><option>Tecnología</option><option>Gaming</option><option>Fitness</option><option>Yoga</option><option>Otros</option></select></label>
+  <label class="field">Playlist<select id="uList"><option value="">Automática</option><option value="entrenamiento">🏋️ Entrenamiento</option><option value="yoga">🧘 Yoga</option><option value="fiestas">🎉 Fiestas</option><option value="tendencias">🔥 Tendencias</option></select></label>
+  <div class="err" id="uErr"></div>
+  <div class="modal-actions"><button class="modal-btn" data-close>Cancelar</button><button class="modal-btn primary" id="uGo">Subir</button></div>
+</div></div>
 
-<div class="modal-box">
+<div class="toast" id="toast"></div>
 
-    <h2>
-        ➕ Agregar a playlist
-    </h2>
-
-    <p id="modalVideoTitle">
-        Selecciona dónde guardar este video.
-    </p>
-
-    <div
-        class="detected"
-        id="detectedText"
-    >
-        🤖 Detectando...
-    </div>
-
-    <div class="playlist-options">
-
-        <button
-            class="playlist-option"
-            data-playlist-option="entrenamiento"
-        >
-            <strong>
-                🏋️ Entrenamiento
-            </strong>
-
-            <small>
-                Fitness, gym y rutinas
-            </small>
-        </button>
-
-        <button
-            class="playlist-option"
-            data-playlist-option="yoga"
-        >
-            <strong>
-                🧘 Yoga
-            </strong>
-
-            <small>
-                Yoga y relajación
-            </small>
-        </button>
-
-        <button
-            class="playlist-option"
-            data-playlist-option="fiestas"
-        >
-            <strong>
-                🎉 Fiestas
-            </strong>
-
-            <small>
-                Música y baile
-            </small>
-        </button>
-
-        <button
-            class="playlist-option"
-            data-playlist-option="tendencias"
-        >
-            <strong>
-                🔥 Tendencias
-            </strong>
-
-            <small>
-                Videos populares
-            </small>
-        </button>
-
-    </div>
-
-    <div class="modal-actions">
-
-        <button
-            class="modal-btn"
-            id="cancelPlaylist"
-        >
-            Cancelar
-        </button>
-
-        <button
-            class="modal-btn primary"
-            id="savePlaylist"
-        >
-            Guardar playlist
-        </button>
-
-    </div>
-
-</div>
-
-
-</div>
-
-<!-- =====================================================
-     TOAST
-===================================================== -->
-
-<div
-    class="toast"
-    id="toast"
-></div>
-
-<!-- =====================================================
-     MUSIC BAR
-===================================================== -->
-
+<!-- MUSIC BAR -->
 <div id="musicBar">
-
-
-<div
-    class="progress"
-    id="progress"
->
-    <div
-        class="progress-fill"
-        id="progressFill"
-    ></div>
+  <div class="progress" id="progress"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="music-left">
+    <button class="music-btn" id="previousButton" aria-label="Anterior">⏮</button>
+    <button class="music-btn play-main" id="playPauseButton" aria-label="Reproducir o pausar">▶</button>
+    <button class="music-btn" id="nextButton" aria-label="Siguiente">⏭</button>
+  </div>
+  <div class="music-info">
+    <img id="barThumb" src="../assets/img/tortuga.jpg" alt="">
+    <div class="music-text"><div id="barTitle">Selecciona un video</div><div id="barCreator">WIBSIPROJECT</div></div>
+    <div class="bars"><i></i><i></i><i></i></div>
+  </div>
+  <div class="music-right">
+    <button class="bar-action favorite" id="favoriteButton">♡ <span>Favoritos</span></button>
+    <button class="bar-action" id="downloadButton">⬇ <span>Descargar</span></button>
+    <button class="bar-action" id="muteButton">🔊</button>
+    <button class="bar-action" id="closeBar">✕</button>
+  </div>
 </div>
 
-<div class="music-left">
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+import {getAuth,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
+import {getDatabase,ref,get,set} from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
+/* ================= UTILIDADES ================= */
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const FB='../assets/img/tortuga.jpg';
+const names={entrenamiento:'🏋️ Entrenamiento',yoga:'🧘 Yoga',fiestas:'🎉 Fiestas',tendencias:'🔥 Tendencias'};
+const LS={
+  get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v??d}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){toast('No se pudo guardar: almacenamiento lleno');return false}}
+};
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2600)}
 
-    <button
-        class="music-btn"
-        id="previousButton"
-    >
-        ⏮
-    </button>
+/* ================= VIDEOS BASE ================= */
+const BASE=[
+ {id:'music001',category:'Musica',title:'AGRESSIVE DRIFT PHONK MIX',video:'https://www.youtube.com/watch?v=DgTJXfsgPi8',image:'../assets/img/tortuga.jpg',creator:'Phonk Nation',meta:'180K vistas • hace 1 día',q:'HD'},
+ {id:'music002',category:'Tecnología',title:'Dentro del futuro digital',video:'https://www.youtube.com/watch?v=pBUlV7rZp_c',image:'../assets/img/paisaje.jpg',creator:'Wibsiproject Lab',meta:'250K vistas • hace 4 h',q:'4K'},
+ {id:'music003',category:'Gaming',title:'Gameplay Black Ops II — Partida Épica',video:'https://youtu.be/c95WGXY42jo',image:'../assets/img/phonk1.jpg',creator:'Night Archive',meta:'310K vistas • ayer',q:'HD'},
+ {id:'music004',category:'Tecnología',title:'Innovación en Inteligencia Artificial',video:'https://youtu.be/CiGVMIErCDw',image:'../assets/img/portada1.jpg',creator:'Tech Global',meta:'420K vistas • hace 6 h',q:'4K'},
+ {id:'music005',category:'Musica',title:'Dark Phonk Night Drive',video:'https://youtu.be/8dOMXfWmghg',image:'../assets/img/tortuga.jpg',creator:'Dark Audio',meta:'350K vistas • hace 3 días',q:'HD'},
+ {id:'music006',category:'Gaming',title:'Black Ops II — El regreso',video:'https://youtu.be/yEbhDfZ6WD0',image:'../assets/img/phonk1.jpg',creator:'Gaming Archive',meta:'275K vistas • hace 3 días',q:'HD'}
+];
 
-    <button
-        class="music-btn play-main"
-        id="playPauseButton"
-    >
-        ▶
-    </button>
+/* ================= CUENTA (Firebase, la misma de cuenta.html) ================= */
+const app=initializeApp({apiKey:"AIzaSyAg8n3AcKE-0QDQYcswUBYZwI702TzPZIU",authDomain:"anthonypg.firebaseapp.com",databaseURL:"https://anthonypg-default-rtdb.firebaseio.com/",projectId:"anthonypg",appId:"1:620424695699:web:429c9ace801a5bc75a6266"});
+const auth=getAuth(app),db=getDatabase(app);
+let user=null,uname='',D;                       // user = uid, o null = invitado
+const me=()=>user?{name:uname}:null;
+const goLogin=()=>{location.href='cuenta.html?volver=tendencias.html'};
+const dkey=()=>'wp_data:'+(user||'guest');
+function norm(x){const o={favs:[],uploads:[],lists:{}};for(const k in names)o.lists[k]=[];
+  if(x){if(Array.isArray(x.favs))o.favs=x.favs;if(Array.isArray(x.uploads))o.uploads=x.uploads;for(const k in names)if(x.lists&&Array.isArray(x.lists[k]))o.lists[k]=x.lists[k]}return o}
+const load=()=>{D=norm(LS.get(dkey(),null))};
+const nube=()=>ref(db,'bibliotecas/'+user);
+async function pull(){if(!user)return;
+  try{const s=await get(nube());
+    if(s.exists()){D=norm(s.val());LS.set(dkey(),D)}
+    else if(D.favs.length||D.uploads.length||Object.values(D.lists).some(l=>l.length))save();
+  }catch(e){console.warn('Nube no disponible, uso este dispositivo:',e.code||e)}}
+function save(){const ok=LS.set(dkey(),D);
+  if(user){try{set(nube(),JSON.parse(JSON.stringify(D))).catch(e=>console.warn('No se guardó en la nube:',e.code||e))}catch(e){}}
+  return ok}
+const all=()=>BASE.concat(D.uploads.map(u=>({...u,own:true})));
+const byId=id=>all().find(v=>v.id===id);
+const inAny=id=>Object.values(D.lists).some(l=>l.includes(id));
 
-    <button
-        class="music-btn"
-        id="nextButton"
-    >
-        ⏭
-    </button>
+/* ================= DETECCIÓN AUTOMÁTICA ================= */
+const W={
+ entrenamiento:'gym,gimnasio,workout,training,entrenamiento,fitness,cardio,crossfit,musculo,músculo,pesas,rutina,abdominal,ejercicio,exercise,running,correr'.split(','),
+ yoga:'yoga,meditacion,meditación,meditation,relax,relajacion,relajación,mindfulness,zen,respiracion,respiración,stretching,estiramiento'.split(','),
+ fiestas:'fiesta,party,dance,baile,club,dj,phonk,drift,mix,remix,music,musica,música,night drive,electronic,reggaeton,festival'.split(',')
+};
+function detect(v){
+  if(v.playlist)return v.playlist;
+  const t=(v.title+' '+v.creator+' '+v.category).toLowerCase();
+  for(const k in W)if(W[k].some(w=>t.includes(w)))return k;
+  return 'tendencias';
+}
 
-</div>
+/* ================= YOUTUBE ================= */
+function ytId(url){
+  try{const u=new URL(url);
+    if(u.hostname.includes('youtu.be'))return u.pathname.slice(1);
+    if(u.hostname.includes('youtube.com')){
+      if(u.searchParams.has('v'))return u.searchParams.get('v');
+      const p=u.pathname.split('/'),i=p.findIndex(x=>['shorts','embed','live'].includes(x));
+      if(i>-1&&p[i+1])return p[i+1];
+    }}catch(e){}
+  return null;
+}
+const thumb=v=>{const y=v.own&&ytId(v.video);return y?`https://i.ytimg.com/vi/${y}/hqdefault.jpg`:(v.image||FB)};
 
-<div class="music-info">
+/* ================= TARJETAS ================= */
+function cardHTML(v,i,removable){
+  const f=D.favs.includes(v.id),s=inAny(v.id),pl=names[detect(v)];
+  return `<article class="card${cur&&cur.id===v.id?' playing':''}" data-id="${esc(v.id)}" style="--i:${i}">
+  <div class="thumb"><img src="${esc(thumb(v))}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${FB}'"><div class="overlay"></div>
+  <span class="playlist-badge">${pl}</span>
+  <button class="round heart${f?' active':''}" data-act="fav" title="Favoritos">${f?'♥':'♡'}</button>
+  <button class="round playlist-add${s?' saved':''}" data-act="add" title="Agregar a playlist">${s?'✓':'＋'}</button>
+  <button class="play" data-act="play" aria-label="Reproducir">▶</button>
+  <span class="quality">${esc(v.q||'HD')}</span>
+  ${removable?'<button class="round del" data-act="rem" title="Quitar de esta lista">✕</button>':''}
+  ${v.own?`<button class="round del${removable?' second':''}" data-act="del" title="Eliminar mi video">🗑</button>`:''}
+  <div class="eq"><i></i><i></i><i></i></div></div>
+  <div class="info"><div class="title">${esc(v.title)}</div>
+  <div class="creator"><div class="avatar">${esc((v.creator||'?')[0].toUpperCase())}</div>${esc(v.creator)}</div>
+  <div class="meta">${esc(v.meta||'')}</div></div></article>`;
+}
+let activeCat='Todos';
+function buildGrid(){
+  const list=all();
+  $('#videoGrid').innerHTML=list.map((v,i)=>cardHTML(v,i)).join('');
+  const cats=['Todos',...new Set(list.map(v=>v.category))];
+  if(!cats.includes(activeCat))activeCat='Todos';
+  $('#filters').innerHTML=cats.map(c=>`<button class="filter${c===activeCat?' active':''}" data-cat="${esc(c)}">${c==='Todos'?'🔥 Todo':esc(c)}</button>`).join('');
+  applyFilters();
+}
+function applyFilters(){
+  const q=$('#searchInput').value.toLowerCase().trim();let n=0;
+  $$('#videoGrid .card').forEach(c=>{
+    const v=byId(c.dataset.id);if(!v)return;
+    const ok=(activeCat==='Todos'||v.category===activeCat)&&(v.title+' '+v.creator+' '+v.category).toLowerCase().includes(q);
+    c.style.display=ok?'':'none';if(ok)n++;
+  });
+  $('#countText').textContent=n+' VIDEOS';
+  $('#empty').style.display=n?'none':'block';
+}
+/* Actualiza corazones, botones + y contadores SIN reconstruir (no hay saltos) */
+function sync(){
+  $$('.card[data-id]').forEach(c=>{
+    const id=c.dataset.id,f=D.favs.includes(id),s=inAny(id);
+    const h=c.querySelector('.heart'),a=c.querySelector('.playlist-add');
+    if(h){h.classList.toggle('active',f);h.textContent=f?'♥':'♡'}
+    if(a){a.classList.toggle('saved',s);a.textContent=s?'✓':'＋'}
+    c.classList.toggle('playing',!!cur&&cur.id===id);
+  });
+  let total=0;
+  for(const k in names){const n=D.lists[k].length;total+=n;$('#count-'+k).textContent=n}
+  $('#playlistTotal').textContent=user?total+' GUARDADOS':'INICIA SESIÓN PARA USARLAS';
+  const m=me();$('#profileButton').textContent=m?m.name.trim()[0].toUpperCase():'👤';
+  favBtn();
+}
 
-    <img
-        id="barThumb"
-        src="../assets/img/tortuga.jpg"
-        alt=""
-    >
+/* ================= LOGIN REQUERIDO ================= */
+function need(fn){
+  if(user){fn();return}
+  toast('🔒 Inicia sesión para usar esto. Te llevo a tu cuenta…');setTimeout(goLogin,1200);
+}
 
-    <div class="music-text">
+/* ================= MODALES ================= */
+const openM=id=>$(id).classList.add('active'),closeM=()=>$$('.modal.active').forEach(m=>m.classList.remove('active'));
+$$('.modal').forEach(m=>m.addEventListener('mousedown',e=>{if(e.target===m)closeM()}));
+$$('[data-close]').forEach(b=>b.addEventListener('click',closeM));
 
-        <div id="barTitle">
-            Selecciona un video
-        </div>
+async function logout(){try{await signOut(auth)}catch(e){}toast('Sesión cerrada. Ahora usas el espacio de invitado.')}
 
-        <div id="barCreator">
-            WIBSIPROJECT
-        </div>
+/* ---- Menú de cuenta ---- */
+const menu=$('#menu');
+$('#profileButton').onclick=e=>{
+  e.stopPropagation();
+  if(!user){goLogin();return}
+  menu.innerHTML=`<p>👤 ${esc(me().name)}<br><small>${esc(user)}</small></p><button data-m="up">⬆ Subir video</button><button data-m="mine">🎞 Mis videos</button><button data-m="lists">💿 Mis playlists</button><button data-m="acc">⚙ Mi cuenta</button><button data-m="out">↩ Cerrar sesión</button>`;
+  menu.classList.toggle('open');
+};
+menu.onclick=e=>{const b=e.target.closest('button');if(!b)return;menu.classList.remove('open');
+  ({up:openUpload,mine:()=>drawer('mine'),lists:()=>drawer('entrenamiento'),acc:()=>location.href='cuenta.html',out:logout})[b.dataset.m]()};
+document.addEventListener('click',e=>{if(!e.target.closest('#menu'))menu.classList.remove('open')});
 
-    </div>
-
-</div>
-
-<div class="music-right">
-
-    <button
-        class="bar-action favorite"
-        id="favoriteButton"
-    >
-        ♡ <span>Favoritos</span>
-    </button>
-
-    <button
-        class="bar-action"
-        id="downloadButton"
-    >
-        ⬇ <span>Descargar</span>
-    </button>
-
-    <button
-        class="bar-action"
-        id="muteButton"
-    >
-        🔊
-    </button>
-
-    <button
-        class="bar-action"
-        id="closeBar"
-    >
-        ✕
-    </button>
-
-</div>
-
-
-</div>
-
-<script>
-
-/* =====================================================
-   ELEMENTOS PRINCIPALES
-===================================================== */
-
-const cards =
-    Array.from(
-        document.querySelectorAll(".card")
-    );
-
-let currentCard = null;
-let currentIndex = -1;
-
-let currentVideo = null;
-let currentIframe = null;
-
-let isPlaying = false;
-let isMuted = false;
-
-
-/* =====================================================
-   NOMBRES DE PLAYLISTS
-===================================================== */
-
-const playlistNames = {
-
-    entrenamiento:"🏋️ Entrenamiento",
-
-    yoga:"🧘 Yoga",
-
-    fiestas:"🎉 Fiestas",
-
-    tendencias:"🔥 Tendencias"
-
+/* ---- Subir video ---- */
+function openUpload(){need(()=>{['#uTitle','#uUrl'].forEach(s=>$(s).value='');$('#uErr').textContent='';openM('#uploadModal')})}
+$('#uploadButton').onclick=openUpload;
+$('#uGo').onclick=()=>{
+  const title=$('#uTitle').value.trim(),url=$('#uUrl').value.trim(),err=$('#uErr');
+  if(!user)return;
+  if(!title)return err.textContent='Escribe un título.';
+  try{const u=new URL(url);if(!/^https?:$/.test(u.protocol))throw 0}catch(e){return err.textContent='Escribe un enlace válido (https://...).'}
+  if(!ytId(url)&&!/\.(mp4|webm|ogg|mp3)(\?|#|$)/i.test(url))return err.textContent='Usa un enlace de YouTube o un archivo .mp4/.webm/.mp3.';
+  const v={id:'u'+Date.now(),title,video:url,category:$('#uCat').value,playlist:$('#uList').value||undefined,creator:me().name,image:FB,meta:'Subido por ti • '+new Date().toLocaleDateString('es'),q:'HD'};
+  D.uploads.unshift(v);
+  if(save()){buildGrid();sync();closeM();toast('✓ Video subido a tu cuenta');if(drawerOpen)drawer(dTab)}else D.uploads.shift();
 };
 
+/* ---- Modal playlist (multi-selección) ---- */
+let plId=null,plSel=new Set();
+function openPlaylist(id){
+  need(()=>{
+    const v=byId(id);plId=id;
+    plSel=new Set(Object.keys(names).filter(k=>D.lists[k].includes(id)));
+    const d=detect(v);if(!plSel.size)plSel.add(d);
+    $('#modalVideoTitle').textContent=v.title;
+    $('#detectedText').innerHTML='🤖 WIBSIPROJECT detectó: <strong>'+names[d]+'</strong>';
+    paintOpts();openM('#playlistModal');
+  });
+}
+const paintOpts=()=>$$('[data-po]').forEach(o=>o.classList.toggle('selected',plSel.has(o.dataset.po)));
+$$('[data-po]').forEach(o=>o.onclick=()=>{const k=o.dataset.po;plSel.has(k)?plSel.delete(k):plSel.add(k);paintOpts()});
+$('#savePlaylist').onclick=()=>{
+  if(!plId||!user)return;
+  for(const k in names){
+    const has=D.lists[k].includes(plId);
+    if(plSel.has(k)&&!has)D.lists[k].push(plId);
+    if(!plSel.has(k)&&has)D.lists[k]=D.lists[k].filter(x=>x!==plId);
+  }
+  save();sync();closeM();
+  toast(plSel.size?'✓ Guardado en '+[...plSel].map(k=>names[k]).join(', '):'✓ Quitado de tus playlists');
+  if(drawerOpen)drawer(dTab);
+};
 
-/* =====================================================
-   PLAYLISTS LOCALSTORAGE
-===================================================== */
-
-const PLAYLIST_KEY =
-    "wibsiproject_playlists";
-
-
-function getPlaylists(){
-
-    const saved =
-        localStorage.getItem(
-            PLAYLIST_KEY
-        );
-
-    if(!saved){
-
-        return {
-            entrenamiento:[],
-            yoga:[],
-            fiestas:[],
-            tendencias:[]
-        };
-
-    }
-
-    try{
-
-        const data =
-            JSON.parse(saved);
-
-        return {
-
-            entrenamiento:
-                Array.isArray(data.entrenamiento)
-                ? data.entrenamiento
-                : [],
-
-            yoga:
-                Array.isArray(data.yoga)
-                ? data.yoga
-                : [],
-
-            fiestas:
-                Array.isArray(data.fiestas)
-                ? data.fiestas
-                : [],
-
-            tendencias:
-                Array.isArray(data.tendencias)
-                ? data.tendencias
-                : []
-
-        };
-
-    }catch(error){
-
-        return {
-            entrenamiento:[],
-            yoga:[],
-            fiestas:[],
-            tendencias:[]
-        };
-
-    }
-
+/* ================= FAVORITOS (también invitado) ================= */
+function toggleFav(id){
+  const i=D.favs.indexOf(id);
+  i>-1?D.favs.splice(i,1):D.favs.push(id);
+  save();sync();toast(i>-1?'♡ Eliminado de favoritos':'♥ Agregado a favoritos'+(user?'':' (invitado)'));
+  if(drawerOpen&&dTab==='favs')drawer('favs',true);
 }
 
-
-function savePlaylists(data){
-
-    localStorage.setItem(
-        PLAYLIST_KEY,
-        JSON.stringify(data)
-    );
-
+/* ================= DRAWER ================= */
+let drawerOpen=false,dTab='entrenamiento';
+const TABS={...names,favs:'♥ Favoritos',mine:'🎞 Mis videos'};
+function drawer(tab,keepScroll){
+  dTab=tab;const body=$('#drawerBody'),sc=body.scrollTop;
+  $('#tabs').innerHTML=Object.keys(TABS).map(k=>`<button class="filter${k===tab?' active':''}" data-tab="${k}">${TABS[k]}</button>`).join('');
+  let items=[];
+  if(tab==='favs')items=D.favs.map(byId).filter(Boolean);
+  else if(tab==='mine')items=D.uploads.map(u=>({...u,own:true}));
+  else items=D.lists[tab].map(byId).filter(Boolean);
+  $('#drawerSub').textContent=(user?me().name:'Invitado')+' • '+TABS[tab]+' • '+items.length+' videos';
+  if(!user&&tab!=='favs'){
+    body.innerHTML='<div class="gate"><div style="font-size:40px">🔒</div><p>Las playlists y tus videos subidos se guardan en tu cuenta.<br>Inicia sesión para usarlos.</p><button class="hero-button" id="gateLogin">Iniciar sesión</button></div>';
+  }else if(!items.length){
+    body.innerHTML='<div class="gate"><div style="font-size:40px">📭</div><p>'+(tab==='mine'?'Aún no has subido videos.':'Esta lista está vacía.<br>Agrega videos con el botón ＋ de cada tarjeta.')+'</p>'+(tab==='mine'?'<button class="hero-button" id="gateUp">⬆ Subir video</button>':'')+'</div>';
+  }else{
+    body.innerHTML='<div class="grid">'+items.map((v,i)=>cardHTML(v,i,tab!=='mine')).join('')+'</div>';
+  }
+  if(keepScroll)body.scrollTop=sc;
+  if(!drawerOpen){drawerOpen=true;$('#drawer').classList.add('open');$('#drawerBg').classList.add('open');$('#drawer').setAttribute('aria-hidden','false');body.scrollTop=0}
+  const a=$('#tabs .active');if(a)a.scrollIntoView({block:'nearest',inline:'center'});
 }
-
-
-/* =====================================================
-   DATOS DEL VIDEO
-===================================================== */
-
-function getVideoData(card){
-
-    return {
-
-        id:card.dataset.id,
-
-        title:card.dataset.title,
-
-        video:card.dataset.video,
-
-        image:card.dataset.image,
-
-        creator:card.dataset.creator,
-
-        category:card.dataset.category
-
-    };
-
-}
-
-
-/* =====================================================
-   RECONOCIMIENTO AUTOMÁTICO
-===================================================== */
-
-function detectPlaylist(card){
-
-    /*
-       Si posteriormente quieres controlar
-       manualmente la playlist de un video,
-       puedes agregar:
-
-       data-playlist="yoga"
-
-       al article.
-
-       Esa clasificación tendrá prioridad.
-    */
-
-    if(card.dataset.playlist){
-
-        return card.dataset.playlist;
-
-    }
-
-
-    const text = (
-
-        (card.dataset.title || "") +
-        " " +
-        (card.dataset.creator || "") +
-        " " +
-        (card.dataset.category || "")
-
-    ).toLowerCase();
-
-
-    /* =========================
-       ENTRENAMIENTO
-    ========================= */
-
-    const entrenamiento = [
-
-        "gym",
-        "gimnasio",
-        "workout",
-        "training",
-        "entrenamiento",
-        "fitness",
-        "fit",
-        "cardio",
-        "crossfit",
-        "musculo",
-        "músculo",
-        "pesas",
-        "rutina",
-        "abs",
-        "abdominal",
-        "ejercicio",
-        "exercise",
-        "running",
-        "correr"
-
-    ];
-
-
-    /* =========================
-       YOGA
-    ========================= */
-
-    const yoga = [
-
-        "yoga",
-        "meditacion",
-        "meditación",
-        "meditation",
-        "relax",
-        "relajacion",
-        "relajación",
-        "mindfulness",
-        "zen",
-        "respiracion",
-        "respiración",
-        "stretching",
-        "estiramiento"
-
-    ];
-
-
-    /* =========================
-       FIESTAS
-    ========================= */
-
-    const fiestas = [
-
-        "fiesta",
-        "fiestas",
-        "party",
-        "dance",
-        "baile",
-        "club",
-        "nightclub",
-        "dj",
-        "phonk",
-        "drift",
-        "mix",
-        "remix",
-        "music",
-        "musica",
-        "música",
-        "night drive",
-        "electronic",
-        "reggaeton",
-        "festival"
-
-    ];
-
-
-    /* =========================
-       TENDENCIAS
-    ========================= */
-
-    const tendencias = [
-
-        "tendencia",
-        "tendencias",
-        "trend",
-        "trending",
-        "viral",
-        "popular",
-        "actual",
-        "nuevo",
-        "news",
-        "gaming",
-        "gameplay",
-        "technology",
-        "tecnologia",
-        "tecnología",
-        "ia",
-        "inteligencia artificial",
-        "futuro"
-
-    ];
-
-
-    if(
-        entrenamiento.some(
-            word => text.includes(word)
-        )
-    ){
-
-        return "entrenamiento";
-
-    }
-
-
-    if(
-        yoga.some(
-            word => text.includes(word)
-        )
-    ){
-
-        return "yoga";
-
-    }
-
-
-    if(
-        fiestas.some(
-            word => text.includes(word)
-        )
-    ){
-
-        return "fiestas";
-
-    }
-
-
-    return "tendencias";
-
-}
-
-
-/* =====================================================
-   ACTUALIZAR BADGES
-===================================================== */
-
-function updatePlaylistBadges(){
-
-    cards.forEach(card => {
-
-        const playlist =
-            detectPlaylist(card);
-
-        const badge =
-            card.querySelector(
-                ".playlist-badge"
-            );
-
-        if(badge){
-
-            badge.textContent =
-                playlistNames[playlist];
-
-        }
-
-    });
-
-}
-
-
-/* =====================================================
-   COMPROBAR SI ESTÁ EN PLAYLIST
-===================================================== */
-
-function isInPlaylist(id){
-
-    const playlists =
-        getPlaylists();
-
-    return Object.values(
-        playlists
-    ).some(
-        list => list.includes(id)
-    );
-
-}
-
-
-/* =====================================================
-   ACTUALIZAR BOTONES +
-===================================================== */
-
-function updatePlaylistButtons(){
-
-    cards.forEach(card => {
-
-        const button =
-            card.querySelector(
-                ".playlist-add"
-            );
-
-        if(!button){
-            return;
-        }
-
-        const saved =
-            isInPlaylist(
-                card.dataset.id
-            );
-
-        button.classList.toggle(
-            "saved",
-            saved
-        );
-
-        button.textContent =
-            saved ? "✓" : "＋";
-
-        button.title =
-            saved
-            ? "Este video está guardado"
-            : "Agregar a playlist";
-
-    });
-
-}
-
-
-/* =====================================================
-   TOAST
-===================================================== */
-
-let toastTimer = null;
-
-
-function showToast(message){
-
-    const toast =
-        document.getElementById(
-            "toast"
-        );
-
-    toast.textContent =
-        message;
-
-    toast.classList.add(
-        "show"
-    );
-
-    clearTimeout(
-        toastTimer
-    );
-
-    toastTimer =
-        setTimeout(
-            () => {
-
-                toast.classList.remove(
-                    "show"
-                );
-
-            },
-            2500
-        );
-
-}
-
-
-/* =====================================================
-   MODAL PLAYLIST
-===================================================== */
-
-const playlistModal =
-    document.getElementById(
-        "playlistModal"
-    );
-
-let playlistCardSelected = null;
-let selectedPlaylist = null;
-
-
-function openPlaylistModal(card){
-
-    playlistCardSelected =
-        card;
-
-    selectedPlaylist =
-        detectPlaylist(card);
-
-
-    document.getElementById(
-        "modalVideoTitle"
-    ).textContent =
-        card.dataset.title;
-
-
-    document.getElementById(
-        "detectedText"
-    ).innerHTML =
-        "🤖 WIBSIPROJECT detectó: <strong>" +
-        playlistNames[selectedPlaylist] +
-        "</strong>";
-
-
-    document
-        .querySelectorAll(
-            ".playlist-option"
-        )
-        .forEach(option => {
-
-            option.classList.toggle(
-
-                "selected",
-
-                option.dataset.playlistOption ===
-                selectedPlaylist
-
-            );
-
-        });
-
-
-    playlistModal.classList.add(
-        "active"
-    );
-
-}
-
-
-function closePlaylistModal(){
-
-    playlistModal.classList.remove(
-        "active"
-    );
-
-    playlistCardSelected =
-        null;
-
-    selectedPlaylist =
-        null;
-
-}
-
-
-/* =====================================================
-   OPCIONES DE PLAYLIST
-===================================================== */
-
-document
-    .querySelectorAll(
-        ".playlist-option"
-    )
-    .forEach(option => {
-
-        option.addEventListener(
-            "click",
-            () => {
-
-                selectedPlaylist =
-                    option.dataset.playlistOption;
-
-
-                document
-                    .querySelectorAll(
-                        ".playlist-option"
-                    )
-                    .forEach(item => {
-
-                        item.classList.toggle(
-
-                            "selected",
-
-                            item === option
-
-                        );
-
-                    });
-
-            }
-        );
-
-    });
-
-
-/* =====================================================
-   GUARDAR PLAYLIST
-===================================================== */
-
-document
-    .getElementById(
-        "savePlaylist"
-    )
-    .addEventListener(
-        "click",
-        () => {
-
-            if(
-                !playlistCardSelected ||
-                !selectedPlaylist
-            ){
-
-                return;
-
-            }
-
-
-            const data =
-                getVideoData(
-                    playlistCardSelected
-                );
-
-
-            const playlists =
-                getPlaylists();
-
-
-            /*
-               El mismo video puede estar
-               en varias playlists.
-            */
-
-            if(
-                !playlists[selectedPlaylist]
-                    .includes(data.id)
-            ){
-
-                playlists[selectedPlaylist]
-                    .push(data.id);
-
-                savePlaylists(
-                    playlists
-                );
-
-                updatePlaylistButtons();
-
-                updatePlaylistCounts();
-
-                showToast(
-                    "✓ Guardado en " +
-                    playlistNames[selectedPlaylist]
-                );
-
-            }else{
-
-                /*
-                   Si ya estaba guardado,
-                   se elimina de esa playlist.
-                */
-
-                playlists[selectedPlaylist] =
-                    playlists[selectedPlaylist]
-                        .filter(
-                            id => id !== data.id
-                        );
-
-                savePlaylists(
-                    playlists
-                );
-
-                updatePlaylistButtons();
-
-                updatePlaylistCounts();
-
-                showToast(
-                    "✓ Eliminado de " +
-                    playlistNames[selectedPlaylist]
-                );
-
-            }
-
-
-            closePlaylistModal();
-
-        }
-    );
-
-
-document
-    .getElementById(
-        "cancelPlaylist"
-    )
-    .addEventListener(
-        "click",
-        closePlaylistModal
-    );
-
-
-playlistModal.addEventListener(
-    "click",
-    event => {
-
-        if(
-            event.target ===
-            playlistModal
-        ){
-
-            closePlaylistModal();
-
-        }
-
-    }
-);
-
-
-/* =====================================================
-   BOTONES PLAYLIST DE TARJETAS
-===================================================== */
-
-cards.forEach(card => {
-
-    const button =
-        card.querySelector(
-            ".playlist-add"
-        );
-
-    if(button){
-
-        button.addEventListener(
-            "click",
-            event => {
-
-                event.stopPropagation();
-
-                openPlaylistModal(
-                    card
-                );
-
-            }
-        );
-
-    }
-
+function closeDrawer(){drawerOpen=false;$('#drawer').classList.remove('open');$('#drawerBg').classList.remove('open');$('#drawer').setAttribute('aria-hidden','true')}
+$('#drawerClose').onclick=closeDrawer;$('#drawerBg').onclick=closeDrawer;
+$('#tabs').onclick=e=>{const b=e.target.closest('[data-tab]');if(b)drawer(b.dataset.tab)};
+$('#drawerBody').addEventListener('click',e=>{
+  if(e.target.id==='gateLogin')goLogin();
+  if(e.target.id==='gateUp')openUpload();
 });
-
-
-/* =====================================================
-   MOSTRAR CONTADORES
-===================================================== */
-
-function updatePlaylistCounts(){
-
-    const playlists =
-        getPlaylists();
-
-
-    Object.keys(
-        playlists
-    ).forEach(name => {
-
-        const counter =
-            document.getElementById(
-                "count-" + name
-            );
-
-        if(counter){
-
-            counter.textContent =
-                playlists[name].length;
-
-        }
-
-    });
-
-
-    const total =
-        Object.values(
-            playlists
-        ).reduce(
-            (sum,list) =>
-                sum + list.length,
-            0
-        );
-
-
-    document.getElementById(
-        "playlistTotal"
-    ).textContent =
-        total + " GUARDADOS";
-
-}
-
-
-/* =====================================================
-   MOSTRAR PLAYLIST
-===================================================== */
-
-const playlistView =
-    document.getElementById(
-        "playlistView"
-    );
-
-const playlistGrid =
-    document.getElementById(
-        "playlistGrid"
-    );
-
-const playlistEmpty =
-    document.getElementById(
-        "playlistEmpty"
-    );
-
-
-function showPlaylist(name){
-
-    const playlists =
-        getPlaylists();
-
-
-    const ids =
-        playlists[name] || [];
-
-
-    playlistGrid.innerHTML =
-        "";
-
-
-    document.getElementById(
-        "playlistViewTitle"
-    ).textContent =
-        playlistNames[name];
-
-
-    document.getElementById(
-        "playlistViewLabel"
-    ).textContent =
-        "PLAYLIST • " +
-        ids.length +
-        " VIDEOS";
-
-
-    if(ids.length === 0){
-
-        playlistEmpty.style.display =
-            "block";
-
-    }else{
-
-        playlistEmpty.style.display =
-            "none";
-
-
-        ids.forEach(id => {
-
-            const card =
-                cards.find(
-                    item =>
-                        item.dataset.id === id
-                );
-
-
-            if(!card){
-                return;
-            }
-
-
-            const clone =
-                card.cloneNode(true);
-
-
-            /*
-               Evitamos IDs duplicados
-               en el DOM clonado.
-            */
-
-            clone.dataset.playlistClone =
-                "true";
-
-
-            playlistGrid.appendChild(
-                clone
-            );
-
-
-            const heart =
-                clone.querySelector(
-                    ".heart"
-                );
-
-
-            if(heart){
-
-                heart.addEventListener(
-                    "click",
-                    event => {
-
-                        event.stopPropagation();
-
-                        toggleFavorite(
-                            card
-                        );
-
-                    }
-                );
-
-                updateHeart(
-                    clone
-                );
-
-            }
-
-
-            const add =
-                clone.querySelector(
-                    ".playlist-add"
-                );
-
-
-            if(add){
-
-                add.addEventListener(
-                    "click",
-                    event => {
-
-                        event.stopPropagation();
-
-                        openPlaylistModal(
-                            card
-                        );
-
-                    }
-                );
-
-            }
-
-
-            clone.addEventListener(
-                "click",
-                event => {
-
-                    if(
-                        event.target.closest(
-                            ".heart"
-                        ) ||
-                        event.target.closest(
-                            ".playlist-add"
-                        )
-                    ){
-
-                        return;
-
-                    }
-
-                    playCard(card);
-
-                }
-            );
-
-        });
-
-    }
-
-
-    playlistView.classList.add(
-        "active"
-    );
-
-
-    playlistView.scrollIntoView({
-        behavior:"smooth",
-        block:"start"
-    });
-
-}
-
-
-document
-    .querySelectorAll(
-        ".playlist-card"
-    )
-    .forEach(card => {
-
-        card.addEventListener(
-            "click",
-            () => {
-
-                showPlaylist(
-                    card.dataset.playlistView
-                );
-
-            }
-        );
-
-    });
-
-
-document
-    .getElementById(
-        "closePlaylist"
-    )
-    .addEventListener(
-        "click",
-        () => {
-
-            playlistView.classList.remove(
-                "active"
-            );
-
-        }
-    );
-
-
-/* =====================================================
-   BOTONES MIS PLAYLISTS
-===================================================== */
-
-function openMyPlaylists(){
-
-    document
-        .getElementById(
-            "playlistsSection"
-        )
-        .scrollIntoView({
-            behavior:"smooth",
-            block:"start"
-        });
-
-}
-
-
-document
-    .getElementById(
-        "topPlaylistButton"
-    )
-    .addEventListener(
-        "click",
-        openMyPlaylists
-    );
-
-
-document
-    .getElementById(
-        "sidebarPlaylist"
-    )
-    .addEventListener(
-        "click",
-        openMyPlaylists
-    );
-
-
-document
-    .getElementById(
-        "heroPlaylistButton"
-    )
-    .addEventListener(
-        "click",
-        openMyPlaylists
-    );
-
-
-/* =====================================================
-   FAVORITOS
-===================================================== */
-
-function getFavorites(){
-
-    return JSON.parse(
-        localStorage.getItem(
-            "wibsiproject_favoritos"
-        )
-    ) || [];
-
-}
-
-
-function saveFavorites(data){
-
-    localStorage.setItem(
-        "wibsiproject_favoritos",
-        JSON.stringify(data)
-    );
-
-}
-
-
-function isFavorite(id){
-
-    return getFavorites()
-        .some(
-            video => video.id === id
-        );
-
-}
-
-
-function updateHeart(card){
-
-    const heart =
-        card.querySelector(
-            ".heart"
-        );
-
-    if(!heart){
-        return;
-    }
-
-
-    const active =
-        isFavorite(
-            card.dataset.id
-        );
-
-
-    heart.classList.toggle(
-        "active",
-        active
-    );
-
-
-    heart.textContent =
-        active
-        ? "♥"
-        : "♡";
-
-}
-
-
-function updateAllHearts(){
-
-    cards.forEach(
-        updateHeart
-    );
-
-}
-
-
-function toggleFavorite(card){
-
-    const data =
-        getVideoData(card);
-
-
-    let favorites =
-        getFavorites();
-
-
-    const index =
-        favorites.findIndex(
-            video =>
-                video.id === data.id
-        );
-
-
-    if(index >= 0){
-
-        favorites.splice(
-            index,
-            1
-        );
-
-        showToast(
-            "♡ Eliminado de favoritos"
-        );
-
-    }else{
-
-        favorites.push(
-            data
-        );
-
-        showToast(
-            "♥ Agregado a favoritos"
-        );
-
-    }
-
-
-    saveFavorites(
-        favorites
-    );
-
-
-    updateAllHearts();
-
-
-    if(
-        currentCard === card
-    ){
-
-        updatePlayerFavorite();
-
-    }
-
-}
-
-
-/* =====================================================
-   HEARTS
-===================================================== */
-
-cards.forEach(card => {
-
-    const heart =
-        card.querySelector(
-            ".heart"
-        );
-
-
-    if(heart){
-
-        heart.addEventListener(
-            "click",
-            event => {
-
-                event.stopPropagation();
-
-                toggleFavorite(
-                    card
-                );
-
-            }
-        );
-
-    }
-
+['#topPlaylistButton','#sidebarPlaylist','#heroPlaylistButton'].forEach(s=>$(s).onclick=()=>drawer('entrenamiento'));
+$('#sideFavs').onclick=()=>drawer('favs');$('#sideMine').onclick=()=>drawer('mine');
+$$('[data-open]').forEach(c=>c.onclick=()=>drawer(c.dataset.open));
+
+/* ================= ACCIONES DE TARJETA (delegación) ================= */
+document.addEventListener('click',e=>{
+  const card=e.target.closest('.card');if(!card)return;
+  const id=card.dataset.id,act=e.target.closest('[data-act]');
+  const a=act?act.dataset.act:'play';
+  if(a==='fav')toggleFav(id);
+  else if(a==='add')openPlaylist(id);
+  else if(a==='rem'){
+    if(dTab==='favs'){toggleFav(id)}
+    else{D.lists[dTab]=D.lists[dTab].filter(x=>x!==id);save();sync();drawer(dTab,true);toast('✓ Quitado de '+names[dTab])}
+  }else if(a==='del'){
+    need(()=>{if(!confirm('¿Eliminar este video de tu cuenta? También saldrá de tus playlists y favoritos.'))return;
+      D.uploads=D.uploads.filter(x=>x.id!==id);D.favs=D.favs.filter(x=>x!==id);
+      for(const k in names)D.lists[k]=D.lists[k].filter(x=>x!==id);
+      if(cur&&cur.id===id)closePlayer();
+      save();buildGrid();sync();if(drawerOpen)drawer(dTab,true);toast('🗑 Video eliminado')})
+  }else playId(id);
 });
+$('#filters').onclick=e=>{const b=e.target.closest('[data-cat]');if(!b)return;activeCat=b.dataset.cat;$$('#filters .filter').forEach(f=>f.classList.toggle('active',f===b));applyFilters()};
+$('#searchInput').addEventListener('input',applyFilters);
 
-
-/* =====================================================
-   YOUTUBE
-===================================================== */
-
-function getYouTubeID(url){
-
-    try{
-
-        const parsed =
-            new URL(url);
-
-
-        if(
-            parsed.hostname.includes(
-                "youtu.be"
-            )
-        ){
-
-            return parsed.pathname
-                .replace("/","");
-
-        }
-
-
-        if(
-            parsed.hostname.includes(
-                "youtube.com"
-            )
-        ){
-
-            if(
-                parsed.searchParams.has("v")
-            ){
-
-                return parsed
-                    .searchParams
-                    .get("v");
-
-            }
-
-
-            const parts =
-                parsed.pathname
-                    .split("/");
-
-
-            const index =
-                parts.findIndex(
-                    p =>
-                        p === "shorts" ||
-                        p === "embed" ||
-                        p === "live"
-                );
-
-
-            if(
-                index !== -1 &&
-                parts[index + 1]
-            ){
-
-                return parts[
-                    index + 1
-                ];
-
-            }
-
-        }
-
-    }catch(error){}
-
-
-    return null;
-
+/* ================= REPRODUCTOR ================= */
+let cur=null,vid=null,ifr=null,playing=false,muted=false,dur=0;
+function stopPlayer(){if(vid){vid.pause();vid.remove();vid=null}if(ifr){ifr.remove();ifr=null}dur=0;setProg(0)}
+function setProg(p){$('#progressFill').style.width=Math.max(0,Math.min(100,p))+'%'}
+function setPlaying(p){playing=p;$('#playPauseButton').textContent=p?'❚❚':'▶';$('#musicBar').classList.toggle('paused',!p)}
+function playId(id){const v=byId(id);if(!v)return;cur=v;stopPlayer();
+  $('#barTitle').textContent=v.title;$('#barCreator').textContent=v.creator;$('#barThumb').src=thumb(v);$('#barThumb').onerror=function(){this.onerror=null;this.src=FB};
+  $('#musicBar').classList.add('active');
+  const y=ytId(v.video);
+  if(y){
+    ifr=document.createElement('iframe');
+    ifr.src='https://www.youtube.com/embed/'+y+'?autoplay=1&enablejsapi=1&rel=0&origin='+encodeURIComponent(location.origin);
+    ifr.allow='autoplay';ifr.title='Reproductor';
+    ifr.style.cssText='position:fixed;width:1px;height:1px;left:-9999px;opacity:0;border:0';
+    ifr.onload=()=>ifr&&ifr.contentWindow.postMessage(JSON.stringify({event:'listening',id:1}),'*');
+    document.body.appendChild(ifr);setPlaying(true);
+    if(muted)yt('mute');
+  }else{
+    vid=document.createElement('video');vid.src=v.video;vid.autoplay=true;vid.muted=muted;vid.style.cssText='position:fixed;width:1px;height:1px;left:-9999px';
+    vid.ontimeupdate=()=>vid.duration&&setProg(vid.currentTime/vid.duration*100);
+    vid.onended=next;vid.onerror=()=>{toast('No se pudo reproducir este enlace');setPlaying(false)};
+    document.body.appendChild(vid);vid.play().catch(()=>{});setPlaying(true);
+  }
+  sync();
 }
-
-
-/* =====================================================
-   PLAYER
-===================================================== */
-
-function stopPlayer(){
-
-    if(currentVideo){
-
-        currentVideo.pause();
-
-        currentVideo.remove();
-
-        currentVideo =
-            null;
-
-    }
-
-
-    if(currentIframe){
-
-        currentIframe.remove();
-
-        currentIframe =
-            null;
-
-    }
-
-}
-
-
-function createPlayer(card){
-
-    stopPlayer();
-
-
-    const url =
-        card.dataset.video;
-
-
-    const youtube =
-        getYouTubeID(url);
-
-
-    if(youtube){
-
-        const iframe =
-            document.createElement(
-                "iframe"
-            );
-
-
-        iframe.src =
-            "https://www.youtube.com/embed/" +
-            youtube +
-            "?autoplay=1&enablejsapi=1&rel=0";
-
-
-        iframe.style.position =
-            "fixed";
-
-        iframe.style.width =
-            "1px";
-
-        iframe.style.height =
-            "1px";
-
-        iframe.style.left =
-            "-9999px";
-
-        iframe.style.opacity =
-            "0";
-
-        iframe.allow =
-            "autoplay";
-
-
-        document.body.appendChild(
-            iframe
-        );
-
-
-        currentIframe =
-            iframe;
-
-
-        isPlaying =
-            true;
-
-    }else{
-
-        const video =
-            document.createElement(
-                "video"
-            );
-
-
-        video.src =
-            url;
-
-        video.autoplay =
-            true;
-
-        video.playsInline =
-            true;
-
-        video.style.position =
-            "fixed";
-
-        video.style.width =
-            "1px";
-
-        video.style.height =
-            "1px";
-
-        video.style.left =
-            "-9999px";
-
-
-        document.body.appendChild(
-            video
-        );
-
-
-        currentVideo =
-            video;
-
-
-        video.addEventListener(
-            "timeupdate",
-            updateProgress
-        );
-
-
-        video.addEventListener(
-            "ended",
-            playNext
-        );
-
-
-        video.play()
-            .catch(
-                () => {}
-            );
-
-
-        isPlaying =
-            true;
-
-    }
-
-
-    updatePlayButton();
-
-}
-
-
-/* =====================================================
-   REPRODUCIR TARJETA
-===================================================== */
-
-function playCard(card){
-
-    currentCard =
-        card;
-
-
-    currentIndex =
-        cards.indexOf(card);
-
-
-    document.getElementById(
-        "barTitle"
-    ).textContent =
-        card.dataset.title;
-
-
-    document.getElementById(
-        "barCreator"
-    ).textContent =
-        card.dataset.creator;
-
-
-    document.getElementById(
-        "barThumb"
-    ).src =
-        card.dataset.image;
-
-
-    document.getElementById(
-        "musicBar"
-    ).classList.add(
-        "active"
-    );
-
-
-    createPlayer(
-        card
-    );
-
-
-    updatePlayerFavorite();
-
-}
-
-
-/* =====================================================
-   CLICK TARJETAS
-===================================================== */
-
-cards.forEach(card => {
-
-    card.addEventListener(
-        "click",
-        event => {
-
-            if(
-                event.target.closest(
-                    ".heart"
-                ) ||
-                event.target.closest(
-                    ".playlist-add"
-                )
-            ){
-
-                return;
-
-            }
-
-
-            playCard(
-                card
-            );
-
-        }
-    );
-
+const yt=f=>ifr&&ifr.contentWindow.postMessage(JSON.stringify({event:'command',func:f,args:[]}),'*');
+addEventListener('message',e=>{
+  if(!ifr||e.source!==ifr.contentWindow)return;
+  try{const d=JSON.parse(e.data);
+    if(d.event==='infoDelivery'&&d.info){if(d.info.duration)dur=d.info.duration;if(dur&&d.info.currentTime!=null)setProg(d.info.currentTime/dur*100);if(d.info.playerState!=null)setPlaying(d.info.playerState===1||d.info.playerState===3)}
+    if(d.event==='onStateChange'&&d.info===0)next();
+  }catch(err){}
 });
-
-
-/* =====================================================
-   FAVORITO DEL PLAYER
-===================================================== */
-
-function updatePlayerFavorite(){
-
-    if(!currentCard){
-        return;
-    }
-
-
-    const active =
-        isFavorite(
-            currentCard.dataset.id
-        );
-
-
-    const button =
-        document.getElementById(
-            "favoriteButton"
-        );
-
-
-    button.classList.toggle(
-        "active",
-        active
-    );
-
-
-    button.innerHTML =
-        active
-        ? "♥ <span>Favorito</span>"
-        : "♡ <span>Favoritos</span>";
-
-}
-
-
-document
-    .getElementById(
-        "favoriteButton"
-    )
-    .addEventListener(
-        "click",
-        () => {
-
-            if(currentCard){
-
-                toggleFavorite(
-                    currentCard
-                );
-
-            }
-
-        }
-    );
-
-
-/* =====================================================
-   PLAY / PAUSE
-===================================================== */
-
 function togglePlay(){
-
-    if(!currentCard){
-        return;
-    }
-
-
-    if(currentVideo){
-
-        if(
-            currentVideo.paused
-        ){
-
-            currentVideo.play();
-
-            isPlaying =
-                true;
-
-        }else{
-
-            currentVideo.pause();
-
-            isPlaying =
-                false;
-
-        }
-
-    }else if(currentIframe){
-
-        currentIframe
-            .contentWindow
-            .postMessage(
-
-                JSON.stringify({
-
-                    event:"command",
-
-                    func:
-                        isPlaying
-                        ? "pauseVideo"
-                        : "playVideo"
-
-                }),
-
-                "*"
-
-            );
-
-
-        isPlaying =
-            !isPlaying;
-
-    }
-
-
-    updatePlayButton();
-
+  if(!cur)return;
+  if(vid){vid.paused?vid.play():vid.pause();setPlaying(!vid.paused)}
+  else if(ifr){yt(playing?'pauseVideo':'playVideo');setPlaying(!playing)}
 }
-
-
-document
-    .getElementById(
-        "playPauseButton"
-    )
-    .addEventListener(
-        "click",
-        togglePlay
-    );
-
-
-function updatePlayButton(){
-
-    document.getElementById(
-        "playPauseButton"
-    ).textContent =
-        isPlaying
-        ? "❚❚"
-        : "▶";
-
-}
-
-
-/* =====================================================
-   SIGUIENTE
-===================================================== */
-
-function playNext(){
-
-    if(!cards.length){
-        return;
-    }
-
-
-    let index =
-        currentIndex + 1;
-
-
-    if(
-        index >= cards.length
-    ){
-
-        index = 0;
-
-    }
-
-
-    playCard(
-        cards[index]
-    );
-
-}
-
-
-document
-    .getElementById(
-        "nextButton"
-    )
-    .addEventListener(
-        "click",
-        playNext
-    );
-
-
-/* =====================================================
-   ANTERIOR
-===================================================== */
-
-document
-    .getElementById(
-        "previousButton"
-    )
-    .addEventListener(
-        "click",
-        () => {
-
-            if(!cards.length){
-                return;
-            }
-
-
-            let index =
-                currentIndex - 1;
-
-
-            if(index < 0){
-
-                index =
-                    cards.length - 1;
-
-            }
-
-
-            playCard(
-                cards[index]
-            );
-
-        }
-    );
-
-
-/* =====================================================
-   PROGRESO
-===================================================== */
-
-function updateProgress(){
-
-    if(
-        !currentVideo ||
-        !currentVideo.duration
-    ){
-
-        return;
-
-    }
-
-
-    const percent =
-        currentVideo.currentTime /
-        currentVideo.duration *
-        100;
-
-
-    document.getElementById(
-        "progressFill"
-    ).style.width =
-        percent + "%";
-
-}
-
-
-document
-    .getElementById(
-        "progress"
-    )
-    .addEventListener(
-        "click",
-        event => {
-
-            if(
-                !currentVideo ||
-                !currentVideo.duration
-            ){
-
-                return;
-
-            }
-
-
-            const rect =
-                event.currentTarget
-                    .getBoundingClientRect();
-
-
-            const percent =
-                (
-                    event.clientX -
-                    rect.left
-                ) /
-                rect.width;
-
-
-            currentVideo.currentTime =
-                percent *
-                currentVideo.duration;
-
-        }
-    );
-
-
-/* =====================================================
-   DESCARGA
-===================================================== */
-
-document
-    .getElementById(
-        "downloadButton"
-    )
-    .addEventListener(
-        "click",
-        () => {
-
-            if(!currentCard){
-                return;
-            }
-
-
-            const url =
-                currentCard.dataset.video;
-
-
-            if(
-                getYouTubeID(url)
-            ){
-
-                alert(
-                    "Este video pertenece a YouTube. " +
-                    "La descarga directa no está disponible " +
-                    "desde WIBSIPROJECT."
-                );
-
-                return;
-
-            }
-
-
-            const link =
-                document.createElement(
-                    "a"
-                );
-
-
-            link.href =
-                url;
-
-
-            link.download =
-                currentCard
-                    .dataset
-                    .title
-                    .replace(
-                        /[^\w\s-]/g,
-                        ""
-                    )
-                    .trim() +
-                ".mp4";
-
-
-            document.body.appendChild(
-                link
-            );
-
-
-            link.click();
-
-
-            link.remove();
-
-        }
-    );
-
-
-/* =====================================================
-   MUTE
-===================================================== */
-
-document
-    .getElementById(
-        "muteButton"
-    )
-    .addEventListener(
-        "click",
-        () => {
-
-            isMuted =
-                !isMuted;
-
-
-            if(currentVideo){
-
-                currentVideo.muted =
-                    isMuted;
-
-            }
-
-
-            if(currentIframe){
-
-                currentIframe
-                    .contentWindow
-                    .postMessage(
-
-                        JSON.stringify({
-
-                            event:"command",
-
-                            func:
-                                isMuted
-                                ? "mute"
-                                : "unMute"
-
-                        }),
-
-                        "*"
-
-                    );
-
-            }
-
-
-            document.getElementById(
-                "muteButton"
-            ).textContent =
-                isMuted
-                ? "🔇"
-                : "🔊";
-
-        }
-    );
-
-
-/* =====================================================
-   CERRAR PLAYER
-===================================================== */
-
-document
-    .getElementById(
-        "closeBar"
-    )
-    .addEventListener(
-        "click",
-        () => {
-
-            stopPlayer();
-
-
-            currentCard =
-                null;
-
-
-            currentIndex =
-                -1;
-
-
-            isPlaying =
-                false;
-
-
-            document.getElementById(
-                "musicBar"
-            ).classList.remove(
-                "active"
-            );
-
-        }
-    );
-
-
-/* =====================================================
-   ALEATORIO
-===================================================== */
-
-function randomVideo(){
-
-    if(!cards.length){
-        return;
-    }
-
-
-    const index =
-        Math.floor(
-            Math.random() *
-            cards.length
-        );
-
-
-    playCard(
-        cards[index]
-    );
-
-}
-
-
-document
-    .getElementById(
-        "randomButton"
-    )
-    .addEventListener(
-        "click",
-        randomVideo
-    );
-
-
-document
-    .getElementById(
-        "randomSide"
-    )
-    .addEventListener(
-        "click",
-        randomVideo
-    );
-
-
-/* =====================================================
-   FILTROS
-===================================================== */
-
-const filters =
-    document.querySelectorAll(
-        ".filter"
-    );
-
-
-filters.forEach(
-    filter => {
-
-        filter.addEventListener(
-            "click",
-            () => {
-
-                filters.forEach(
-                    f =>
-                        f.classList.remove(
-                            "active"
-                        )
-                );
-
-
-                filter.classList.add(
-                    "active"
-                );
-
-
-                const category =
-                    filter.dataset.category;
-
-
-                let count = 0;
-
-
-                cards.forEach(
-                    card => {
-
-                        const show =
-                            category === "Todos" ||
-                            card.dataset.category ===
-                            category;
-
-
-                        card.style.display =
-                            show
-                            ? ""
-                            : "none";
-
-
-                        if(show){
-
-                            count++;
-
-                        }
-
-                    }
-                );
-
-
-                document.getElementById(
-                    "countText"
-                ).textContent =
-                    count +
-                    " VIDEOS";
-
-
-                document.getElementById(
-                    "empty"
-                ).style.display =
-                    count
-                    ? "none"
-                    : "block";
-
-            }
-        );
-
-    }
-);
-
-
-/* =====================================================
-   BUSCAR
-===================================================== */
-
-document
-    .getElementById(
-        "searchInput"
-    )
-    .addEventListener(
-        "input",
-        event => {
-
-            const text =
-                event.target.value
-                    .toLowerCase()
-                    .trim();
-
-
-            let count = 0;
-
-
-            cards.forEach(
-                card => {
-
-                    const content = (
-
-                        card.dataset.title +
-                        " " +
-                        card.dataset.creator +
-                        " " +
-                        card.dataset.category
-
-                    ).toLowerCase();
-
-
-                    const show =
-                        content.includes(
-                            text
-                        );
-
-
-                    card.style.display =
-                        show
-                        ? ""
-                        : "none";
-
-
-                    if(show){
-
-                        count++;
-
-                    }
-
-                }
-            );
-
-
-            document.getElementById(
-                "countText"
-            ).textContent =
-                count +
-                " VIDEOS";
-
-
-            document.getElementById(
-                "empty"
-            ).style.display =
-                count
-                ? "none"
-                : "block";
-
-        }
-    );
-
-
-/* =====================================================
-   CONTRASEÑA
-===================================================== */
-
-function checkPassword(){
-
-    const password =
-        prompt(
-            "Ingresa la contraseña para ver los videos guardados:"
-        );
-
-
-    if(
-        password ===
-        "2436anthony123privado123"
-    ){
-
-        window.location.href =
-            "privado.html";
-
-    }else if(
-        password !== null
-    ){
-
-        alert(
-            "Contraseña incorrecta."
-        );
-
-    }
-
-}
-
-
-/* =====================================================
-   INICIALIZAR
-===================================================== */
-
-updateAllHearts();
-
-updatePlaylistBadges();
-
-updatePlaylistButtons();
-
-updatePlaylistCounts();
-
+function step(d){const l=all().filter(v=>$('#videoGrid .card[data-id="'+v.id+'"]')&&$('#videoGrid .card[data-id="'+v.id+'"]').style.display!=='none');const L=l.length?l:all();
+  let i=L.findIndex(v=>cur&&v.id===cur.id);i=(i+d+L.length)%L.length;playId(L[i].id)}
+const next=()=>step(1);
+function closePlayer(){stopPlayer();cur=null;setPlaying(false);$('#musicBar').classList.remove('active');sync()}
+function favBtn(){const b=$('#favoriteButton'),a=!!cur&&D.favs.includes(cur.id);b.classList.toggle('active',a);b.innerHTML=a?'♥ <span>Favorito</span>':'♡ <span>Favoritos</span>'}
+$('#playPauseButton').onclick=togglePlay;
+$('#nextButton').onclick=next;$('#previousButton').onclick=()=>step(-1);
+$('#closeBar').onclick=closePlayer;
+$('#favoriteButton').onclick=()=>cur&&toggleFav(cur.id);
+$('#progress').onclick=e=>{const r=e.currentTarget.getBoundingClientRect(),p=(e.clientX-r.left)/r.width;
+  if(vid&&vid.duration)vid.currentTime=p*vid.duration;
+  else if(ifr&&dur){ifr.contentWindow.postMessage(JSON.stringify({event:'command',func:'seekTo',args:[p*dur,true]}),'*');setProg(p*100)}};
+$('#muteButton').onclick=()=>{muted=!muted;if(vid)vid.muted=muted;yt(muted?'mute':'unMute');$('#muteButton').textContent=muted?'🔇':'🔊'};
+$('#downloadButton').onclick=()=>{
+  if(!cur)return;
+  if(ytId(cur.video))return toast('Los videos de YouTube no se pueden descargar desde WIBSIPROJECT.');
+  const a=document.createElement('a');a.href=cur.video;a.download=cur.title.replace(/[^\w\s-]/g,'').trim()+'.mp4';document.body.appendChild(a);a.click();a.remove();
+};
+const rnd=()=>{const l=all();playId(l[Math.floor(Math.random()*l.length)].id)};
+['#randomButton','#randomSide','#heroPlay'].forEach(s=>$(s).onclick=rnd);
+
+/* ================= TECLADO ================= */
+addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeM();closeDrawer();menu.classList.remove('open')}
+  if(e.code==='Space'&&!/INPUT|SELECT|TEXTAREA|BUTTON/.test(document.activeElement.tagName)&&cur){e.preventDefault();togglePlay()}
+});
+
+/* ================= INICIO ================= */
+load();buildGrid();sync();
+onAuthStateChanged(auth,async u=>{
+  user=u?u.uid:null;uname=u?(u.displayName||(u.email||'Usuario').split('@')[0]):'';
+  load();buildGrid();sync();
+  if(u){await pull();buildGrid();sync()}
+  if(drawerOpen)drawer(dTab,true);
+});
 </script>
-
 </body>
 </html>
